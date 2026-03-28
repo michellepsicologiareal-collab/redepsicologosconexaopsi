@@ -402,7 +402,12 @@ const H = {'apikey':KEY,'Authorization':'Bearer '+KEY};
 
 async function carregarPsis() {
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=nome.asc&limit=200`, {headers:H});
+    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=nome.asc&limit=200`, {
+      method: 'GET',
+      headers: H,
+      mode: 'cors'
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     todos = Array.isArray(data) ? data : [];
     const n = todos.length;
