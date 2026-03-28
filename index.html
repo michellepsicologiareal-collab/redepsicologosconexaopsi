@@ -261,7 +261,7 @@ footer a:hover{color:var(--violet);}
     </div>
   </div>
   <div class="hero-stats">
-    <div class="stat"><strong>🇧🇷</strong><span>todo o Brasil</span></div>
+    <div class="stat"><strong id="stat-count">—</strong><span>profissionais</span></div>
     <div class="stat"><strong>🇧🇷</strong><span>todo o Brasil</span></div>
     <div class="stat"><strong>💜</strong><span>ética &amp; colaboração</span></div>
   </div>
@@ -389,7 +389,7 @@ async function carregarPsis() {
     const data = await r.json();
     todos = Array.isArray(data) ? data : [];
     const n = todos.length;
-    // count hidden for UX
+    document.getElementById('stat-count').textContent = n;
     document.getElementById('visible-count').textContent = n;
     renderPremium();
     renderGrid();
