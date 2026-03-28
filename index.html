@@ -372,7 +372,7 @@ footer a:hover{color:var(--violet);}
         ✔ Botão de agendamento WA<br>
         ✔ Perfil ativado em 24h
       </div>
-      <a href="planos.html" class="btn-enter btn-gold">💛 Ver planos — a partir de R$0</a>
+      <a href="planos.html" class="btn-enter btn-gold">💛 Aumentar minha visibilidade</a>
       <div style="text-align:center;margin-top:0.8rem;">
         <a href="https://tally.so/r/b5OGYZ" target="_blank" style="font-size:0.78rem;color:var(--muted);text-decoration:underline;text-underline-offset:3px;">Prefiro só visibilidade gratuita →</a>
       </div>
@@ -402,7 +402,7 @@ const H = {'apikey':KEY,'Authorization':'Bearer '+KEY};
 
 async function carregarPsis() {
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=premium.desc,nome.asc`, {headers:H});
+    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=nome.asc&limit=200`, {headers:H});
     const data = await r.json();
     todos = Array.isArray(data) ? data : [];
     const n = todos.length;
@@ -417,7 +417,7 @@ async function carregarPsis() {
 }
 
 function renderPremium() {
-  const premium = todos.filter(p => p.premium);
+  const premium = todos.filter(p => p.premium === true);
   const g = document.getElementById('premium-grid');
   if (!premium.length) {
     g.innerHTML = '<div class="premium-empty">Em breve psicólogos em destaque aqui ✨</div>';
