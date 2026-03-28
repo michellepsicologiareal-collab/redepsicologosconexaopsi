@@ -434,6 +434,7 @@ function renderPremium() {
         <div class="phandle">${h?'@'+h:''}</div>
       </div></div>
       <div class="ptags">${abTag}${fmtTag}${esps}</div>
+      ${p.bio?`<div style="font-size:0.8rem;color:#666;line-height:1.6;margin-bottom:0.5rem;font-style:italic;">"${p.bio}"</div>`:''}
       <div class="pmeta">
         ${p.cidade?'📍 '+p.cidade:''}
         ${p.disponibilidade?'<br>🕐 '+p.disponibilidade:''}

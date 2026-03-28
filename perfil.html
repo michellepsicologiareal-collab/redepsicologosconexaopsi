@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conexão Psi — Meu Perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0F0D1A;--cream:#FAF7F2;--warm:#F2EDE4;--card:#FFFFFF;--plum:#2D1B4E;--violet:#5B3FA0;--gold:#C8934A;--gold-light:#E8C98A;--sage:#3D7A5E;--muted:#7A7490;--border:#E8E2D8;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+#login{min-height:100vh;background:var(--plum);display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+#login::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 20%,rgba(91,63,160,0.5) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(200,147,74,0.2) 0%,transparent 50%);}
+.lbox{position:relative;z-index:2;width:100%;max-width:420px;text-align:center;}
+.lbrand{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:#fff;margin-bottom:0.2rem;}
+.lbrand em{color:var(--gold-light);font-style:italic;}
+.ltag{font-size:0.68rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2rem;}
+.lcard{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;}
+.lcard h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:0.3rem;}
+.lcard p{font-size:0.8rem;color:rgba(255,255,255,0.45);margin-bottom:1.5rem;line-height:1.6;}
+.linput{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:0.9rem;margin-bottom:0.8rem;outline:none;}
+.linput:focus{border-color:var(--gold);}
+.linput::placeholder{color:rgba(255,255,255,0.35);}
+.lblogin{width:100%;padding:0.85rem;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;}
+.lerr{color:#ff8a80;font-size:0.8rem;margin-top:0.6rem;min-height:1.2rem;}
+.lnao{color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:1rem;line-height:1.6;}
+.lnao a{color:var(--gold-light);text-decoration:none;}
+
+#app{display:none;}
+.header{background:var(--plum);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(15,13,26,0.3);}
+.hbrand{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fff;}
+.hbrand em{color:var(--gold-light);font-style:italic;}
+.hright{display:flex;align-items:center;gap:0.8rem;}
+.chip{font-size:0.72rem;color:var(--gold-light);background:rgba(200,147,74,0.15);border:1px solid rgba(200,147,74,0.25);border-radius:999px;padding:4px 12px;}
+.bsair{padding:0.4rem 1rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+.content{max-width:700px;margin:0 auto;padding:2.5rem 1.5rem;}
+
+.profile-preview{background:var(--plum);border-radius:20px;padding:1.8rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;}
+.pp-av{width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid rgba(200,147,74,0.4);flex-shrink:0;}
+.pp-av-i{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:#fff;border:2px solid rgba(200,147,74,0.3);flex-shrink:0;}
+.pp-info{}
+.pp-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;font-weight:600;}
+.pp-crp{font-size:0.75rem;color:var(--gold-light);margin-top:2px;}
+.pp-status{display:inline-block;font-size:0.68rem;padding:3px 10px;border-radius:999px;margin-top:6px;font-weight:600;}
+.st-pendente{background:rgba(200,147,74,0.2);color:var(--gold-light);}
+.st-aprovado{background:rgba(61,122,94,0.2);color:#6db89a;}
+.st-premium{background:rgba(200,147,74,0.3);color:var(--gold-light);}
+
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.6rem;margin-bottom:1.2rem;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--plum);margin-bottom:1.2rem;display:flex;align-items:center;gap:8px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-full{grid-column:span 2;}
+label{font-size:0.75rem;color:var(--muted);font-weight:500;display:block;margin-bottom:4px;letter-spacing:0.3px;}
+input[type=text],input[type=tel],textarea,select{width:100%;padding:0.65rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:0.85rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--violet);}
+textarea{resize:vertical;min-height:80px;}
+.hint{font-size:0.72rem;color:var(--muted);margin-top:4px;}
+
+.esp-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
+.esp-tag{display:inline-flex;align-items:center;gap:5px;background:#EDE6F8;color:#5B3FA0;font-size:0.75rem;font-weight:500;padding:4px 10px;border-radius:999px;}
+.esp-tag button{background:none;border:none;cursor:pointer;color:#5B3FA0;font-size:12px;line-height:1;}
+.esp-add{display:flex;gap:8px;margin-top:0.6rem;}
+.esp-input{flex:1;padding:0.5rem 0.8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.82rem;outline:none;}
+.esp-input:focus{border-color:var(--violet);}
+.esp-btn{padding:0.5rem 1rem;background:var(--violet);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.8rem;cursor:pointer;white-space:nowrap;}
+
+.premium-cta{background:linear-gradient(135deg,var(--plum),#1a0d3a);border-radius:18px;padding:1.6rem;margin-bottom:1.2rem;text-align:center;}
+.premium-cta h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:0.5rem;}
+.premium-cta p{font-size:0.83rem;color:rgba(255,255,255,0.55);margin-bottom:1.2rem;line-height:1.7;}
+.btn-premium{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.8rem;background:var(--gold);color:var(--ink);border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:600;text-decoration:none;}
+
+.btn-save{width:100%;padding:0.85rem;background:var(--plum);color:#fff;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:0.5rem;}
+.btn-save:hover{background:var(--violet);}
+.btn-save:disabled{opacity:0.6;cursor:not-allowed;}
+
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--plum);color:#fff;padding:0.8rem 1.4rem;border-radius:12px;font-size:0.85rem;z-index:999;box-shadow:0 8px 24px rgba(15,13,26,0.3);}
+
+@media(max-width:500px){.form-grid{grid-template-columns:1fr;}.form-full{grid-column:span 1;}.content{padding:1.5rem 1rem;}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <div class="lbrand">Conexão <em>Psi</em></div>
+    <div class="ltag">Área da Psicóloga</div>
+    <div class="lcard">
+      <h2>Acesse seu perfil</h2>
+      <p>Entre com o email cadastrado no formulário de cadastro</p>
+      <input type="email" class="linput" id="email-input" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')entrar()">
+      <button class="lblogin" onclick="entrar()">Entrar →</button>
+      <div class="lerr" id="lerr"></div>
+      <p class="lnao">Ainda não é da rede? <a href="https://tally.so/r/b5OGYZ" target="_blank">Cadastre-se aqui</a></p>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <header class="header">
+    <div>
+      <div class="hbrand">Conexão <em>Psi</em></div>
+    </div>
+    <div class="hright">
+      <span class="chip" id="chip">—</span>
+      <button class="bsair" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- PREVIEW -->
+    <div class="profile-preview" id="preview">
+      <div class="pp-av-i" id="pp-av" style="background:#4A3570">??</div>
+      <div class="pp-info">
+        <div class="pp-name" id="pp-name">—</div>
+        <div class="pp-crp" id="pp-crp">—</div>
+        <span class="pp-status" id="pp-status">—</span>
+      </div>
+    </div>
+
+    <!-- PREMIUM CTA (shown if not premium) -->
+    <div class="premium-cta" id="premium-cta" style="display:none;">
+      <h3>✨ Apareça em destaque!</h3>
+      <p>Com o Perfil Premium você aparece na seção especial do diretório, mostra suas especialidades e recebe agendamentos direto pelo WhatsApp.</p>
+      <a href="https://wa.me/5511947388423?text=Olá!%20Quero%20ter%20meu%20perfil%20Premium%20na%20Conexão%20Psi%20💜" target="_blank" class="btn-premium">💛 Quero ser Premium — R$20/mês</a>
+    </div>
+
+    <!-- DADOS BÁSICOS (read-only) -->
+    <div class="section-card">
+      <div class="section-title">📋 Seus dados cadastrados</div>
+      <div class="form-grid">
+        <div><label>Nome</label><input type="text" id="v-nome" readonly style="background:#f0ede8;"></div>
+        <div><label>CRP</label><input type="text" id="v-crp" readonly style="background:#f0ede8;"></div>
+        <div><label>Email</label><input type="text" id="v-email" readonly style="background:#f0ede8;"></div>
+        <div><label>Instagram</label><input type="text" id="v-handle" readonly style="background:#f0ede8;"></div>
+        <div><label>Abordagem</label><input type="text" id="v-abordagem" readonly style="background:#f0ede8;"></div>
+        <div><label>Formato</label><input type="text" id="v-formato" readonly style="background:#f0ede8;"></div>
+      </div>
+      <p class="hint" style="margin-top:0.8rem;">Para alterar dados cadastrais, entre em contato: <a href="https://wa.me/5511947388423" style="color:var(--violet);">WhatsApp</a></p>
+    </div>
+
+    <!-- DADOS EDITÁVEIS -->
+    <div class="section-card">
+      <div class="section-title">✏️ Personalize seu perfil</div>
+      <div class="form-grid">
+        <div class="form-full">
+          <label>WhatsApp para agendamento (só números, com DDD)</label>
+          <input type="tel" id="e-whatsapp" placeholder="Ex: 11947388423">
+        </div>
+        <div class="form-full">
+          <label>Valor da sessão</label>
+          <input type="text" id="e-valor" placeholder="Ex: R$ 150 · Aceito planos · Valor social disponível">
+        </div>
+        <div class="form-full">
+          <label>Disponibilidade de agenda</label>
+          <input type="text" id="e-disponibilidade" placeholder="Ex: Seg a Sex, manhã e tarde · Aceito novos pacientes">
+        </div>
+        <div class="form-full">
+          <label>Público atendido</label>
+          <input type="text" id="e-publico" placeholder="Ex: Adultos, Adolescentes, Casais">
+        </div>
+        <div class="form-full">
+          <label>Mini bio (aparece só no perfil Premium — máx 2 linhas)</label>
+          <textarea id="e-bio" placeholder="Ex: Especialista em ansiedade e relacionamentos. Atendo adultos e casais com foco em resultados práticos."></textarea>
+          <p class="hint">Visível apenas no perfil Premium ✨</p>
+        </div>
+        <div class="form-full">
+          <label>Especialidades (adicione até 5)</label>
+          <div class="esp-wrap" id="esp-wrap"></div>
+          <div class="esp-add">
+            <input type="text" class="esp-input" id="esp-input" placeholder="Ex: Ansiedade, Luto, TDAH..." onkeydown="if(event.key==='Enter'){addEsp();event.preventDefault();}">
+            <button class="esp-btn" onclick="addEsp()">+ Adicionar</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-save" id="btn-save" onclick="salvar()">💾 Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
+const COLORS = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC'];
+let perfil = null;
+let especialidades = [];
+
+async function entrar() {
+  const email = document.getElementById('email-input').value.trim().toLowerCase();
+  if (!email) { document.getElementById('lerr').textContent = 'Digite seu email.'; return; }
+  document.getElementById('lerr').textContent = '';
+
+  try {
+    const r = await fetch(`${SB}/rest/v1/psis?email=eq.${encodeURIComponent(email)}&select=*`, {headers: H});
+    const data = await r.json();
+    if (!data || data.length === 0) {
+      document.getElementById('lerr').textContent = 'Email não encontrado. Verifique ou cadastre-se.';
+      return;
+    }
+    perfil = data[0];
+    iniciar();
+  } catch(e) {
+    document.getElementById('lerr').textContent = 'Erro ao conectar. Tente novamente.';
+  }
+}
+
+function sair() {
+  perfil = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('email-input').value = '';
+}
+
+function iniciar() {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const nome = perfil.nome || '';
+  const ini = nome.trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+  // Avatar
+  const ppAv = document.getElementById('pp-av');
+  if (perfil.foto_url) {
+    ppAv.outerHTML = `<img src="${perfil.foto_url}" class="pp-av" id="pp-av" alt="">`;
+  } else {
+    ppAv.style.background = c;
+    ppAv.textContent = ini;
+  }
+
+  document.getElementById('chip').textContent = '🧠 ' + (nome.split(' ')[0] || 'Psicóloga');
+  document.getElementById('pp-name').textContent = nome;
+  document.getElementById('pp-crp').textContent = perfil.crp || '';
+
+  const statusEl = document.getElementById('pp-status');
+  if (perfil.premium) {
+    statusEl.textContent = '✨ Premium';
+    statusEl.className = 'pp-status st-premium';
+  } else if (perfil.status === 'aprovado') {
+    statusEl.textContent = '✅ Aprovada';
+    statusEl.className = 'pp-status st-aprovado';
+    document.getElementById('premium-cta').style.display = 'block';
+  } else {
+    statusEl.textContent = '⏳ Cadastro pendente';
+    statusEl.className = 'pp-status st-pendente';
+    document.getElementById('premium-cta').style.display = 'block';
+  }
+
+  // Read-only fields
+  document.getElementById('v-nome').value = perfil.nome || '';
+  document.getElementById('v-crp').value = perfil.crp || '';
+  document.getElementById('v-email').value = perfil.email || '';
+  document.getElementById('v-handle').value = perfil.handle ? '@' + perfil.handle : '';
+  document.getElementById('v-abordagem').value = perfil.abordagem || '';
+  document.getElementById('v-formato').value = perfil.formato || '';
+
+  // Editable fields
+  document.getElementById('e-whatsapp').value = perfil.whatsapp || '';
+  document.getElementById('e-bio').value = perfil.bio || '';
+  document.getElementById('e-valor').value = perfil.valor_sessao || '';
+  document.getElementById('e-disponibilidade').value = perfil.disponibilidade || '';
+  document.getElementById('e-publico').value = perfil.publico || '';
+
+  // Especialidades
+  especialidades = perfil.especialidades ? perfil.especialidades.split(',').map(e=>e.trim()).filter(Boolean) : [];
+  renderEsps();
+}
+
+function renderEsps() {
+  const wrap = document.getElementById('esp-wrap');
+  wrap.innerHTML = especialidades.map((e,i) => `
+    <span class="esp-tag">${e}<button onclick="removeEsp(${i})">×</button></span>
+  `).join('');
+}
+
+function addEsp() {
+  const input = document.getElementById('esp-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (especialidades.length >= 5) { toast('Máximo de 5 especialidades.'); return; }
+  if (especialidades.includes(val)) { input.value=''; return; }
+  especialidades.push(val);
+  input.value = '';
+  renderEsps();
+}
+
+function removeEsp(i) {
+  especialidades.splice(i, 1);
+  renderEsps();
+}
+
+async function salvar() {
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    const updates = {
+      whatsapp: document.getElementById('e-whatsapp').value.trim().replace(/\D/g,''),
+      valor_sessao: document.getElementById('e-valor').value.trim(),
+      disponibilidade: document.getElementById('e-disponibilidade').value.trim(),
+      publico: document.getElementById('e-publico').value.trim(),
+      especialidades: especialidades.join(', '),
+      bio: document.getElementById('e-bio').value.trim()
+    };
+    const r = await fetch(`${SB}/rest/v1/psis?id=eq.${perfil.id}`, {
+      method: 'PATCH',
+      headers: H,
+      body: JSON.stringify(updates)
+    });
+    if (!r.ok) throw new Error(await r.text());
+    Object.assign(perfil, updates);
+    toast('✅ Perfil atualizado com sucesso!');
+  } catch(e) {
+    alert('Erro ao salvar: ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = '💾 Salvar alterações';
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
+</body>
+</html>
