@@ -402,7 +402,7 @@ const H = {'apikey':KEY,'Authorization':'Bearer '+KEY};
 
 async function carregarPsis() {
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=nome.asc&limit=200`, {
+    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=ilike.aprovado&order=nome.asc&limit=500`, {
       method: 'GET',
       headers: H,
       mode: 'cors'
@@ -435,8 +435,8 @@ function renderPremium() {
       ? `<img src="${p.foto_url}" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(200,147,74,0.4);">`
       : `<div class="pav-init" style="background:${c}">${ini}</div>`;
     const h = (p.handle||'').replace('@','');
-    const esps = espsArr.map(e=>`<span class="tag-esp">${e}</span>`).join('');
     const espsArr = p.especialidades ? p.especialidades.split(',').map(e=>e.trim()) : [];
+    const esps = espsArr.map(e=>`<span class="tag-esp">${e}</span>`).join('');
     const abTag = (p.abordagem && !espsArr.includes(p.abordagem)) ? `<span class="tag-p">${p.abordagem}</span>` : '';
     const fmtLabel = p.formato === 'Ambos' ? 'Online + Presencial' : p.formato === 'Online' ? 'Online' : p.formato === 'Presencial' ? 'Presencial' : (p.formato||'');
     const fmtTag = fmtLabel ? `<span class="tag-p">🌐 ${fmtLabel}</span>` : '';
