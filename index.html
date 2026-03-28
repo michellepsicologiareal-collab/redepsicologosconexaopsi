@@ -145,10 +145,11 @@ nav{position:relative;z-index:2;display:flex;align-items:flex-end;justify-conten
 }
 .bwa-p:hover{opacity:0.9;}
 .binsta-p{
-  padding:0.65rem 0.8rem;background:#F7F2E7;color:#888;
+  padding:0.65rem 0.75rem;background:transparent;color:#ccc;
   border-radius:10px;font-size:0.78rem;
-  text-decoration:none;border:1px solid #EAD9B0;
+  text-decoration:none;border:1px solid #eee;
   display:inline-flex;align-items:center;justify-content:center;
+  flex:0 0 auto;
 }
 .premium-empty{text-align:center;padding:3rem;color:#bbb;font-size:0.9rem;}
 
@@ -273,12 +274,12 @@ footer a:hover{color:var(--violet);}
     <div class="premium-header">
       <div class="premium-eyebrow">Psicólogos com agendamento imediato</div>
       <h2 class="premium-title">Encontre um psicólogo e <em>comece ainda hoje</em></h2>
-      <p class="premium-sub">Perfis com valor claro e agendamento direto pelo WhatsApp</p>
+      <p class="premium-sub">Perfis verificados com valor claro e agendamento direto pelo WhatsApp</p>
       <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;align-items:center;">
         <a href="#premium-grid" class="btn-seja-premium" style="background:#C8A96A;">Ver psicólogos disponíveis →</a>
-        <a href="https://wa.me/5511947388423?text=Olá!%20Quero%20ter%20meu%20perfil%20Premium%20na%20Conexão%20Psi%20💜" target="_blank" style="font-size:0.8rem;color:#C8A96A;text-decoration:underline;text-underline-offset:3px;">Quero aparecer aqui</a>
+        <a href="https://wa.me/5511947388423?text=Olá!%20Sou%20psicóloga%20da%20Conexão%20Psi%20e%20quero%20aparecer%20em%20destaque%20no%20diretório%20Premium%20💜%0A%0AMeus%20dados:%0A•%20Nome:%0A•%20CRP:%0A•%20Instagram:%0A%0AQuero%20saber%20mais%20sobre%20o%20Perfil%20Premium%20(R$%2020/mês)" target="_blank" style="font-size:0.8rem;color:#C8A96A;text-decoration:underline;text-underline-offset:3px;">Quero receber pacientes</a>
       </div>
-      <p style="font-size:0.72rem;color:#aaa;margin-top:0.8rem;">Sem burocracia&nbsp;•&nbsp;Sem espera</p>
+      <p style="font-size:0.72rem;color:#aaa;margin-top:0.8rem;">Resposta rápida&nbsp;•&nbsp;Sem burocracia</p>
     </div>
     <div class="premium-grid" id="premium-grid">
       <div class="premium-empty">Carregando perfis premium...</div>
@@ -358,7 +359,7 @@ footer a:hover{color:var(--violet);}
     <div class="pzone-card">
       <h4>✨ Quero ser Premium</h4>
       <p>Apareça em destaque, mostre suas especialidades, valor da sessão e receba agendamentos direto pelo WhatsApp.</p>
-      <a href="https://wa.me/5511947388423?text=Olá!%20Quero%20ter%20meu%20perfil%20Premium%20na%20Conexão%20Psi%20💜" target="_blank" class="btn-enter btn-gold">💛 Quero ser Premium — R$20/mês</a>
+      <a href="https://wa.me/5511947388423?text=Olá!%20Sou%20psicóloga%20da%20Conexão%20Psi%20e%20quero%20aparecer%20em%20destaque%20no%20diretório%20Premium%20💜%0A%0AMeus%20dados:%0A•%20Nome:%0A•%20CRP:%0A•%20Instagram:%0A%0AQuero%20saber%20mais%20sobre%20o%20Perfil%20Premium%20(R$%2020/mês)" target="_blank" class="btn-enter btn-gold">💛 Quero ser Premium — R$20/mês</a>
     </div>
     <div class="pzone-card">
       <h4>Já é Premium?</h4>
@@ -415,19 +416,20 @@ function renderPremium() {
     const h = (p.handle||'').replace('@','');
     const esps = p.especialidades ? p.especialidades.split(',').map(e=>`<span class="tag-esp">${e.trim()}</span>`).join('') : '';
     const abTag = p.abordagem ? `<span class="tag-p">${p.abordagem}</span>` : '';
-    const fmtTag = p.formato ? `<span class="tag-p">${p.formato}</span>` : '';
+    const fmtLabel = p.formato === 'Ambos' ? '🌐 Online + Presencial' : p.formato === 'Online' ? '🌐 Online' : p.formato === 'Presencial' ? '📍 Presencial' : (p.formato||'');
+    const fmtTag = fmtLabel ? `<span class="tag-p">${fmtLabel}</span>` : '';
     const waMsg = `Olá ${p.nome ? p.nome.split(' ')[0] : ''}! Vi seu perfil na Conexão Psi e gostaria de agendar uma sessão 💜`;
     const waBtn = p.whatsapp
       ? `<a href="https://wa.me/${p.whatsapp}?text=${encodeURIComponent(waMsg)}" target="_blank" class="bwa-p">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Agendar sessão
+          Agendar pelo WhatsApp
         </a>` : '';
     const instaBtn = h ? `<a href="https://instagram.com/${h}" target="_blank" class="binsta-p">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:12px;height:12px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
       Instagram
     </a>` : '';
     return `<div class="card-premium">
-      <span class="premium-badge">⭐ Indicado pela Conexão Psi</span>
+      <span class="premium-badge">✔️ Profissional verificado</span>
       <div class="pav">${av}<div>
         <div class="pname">${p.nome||''}</div>
         <div class="pcrp">${p.crp||''}</div>
