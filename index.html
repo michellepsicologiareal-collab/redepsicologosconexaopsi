@@ -414,10 +414,11 @@ function renderPremium() {
       ? `<img src="${p.foto_url}" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(200,147,74,0.4);">`
       : `<div class="pav-init" style="background:${c}">${ini}</div>`;
     const h = (p.handle||'').replace('@','');
-    const esps = p.especialidades ? p.especialidades.split(',').map(e=>`<span class="tag-esp">${e.trim()}</span>`).join('') : '';
-    const abTag = p.abordagem ? `<span class="tag-p">${p.abordagem}</span>` : '';
-    const fmtLabel = p.formato === 'Ambos' ? '🌐 Online + Presencial' : p.formato === 'Online' ? '🌐 Online' : p.formato === 'Presencial' ? '📍 Presencial' : (p.formato||'');
-    const fmtTag = fmtLabel ? `<span class="tag-p">${fmtLabel}</span>` : '';
+    const esps = espsArr.map(e=>`<span class="tag-esp">${e}</span>`).join('');
+    const espsArr = p.especialidades ? p.especialidades.split(',').map(e=>e.trim()) : [];
+    const abTag = (p.abordagem && !espsArr.includes(p.abordagem)) ? `<span class="tag-p">${p.abordagem}</span>` : '';
+    const fmtLabel = p.formato === 'Ambos' ? 'Online + Presencial' : p.formato === 'Online' ? 'Online' : p.formato === 'Presencial' ? 'Presencial' : (p.formato||'');
+    const fmtTag = fmtLabel ? `<span class="tag-p">🌐 ${fmtLabel}</span>` : '';
     const waMsg = `Olá ${p.nome ? p.nome.split(' ')[0] : ''}! Vi seu perfil na Conexão Psi e gostaria de agendar uma sessão 💜`;
     const waBtn = p.whatsapp
       ? `<a href="https://wa.me/${p.whatsapp}?text=${encodeURIComponent(waMsg)}" target="_blank" class="bwa-p">
