@@ -255,7 +255,7 @@ footer a:hover{color:var(--violet);}
   <div class="hero-body">
     <div class="hero-label"><span>Rede colaborativa de psicólogos</span></div>
     <h1 class="hero-title">Psicólogos<br>mais conectados<br><em>cuidam melhor.</em></h1>
-    <p class="hero-sub">Um espaço para encaminhamentos éticos, parcerias genuínas e trocas entre colegas que acreditam que colaborar é parte do cuidado.</p>
+    <p class="hero-sub">Uma plataforma de conexão entre psicólogos para encaminhamentos éticos, parcerias genuínas e colaboração profissional.</p>
     <div class="hero-actions">
       <a href="#diretorio" class="btn-primary">Explorar a rede →</a>
       <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="btn-ghost">Entrar no grupo</a>
@@ -272,12 +272,12 @@ footer a:hover{color:var(--violet);}
 <section class="premium-section" id="premium">
   <div class="premium-inner">
     <div class="premium-header">
-      <div class="premium-eyebrow">Psicólogos com agendamento imediato</div>
+      <div class="premium-eyebrow">Psicólogos com visibilidade ampliada</div>
       <h2 class="premium-title">Encontre um psicólogo e <em>comece ainda hoje</em></h2>
       <p class="premium-sub">Perfis verificados com valor claro e agendamento direto pelo WhatsApp</p>
       <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;align-items:center;">
         <a href="#premium-grid" class="btn-seja-premium" style="background:#C8A96A;">Ver psicólogos disponíveis →</a>
-        <a href="https://wa.me/5511947388423?text=Olá!%20Sou%20psicóloga%20da%20Conexão%20Psi%20e%20quero%20aparecer%20em%20destaque%20no%20diretório%20Premium%20💜%0A%0AMeus%20dados:%0A•%20Nome:%0A•%20CRP:%0A•%20Instagram:%0A%0AQuero%20saber%20mais%20sobre%20o%20Perfil%20Premium%20(R$%2020/mês)" target="_blank" style="font-size:0.8rem;color:#C8A96A;text-decoration:underline;text-underline-offset:3px;">Quero receber pacientes</a>
+        <a href="https://wa.me/5511947388423?text=Olá!%20Sou%20psicóloga%20da%20Conexão%20Psi%20e%20quero%20aparecer%20em%20destaque%20no%20diretório%20Premium%20💜%0A%0AMeus%20dados:%0A•%20Nome:%0A•%20CRP:%0A•%20Instagram:%0A%0AQuero%20saber%20mais%20sobre%20o%20Perfil%20Premium%20(R$%2020/mês)" target="_blank" style="font-size:0.8rem;color:#C8A96A;text-decoration:underline;text-underline-offset:3px;">Aumentar minha visibilidade</a>
       </div>
       <p style="font-size:0.72rem;color:#aaa;margin-top:0.8rem;">Resposta rápida&nbsp;•&nbsp;Sem burocracia</p>
     </div>
@@ -288,6 +288,13 @@ footer a:hover{color:var(--violet);}
 </section>
 
 <!-- INVITE -->
+<div style="background:#F7F2E7;padding:0.8rem 2rem;border-top:1px solid #EAD9B0;border-bottom:1px solid #EAD9B0;">
+  <p style="max-width:1100px;margin:0 auto;font-size:0.72rem;color:#aaa;text-align:center;line-height:1.6;">
+    Os perfis em destaque referem-se a maior visibilidade na plataforma e não constituem avaliação, recomendação ou endosso clínico. 
+    A Conexão Psi é uma plataforma de conexão entre profissionais e não se responsabiliza pelos atendimentos realizados.
+  </p>
+</div>
+
 <section class="invite-strip">
   <div class="invite-inner">
     <h2 class="invite-title">Conhece um psicólogo incrível?</h2>
@@ -343,7 +350,7 @@ footer a:hover{color:var(--violet);}
   <div class="cta-inner">
     <div class="cta-badge"><span>Exclusivo para psicólogos da rede</span></div>
     <h2 class="cta-title">Tem um paciente<br>para <em>indicar?</em></h2>
-    <p class="cta-body">Indique aqui. Nossa equipe revisa e publica no painel para que um colega possa atendê-lo com ética e cuidado. 💜</p>
+    <p class="cta-body">Indique aqui. Os dados são compartilhados com psicólogos da rede para possível encaminhamento, conforme disponibilidade. 💜</p>
     <a href="https://tally.so/r/gD46z1" target="_blank" class="cta-btn">Indicar paciente agora →</a>
   </div>
 </section>
@@ -430,7 +437,7 @@ function renderPremium() {
       Instagram
     </a>` : '';
     return `<div class="card-premium">
-      <span class="premium-badge">✔️ Profissional verificado</span>
+      <span class="premium-badge">⭐ Perfil em destaque</span>
       <div class="pav">${av}<div>
         <div class="pname">${p.nome||''}</div>
         <div class="pcrp">${p.crp||''}</div>
