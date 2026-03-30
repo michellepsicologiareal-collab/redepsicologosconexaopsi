@@ -129,6 +129,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
     <button class="tab" onclick="mudarAba('aprovados',this)">✅ Aprovados <span class="badge" id="n-aprov" style="background:var(--sage)">0</span></button>
     <button class="tab" onclick="mudarAba('premium',this)">✨ Premium <span class="badge" id="n-prem" style="background:var(--gold)">0</span></button>
     <button class="tab" onclick="mudarAba('todos',this)">📋 Todos</button>
+    <button class="tab" onclick="abrirHub(this)">🧭 Hub</button>
   </div>
 
   <div class="content">
@@ -143,6 +144,149 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
       </div>
     </div>
     <div id="grid" class="grid"></div>
+    <!-- HUB SECTION -->
+    <div id="hub-section" style="display:none;">
+      <div style="max-width:680px;margin:0 auto;padding:8px 0 40px;">
+
+        <!-- SENHA DO HUB -->
+        <div id="hub-gate" style="text-align:center;padding:40px 20px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--plum);margin-bottom:8px;">Hub Conexão Psi</div>
+          <div style="font-size:12px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;">Acesso restrito</div>
+          <input id="hub-pwd" type="password" placeholder="Senha do Hub"
+            style="width:100%;max-width:280px;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(45,27,78,0.2);font-family:'Outfit',sans-serif;font-size:14px;outline:none;display:block;margin:0 auto 12px;"
+            onkeydown="if(event.key==='Enter') verificarHub()"/>
+          <button onclick="verificarHub()" style="background:var(--plum);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;max-width:280px;">Entrar no Hub</button>
+          <div id="hub-err" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;">Senha incorreta.</div>
+        </div>
+
+        <!-- CONTEÚDO DO HUB -->
+        <div id="hub-content" style="display:none;">
+
+          <!-- IDENTIDADE VISUAL -->
+          <div style="margin-bottom:24px;">
+            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">🎨 Identidade Visual</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+              <div style="background:#4A5240;border-radius:12px;padding:16px;color:#D9C4B0;">
+                <div style="font-size:13px;font-weight:600;">Verde-oliva</div>
+                <div style="font-family:monospace;font-size:11px;opacity:0.7;margin-top:2px;">#4A5240</div>
+                <div style="font-size:11px;margin-top:6px;opacity:0.8;">Fundos, headers</div>
+              </div>
+              <div style="background:#D9C4B0;border-radius:12px;padding:16px;color:#2a1f3d;border:1px solid rgba(45,27,78,0.1);">
+                <div style="font-size:13px;font-weight:600;">Nude rosado</div>
+                <div style="font-family:monospace;font-size:11px;opacity:0.6;margin-top:2px;">#D9C4B0</div>
+                <div style="font-size:11px;margin-top:6px;opacity:0.7;">Texto, cards</div>
+              </div>
+              <div style="background:#B5603A;border-radius:12px;padding:16px;color:#fff;">
+                <div style="font-size:13px;font-weight:600;">Terracota</div>
+                <div style="font-family:monospace;font-size:11px;opacity:0.7;margin-top:2px;">#B5603A</div>
+                <div style="font-size:11px;margin-top:6px;opacity:0.8;">CTAs, destaques</div>
+              </div>
+              <div style="background:#F5F0EA;border-radius:12px;padding:16px;color:#2a1f3d;border:1px solid rgba(45,27,78,0.1);">
+                <div style="font-size:13px;font-weight:600;">Off-white</div>
+                <div style="font-family:monospace;font-size:11px;opacity:0.6;margin-top:2px;">#F5F0EA</div>
+                <div style="font-size:11px;margin-top:6px;opacity:0.7;">Fundos claros</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(45,27,78,0.04);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.7;">
+              <strong>Tipografia:</strong> Cormorant Garamond (títulos) · DM Sans (corpo) · DM Sans Bold (dados)<br>
+              <strong>Estilo:</strong> Fundo escuro = autoridade · Fundo claro = educativo · Sem fotos de banco<br>
+              <strong>Grid:</strong> Escuro → Claro → Escuro alternado<br>
+              <strong>Referências:</strong> @vittude · @psicologiareal_terapias · @endeavor_brasil
+            </div>
+          </div>
+
+          <!-- INSTAGRAM -->
+          <div style="margin-bottom:24px;">
+            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">📱 Instagram @conexaopsi</div>
+
+            <!-- BIO -->
+            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Bio otimizada</div>
+            <div style="background:white;border:1px solid rgba(45,27,78,0.1);border-radius:10px;padding:14px;font-size:14px;line-height:1.9;color:var(--text);margin-bottom:16px;position:relative;">
+              🔗 A rede de encaminhamento entre psicólogos<br>
+              Encaminhe com confiança. Receba pacientes qualificados.<br>
+              Cadastre-se gratuitamente 👇<br>
+              <span style="color:var(--gold);font-size:12px;">tally.so/r/b5OGYZ</span>
+              <button onclick="copiarBio()" style="position:absolute;top:10px;right:10px;background:var(--plum);color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;" id="btn-bio-copy">📋 Copiar</button>
+            </div>
+
+            <!-- PILARES -->
+            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">5 Pilares de conteúdo</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
+                <div style="background:#EEEDFE;color:#3C3489;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
+                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Encaminhamento na prática</span> <span style="font-size:12px;color:var(--muted);">· 2x/semana</span></div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
+                <div style="background:#E1F5EE;color:#085041;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
+                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Psi da rede — perfil de membro</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
+                <div style="background:#E6F1FB;color:#0C447C;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
+                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Dados e mercado</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
+                <div style="background:#FAEEDA;color:#854F0B;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</div>
+                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Bastidores da rede</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
+                <div style="background:#FCEBEB;color:#A32D2D;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">5</div>
+                <div><span style="font-size:13px;font-weight:600;color:var(--text);">CTA de cadastro</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
+              </div>
+            </div>
+
+            <!-- 9 POSTS -->
+            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">9 Posts de lançamento</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
+                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">01</div>
+                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Apresentação — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">"Você já perdeu um paciente porque não sabia para quem encaminhar?"</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
+                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">02</div>
+                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dado de mercado — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"O Brasil tem +500 mil psicólogos. A maioria ainda encaminha pelo WhatsApp."</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
+                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">03</div>
+                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Como funciona — carrossel escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">5 slides explicando o fluxo. Zero comissão. CTA de cadastro.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
+                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">04</div>
+                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dor do psi — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"3 situações em que você precisou encaminhar e não sabia para quem."</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
+                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">05</div>
+                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Perfil de membro — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">Apresentação de uma psi cadastrada. Pode ser você no lançamento.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
+                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">06</div>
+                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Diferencial vs mercado — carrossel</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Encaminhamento entre psis vs. diretório para pacientes.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
+                <div style="background:#B5603A;color:#fff;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">07</div>
+                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Bastidores — Reels 60s ⭐ maior alcance</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">Michelle fala: "Por que criei a Conexão Psi." História pessoal.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
+                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">08</div>
+                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dado + prova social — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"[X] psicólogos já fazem parte da rede." Atualizar com o número real.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
+                <div style="background:#B5603A;color:#fff;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">09</div>
+                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Convite direto — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">"Se você é psicóloga e quer receber encaminhamentos — seu lugar é aqui." CTA Tally.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SQL ÚTEIS -->
+          <div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">🗄️ SQL Úteis</div>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="sql-list"></div>
+          </div>
+
+        </div><!-- fim hub-content -->
+      </div>
+    </div><!-- fim hub-section -->
     <div id="empty" class="empty" style="display:none;">Nenhum registro aqui.</div>
     <div id="loading" class="loading">Carregando...</div>
   </div>
@@ -219,6 +363,7 @@ function sair() {
 }
 
 function mudarAba(a, btn) {
+  fecharHub();
   aba = a;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
@@ -433,6 +578,118 @@ function toast(msg) {
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) fecharModal();
 });
+
+const SQL_QUERIES = [
+  {
+    titulo: "Ver duplicatas por nome",
+    desc: "Encontra psis com o mesmo nome cadastradas mais de uma vez",
+    sql: `SELECT nome, COUNT(*) as total, array_agg(id) as ids\nFROM psis\nGROUP BY nome\nHAVING COUNT(*) > 1\nORDER BY nome;`
+  },
+  {
+    titulo: "Deletar duplicata mais antiga",
+    desc: "Remove a versão mais antiga quando há nome duplicado",
+    sql: `DELETE FROM psis\nWHERE id = (\n  SELECT id FROM psis\n  WHERE nome ILIKE '%NOME_AQUI%'\n  ORDER BY created_at ASC\n  LIMIT 1\n);`
+  },
+  {
+    titulo: "Ativar premium por CRP",
+    desc: "Ativa o perfil premium de uma psi específica",
+    sql: `UPDATE psis\nSET premium = true,\n    premium_ativo_ate = NOW() + INTERVAL '30 days'\nWHERE crp = 'XX/XXXXXX';`
+  },
+  {
+    titulo: "Ver psis com dados incompletos",
+    desc: "Lista psis aprovadas sem WhatsApp, valor ou bio",
+    sql: `SELECT nome, crp,\n  CASE WHEN whatsapp IS NULL OR whatsapp = '' THEN '❌' ELSE '✅' END as whats,\n  CASE WHEN valor_sessao IS NULL OR valor_sessao = '' THEN '❌' ELSE '✅' END as valor,\n  CASE WHEN bio IS NULL OR bio = '' THEN '❌' ELSE '✅' END as bio\nFROM psis\nWHERE status ILIKE 'aprovado'\nORDER BY nome;`
+  },
+  {
+    titulo: "Limpar foto corrompida [object Object]",
+    desc: "Remove URLs de foto inválidas do banco",
+    sql: `UPDATE psis\nSET foto_url = NULL\nWHERE foto_url = '[object Object]'\n   OR (foto_url IS NOT NULL AND foto_url NOT LIKE 'http%');`
+  },
+  {
+    titulo: "Atualizar foto por CRP",
+    desc: "Adiciona ou troca a foto de uma psi específica",
+    sql: `UPDATE psis\nSET foto_url = 'https://LINK_DA_IMAGEM_AQUI'\nWHERE crp = 'XX/XXXXXX';`
+  },
+  {
+    titulo: "Verificar RLS nas tabelas",
+    desc: "Confirma se Row Level Security está ativo ou desativado",
+    sql: `SELECT tablename, rowsecurity\nFROM pg_tables\nWHERE tablename IN ('psis', 'pacientes');`
+  },
+  {
+    titulo: "Contagem por status",
+    desc: "Mostra quantas psis existem em cada status",
+    sql: `SELECT status, COUNT(*) as total\nFROM psis\nGROUP BY status\nORDER BY status;`
+  }
+];
+
+function abrirHub(btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('stats').style.display = 'none';
+  document.querySelector('.section-title') && (document.querySelector('.section-title').style.display = 'none');
+  document.getElementById('grid').style.display = 'none';
+  document.getElementById('empty').style.display = 'none';
+  document.getElementById('hub-section').style.display = 'block';
+  renderSQLs();
+}
+
+function fecharHub() {
+  document.getElementById('hub-section').style.display = 'none';
+  document.getElementById('grid').style.display = '';
+  document.getElementById('stats').style.display = '';
+  const st = document.querySelector('.section-title');
+  if (st) st.style.display = '';
+}
+
+function verificarHub() {
+  const pwd = document.getElementById('hub-pwd').value.trim();
+  if (pwd === 'hub2026' || pwd === 'conexaopsi2026') {
+    document.getElementById('hub-gate').style.display = 'none';
+    document.getElementById('hub-content').style.display = 'block';
+  } else {
+    document.getElementById('hub-err').style.display = 'block';
+    document.getElementById('hub-pwd').value = '';
+  }
+}
+
+function renderSQLs() {
+  const container = document.getElementById('sql-list');
+  if (!container) return;
+  container.innerHTML = SQL_QUERIES.map((q, i) => `
+    <div style="background:white;border:1px solid rgba(45,27,78,0.08);border-radius:12px;overflow:hidden;">
+      <div style="padding:14px 16px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--plum);">${q.titulo}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${q.desc}</div>
+        </div>
+        <button onclick="copiarSQL(${i})" id="sql-btn-${i}"
+          style="background:var(--plum);color:white;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+          📋 Copiar
+        </button>
+      </div>
+      <pre style="margin:0;padding:12px 16px;background:#1e1530;color:#a89bc2;font-size:12px;line-height:1.6;overflow-x:auto;border-top:1px solid rgba(45,27,78,0.08);">${q.sql.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+    </div>
+  `).join('');
+}
+
+function copiarSQL(i) {
+  const sql = SQL_QUERIES[i].sql.replace(/\\n/g, '\n');
+  navigator.clipboard.writeText(sql).then(() => {
+    const btn = document.getElementById('sql-btn-'+i);
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
+function copiarBio() {
+  const bio = `🔗 A rede de encaminhamento entre psicólogos\nEncaminhe com confiança. Receba pacientes qualificados.\nCadastre-se gratuitamente 👇\ntally.so/r/b5OGYZ`;
+  navigator.clipboard.writeText(bio).then(() => {
+    const btn = document.getElementById('btn-bio-copy');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
 </script>
 </body>
 </html>
