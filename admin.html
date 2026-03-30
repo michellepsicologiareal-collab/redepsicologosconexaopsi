@@ -273,9 +273,15 @@ function render() {
     const stClass = `st-${p.status}`;
     const stLabel = {pendente:'⏳ Pendente', aprovado:'✅ Aprovado', reprovado:'❌ Reprovado'}[p.status] || p.status;
     const h = (p.handle||'').replace('@','');
+    const COLORS = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
+    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cor = COLORS[Math.abs(ini.charCodeAt(0)||0) % COLORS.length];
+    const avatar = p.foto_url
+      ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0;">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">${ini}</div>`;
     return `<div class="card ${p.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div class="card-name">${p.nome||'—'}</div>
+        <div style="display:flex;align-items:center;gap:10px;">${avatar}<div class="card-name">${p.nome||'—'}</div></div>
         <span class="card-status ${stClass}">${stLabel}</span>
       </div>
       <div class="card-info">
