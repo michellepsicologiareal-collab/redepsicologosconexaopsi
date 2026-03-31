@@ -593,6 +593,60 @@ footer {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+/* ═══════ PSI MANAGEMENT ═══════ */
+.nbadge { display:inline-block; background:var(--laranja); color:#fff; font-size:10px; padding:1px 6px; border-radius:999px; margin-left:4px; font-weight:700; }
+.nbadge-green { background:#3D7A5E; }
+.nbadge-gold { background:var(--gold); }
+
+.psi-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+.psi-stat { background:#fff; border:1px solid var(--cinza-borda); border-radius:14px; padding:16px; text-align:center; }
+.psi-stat-num { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:700; color:var(--indigo); line-height:1; }
+.psi-stat-label { font-size:11px; color:var(--texto-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+.psi-section-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--indigo); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.psi-btn-action { padding:7px 14px; background:var(--azul); color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; }
+.psi-btn-action:hover { opacity:0.85; }
+
+.psi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+.psi-card { background:#fff; border:1px solid var(--cinza-borda); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:10px; }
+.psi-card.pendente { border-left:4px solid var(--laranja); }
+.psi-card.aprovado { border-left:4px solid #3D7A5E; }
+.psi-card.reprovado { border-left:4px solid #c0392b; opacity:0.7; }
+.psi-card-name { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; color:var(--indigo); }
+.psi-card-info { font-size:12px; color:var(--texto-sub); line-height:1.9; }
+.psi-card-info span { display:block; }
+.psi-card-status { font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; }
+.st-pendente { background:#FEF0E6; color:#B85C1A; }
+.st-aprovado { background:#E3F4ED; color:#3D7A5E; }
+.st-reprovado { background:#FCE8E8; color:#c0392b; }
+.psi-card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:auto; }
+.btn-aprovar { flex:1; padding:8px; background:#3D7A5E; color:#fff; border:none; border-radius:8px; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:600; }
+.btn-reprovar { flex:1; padding:8px; background:#c0392b; color:#fff; border:none; border-radius:8px; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:600; }
+.btn-premium { padding:8px 12px; background:var(--gold); color:#fff; border:none; border-radius:8px; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:600; }
+.btn-editar { padding:8px 12px; background:var(--azul); color:#fff; border:none; border-radius:8px; font-size:12px; cursor:pointer; }
+.btn-excluir { padding:8px; background:transparent; color:#ccc; border:1px solid var(--cinza-borda); border-radius:8px; font-size:12px; cursor:pointer; }
+.btn-excluir:hover { color:#c0392b; border-color:#c0392b; }
+
+.psi-empty { text-align:center; padding:40px; color:var(--texto-muted); font-size:14px; }
+.psi-loading { text-align:center; padding:30px; color:var(--texto-muted); }
+.psi-toast { position:fixed; bottom:24px; right:24px; background:var(--indigo); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; z-index:9999; box-shadow:0 8px 24px rgba(45,27,78,0.3); }
+
+/* MODAL */
+#psi-modal { display:none; position:fixed; inset:0; background:rgba(15,13,26,0.55); z-index:1000; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
+#psi-modal.open { display:flex; }
+.psi-modal-box { background:#fff; border-radius:18px; padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; }
+.psi-modal-box h3 { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--indigo); margin-bottom:18px; }
+.psi-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.psi-modal-grid label { font-size:11px; color:var(--texto-muted); display:block; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.5px; }
+.psi-modal-grid input, .psi-modal-grid select, .psi-modal-grid textarea { width:100%; padding:9px 12px; border:1.5px solid var(--cinza-borda); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--texto); background:var(--creme); outline:none; }
+.psi-modal-grid input:focus, .psi-modal-grid select:focus, .psi-modal-grid textarea:focus { border-color:var(--azul); }
+.mfull { grid-column:span 2; }
+.psi-modal-actions { display:flex; gap:10px; margin-top:18px; }
+.btn-modal-save { flex:1; padding:11px; background:var(--azul); color:#fff; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-modal-cancel { padding:11px 18px; background:transparent; border:1.5px solid var(--cinza-borda); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; color:var(--texto-muted); }
+@media(max-width:500px) { .psi-modal-grid{grid-template-columns:1fr;} .mfull{grid-column:span 1;} }
+
 </style>
 </head>
 <body>
@@ -619,16 +673,84 @@ footer {
 
 <!-- ═══════ NAV TABS ═══════ -->
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showTab('sistema')">🗂️ Sistema</button>
-  <button class="nav-tab" onclick="showTab('visual')">🎨 Identidade Visual</button>
+  <button class="nav-tab active" onclick="showTab('pendentes')">⏳ Pendentes <span class="nbadge" id="n-pend">0</span></button>
+  <button class="nav-tab" onclick="showTab('aprovados')">✅ Aprovados <span class="nbadge nbadge-green" id="n-aprov">0</span></button>
+  <button class="nav-tab" onclick="showTab('premium')">✨ Premium <span class="nbadge nbadge-gold" id="n-prem">0</span></button>
+  <button class="nav-tab" onclick="showTab('todos')">📋 Todos</button>
+  <button class="nav-tab" onclick="showTab('sistema')">🗂️ Sistema</button>
+  <button class="nav-tab" onclick="showTab('visual')">🎨 Identidade</button>
   <button class="nav-tab" onclick="showTab('instagram')">📱 Instagram</button>
-  <button class="nav-tab" onclick="showTab('sql')">🗄️ SQL Úteis</button>
+  <button class="nav-tab" onclick="showTab('sql')">🗄️ SQL</button>
 </div>
 
 <!-- ═══════════════════════════════════════
      SEÇÃO 1 — SISTEMA
      ═══════════════════════════════════════ -->
-<div class="section active" id="tab-sistema">
+<!-- ═══ GESTÃO DE PSICÓLOGAS ═══ -->
+<div class="section active" id="tab-pendentes">
+  <div id="psi-stats" class="psi-stats"></div>
+  <div class="psi-section-title">
+    <span id="section-label">Psicólogos Pendentes</span>
+    <div style="display:flex;gap:8px;">
+      <button class="psi-btn-action" onclick="carregar()">🔄 Atualizar</button>
+      <button class="psi-btn-action" style="background:var(--texto);" onclick="exportar()">📥 CSV</button>
+    </div>
+  </div>
+  <div id="psi-grid" class="psi-grid"></div>
+  <div id="psi-empty" class="psi-empty" style="display:none;">Nenhuma psi pendente. 🎉</div>
+  <div id="psi-loading" class="psi-loading">Carregando...</div>
+</div>
+<div class="section" id="tab-aprovados">
+  <div class="psi-section-title"><span>Psicólogos Aprovados</span><button class="psi-btn-action" onclick="carregar()">🔄 Atualizar</button></div>
+  <div id="psi-grid-aprov" class="psi-grid"></div>
+  <div id="psi-empty-aprov" class="psi-empty" style="display:none;">Nenhum registro aqui.</div>
+</div>
+<div class="section" id="tab-premium">
+  <div class="psi-section-title"><span>Perfis Premium ✨</span><button class="psi-btn-action" onclick="carregar()">🔄 Atualizar</button></div>
+  <div id="psi-grid-prem" class="psi-grid"></div>
+  <div id="psi-empty-prem" class="psi-empty" style="display:none;">Nenhum premium ainda.</div>
+</div>
+<div class="section" id="tab-todos">
+  <div class="psi-section-title"><span>Todos os Psicólogos</span><button class="psi-btn-action" onclick="carregar()">🔄 Atualizar</button></div>
+  <div id="psi-grid-todos" class="psi-grid"></div>
+  <div id="psi-empty-todos" class="psi-empty" style="display:none;">Sem registros.</div>
+</div>
+
+<!-- MODAL EDITAR PSI -->
+<div id="psi-modal">
+  <div class="psi-modal-box">
+    <h3>✏️ Editar Psicóloga</h3>
+    <div class="psi-modal-grid">
+      <div class="mfull"><label>Nome</label><input id="e-nome"></div>
+      <div><label>CRP</label><input id="e-crp"></div>
+      <div><label>Instagram / handle</label><input id="e-handle" placeholder="sem @"></div>
+      <div><label>Abordagem</label><input id="e-abordagem"></div>
+      <div><label>Formato</label><select id="e-formato"><option>Online</option><option>Presencial</option><option>Ambos</option></select></div>
+      <div class="mfull"><label>Cidade/Estado</label><input id="e-cidade"></div>
+      <div class="mfull"><label>Público Atendido</label><input id="e-publico"></div>
+      <div class="mfull"><label>Email</label><input id="e-email" type="email"></div>
+      <div><label>WhatsApp (só números)</label><input id="e-whatsapp"></div>
+      <div><label>Valor da Sessão</label><input id="e-valor"></div>
+      <div class="mfull"><label>Especialidades</label><input id="e-especialidades"></div>
+      <div class="mfull"><label>Mini Bio</label><textarea id="e-bio" style="min-height:70px;resize:vertical;"></textarea></div>
+      <div class="mfull"><label>URL da Foto</label><input id="e-foto" placeholder="https://..."></div>
+      <div><label>Status</label>
+        <select id="e-status">
+          <option value="pendente">Pendente</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="reprovado">Reprovado</option>
+        </select>
+      </div>
+      <div><label>Premium</label><select id="e-premium"><option value="false">Não</option><option value="true">Sim ✨</option></select></div>
+    </div>
+    <div class="psi-modal-actions">
+      <button class="btn-modal-save" onclick="salvarEd()">💾 Salvar</button>
+      <button class="btn-modal-cancel" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="tab-sistema">
   <div class="section-label">Guia do sistema</div>
   <div class="section-title">Links e Etapas</div>
   <div class="section-desc">Todos os links, senhas e fluxos da Conexão Psi organizados por etapa.</div>
@@ -1196,6 +1318,7 @@ function tryLogin() {
   if (pw === 'hub2026' || pw === 'conexaopsi2026') {
     document.getElementById('login-overlay').classList.add('hidden');
     sessionStorage.setItem('hub-auth', '1');
+    carregar();
   } else {
     document.getElementById('login-error').textContent = 'Senha incorreta. Tente novamente.';
     document.getElementById('login-pw').value = '';
@@ -1207,15 +1330,21 @@ document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key
 // Auto-login se já autenticado na sessão
 if (sessionStorage.getItem('hub-auth') === '1') {
   document.getElementById('login-overlay').classList.add('hidden');
+  carregar();
 }
 
 // ═══════ TABS ═══════
+let currentTab = 'pendentes';
+const PSI_TABS = ['pendentes','aprovados','premium','todos'];
+
 function showTab(id) {
+  currentTab = id;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   event.target.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (PSI_TABS.includes(id)) renderTab(id);
 }
 
 // ═══════ CARDS ═══════
@@ -1260,6 +1389,224 @@ function copyBio() {
     }, 1800);
   });
 }
+
+// ═══════ SUPABASE PSI MANAGEMENT ═══════
+const SB = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const SB_H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+
+let todosRegistros = [], editId = null;
+
+async function api(method, path, body) {
+  const r = await fetch(SB+'/rest/v1/'+path, {method, headers:SB_H, body: body ? JSON.stringify(body) : undefined});
+  const text = await r.text();
+  if (!r.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
+}
+
+async function carregar() {
+  document.getElementById('psi-loading').style.display = 'block';
+  document.getElementById('psi-grid').innerHTML = '';
+  try {
+    todosRegistros = await api('GET', 'psis?select=*&order=created_at.desc&limit=500') || [];
+    atualizarStats();
+    renderTabs();
+  } catch(e) {
+    document.getElementById('psi-loading').textContent = 'Erro: ' + e.message;
+  }
+  document.getElementById('psi-loading').style.display = 'none';
+}
+
+function atualizarStats() {
+  const pend = todosRegistros.filter(p => (p.status||'').toLowerCase().includes('pendente')).length;
+  const aprov = todosRegistros.filter(p => (p.status||'').toLowerCase().includes('aprovado')).length;
+  const prem = todosRegistros.filter(p => p.premium === true).length;
+  const reprov = todosRegistros.filter(p => (p.status||'').toLowerCase().includes('reprovado')).length;
+  document.getElementById('n-pend').textContent = pend;
+  document.getElementById('n-aprov').textContent = aprov;
+  document.getElementById('n-prem').textContent = prem;
+  document.getElementById('psi-stats').innerHTML = `
+    <div class="psi-stat"><div class="psi-stat-num">${todosRegistros.length}</div><div class="psi-stat-label">Total</div></div>
+    <div class="psi-stat"><div class="psi-stat-num" style="color:var(--laranja)">${pend}</div><div class="psi-stat-label">Pendentes</div></div>
+    <div class="psi-stat"><div class="psi-stat-num" style="color:#3D7A5E">${aprov}</div><div class="psi-stat-label">Aprovados</div></div>
+    <div class="psi-stat"><div class="psi-stat-num" style="color:var(--gold)">${prem}</div><div class="psi-stat-label">Premium ✨</div></div>
+    <div class="psi-stat"><div class="psi-stat-num" style="color:#c0392b">${reprov}</div><div class="psi-stat-label">Reprovados</div></div>
+  `;
+}
+
+function renderTabs() {
+  renderTab('pendentes');
+  renderTab('aprovados');
+  renderTab('premium');
+  renderTab('todos');
+}
+
+function renderTab(tab) {
+  const filtros = {
+    pendentes: p => (p.status||'').toLowerCase().includes('pendente'),
+    aprovados: p => (p.status||'').toLowerCase().includes('aprovado'),
+    premium: p => p.premium === true,
+    todos: () => true
+  };
+  const gridIds = {pendentes:'psi-grid', aprovados:'psi-grid-aprov', premium:'psi-grid-prem', todos:'psi-grid-todos'};
+  const emptyIds = {pendentes:'psi-empty', aprovados:'psi-empty-aprov', premium:'psi-empty-prem', todos:'psi-empty-todos'};
+  const lista = todosRegistros.filter(filtros[tab]);
+  const g = document.getElementById(gridIds[tab]);
+  const e = document.getElementById(emptyIds[tab]);
+  if (!g) return;
+  if (!lista.length) { g.innerHTML = ''; if(e) e.style.display='block'; return; }
+  if(e) e.style.display='none';
+  const COLORS = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
+  g.innerHTML = lista.map(p => {
+    const st = (p.status||'pendente').toLowerCase();
+    const stClass = st.includes('aprovado') ? 'aprovado' : st.includes('reprovado') ? 'reprovado' : 'pendente';
+    const stLabel = st.includes('aprovado') ? '✅ Aprovado' : st.includes('reprovado') ? '❌ Reprovado' : '⏳ Pendente';
+    const badgeClass = st.includes('aprovado') ? 'st-aprovado' : st.includes('reprovado') ? 'st-reprovado' : 'st-pendente';
+    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cor = COLORS[Math.abs((ini.charCodeAt(0)||0)) % COLORS.length];
+    const avatar = p.foto_url && p.foto_url.startsWith('http')
+      ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0;" onerror="this.style.display='none'">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">${ini}</div>`;
+    return `<div class="psi-card ${stClass}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">${avatar}<div class="psi-card-name">${p.nome||'—'}</div></div>
+        <span class="psi-card-status ${badgeClass}">${stLabel}</span>
+      </div>
+      <div class="psi-card-info">
+        <span>📋 ${p.crp||'—'}</span>
+        <span>📷 @${(p.handle||'').replace('@','') || '—'}</span>
+        <span>🧠 ${p.abordagem||'—'} · ${p.formato||'—'}</span>
+        <span>📍 ${p.cidade||'—'}</span>
+        <span>✉️ ${p.email||'—'}</span>
+        ${p.premium ? '<span style="color:var(--gold);font-weight:600;">✨ Premium</span>' : ''}
+      </div>
+      <div class="psi-card-actions">
+        ${stClass === 'pendente' ? `
+          <button class="btn-aprovar" onclick="aprovar('${p.id}')">✅ Aprovar</button>
+          <button class="btn-reprovar" onclick="reprovar('${p.id}')">❌ Reprovar</button>
+        ` : ''}
+        ${stClass === 'aprovado' && !p.premium ? `<button class="btn-premium" onclick="ativarPremium('${p.id}')">✨ Premium</button>` : ''}
+        ${stClass === 'aprovado' && p.premium ? `<button class="btn-premium" style="background:var(--texto-muted)" onclick="desativarPremium('${p.id}')">Remover Premium</button>` : ''}
+        <button class="btn-editar" onclick="abrirEd('${p.id}')">✏️</button>
+        <button class="btn-excluir" onclick="excluir('${p.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function aprovar(id) {
+  try {
+    await api('PATCH', `psis?id=eq.${id}`, {status:'aprovado'});
+    const p = todosRegistros.find(x => x.id === id);
+    if (p) p.status = 'aprovado';
+    atualizarStats(); renderTabs(); toast('✅ Psicóloga aprovada!');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+async function reprovar(id) {
+  if (!confirm('Reprovar esta psicóloga?')) return;
+  try {
+    await api('PATCH', `psis?id=eq.${id}`, {status:'reprovado'});
+    const p = todosRegistros.find(x => x.id === id);
+    if (p) p.status = 'reprovado';
+    atualizarStats(); renderTabs(); toast('❌ Reprovado.');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+async function ativarPremium(id) {
+  try {
+    await api('PATCH', `psis?id=eq.${id}`, {premium:true});
+    const p = todosRegistros.find(x => x.id === id);
+    if (p) p.premium = true;
+    atualizarStats(); renderTabs(); toast('✨ Premium ativado!');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+async function desativarPremium(id) {
+  if (!confirm('Remover premium?')) return;
+  try {
+    await api('PATCH', `psis?id=eq.${id}`, {premium:false});
+    const p = todosRegistros.find(x => x.id === id);
+    if (p) p.premium = false;
+    atualizarStats(); renderTabs(); toast('Premium removido.');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+async function excluir(id) {
+  if (!confirm('Excluir permanentemente?')) return;
+  try {
+    await api('DELETE', `psis?id=eq.${id}`);
+    todosRegistros = todosRegistros.filter(x => x.id !== id);
+    atualizarStats(); renderTabs(); toast('Registro excluído.');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+
+function abrirEd(id) {
+  const p = todosRegistros.find(x => x.id === id);
+  if (!p) return;
+  editId = id;
+  document.getElementById('e-nome').value = p.nome||'';
+  document.getElementById('e-crp').value = p.crp||'';
+  document.getElementById('e-handle').value = (p.handle||'').replace('@','');
+  document.getElementById('e-abordagem').value = p.abordagem||'';
+  document.getElementById('e-formato').value = p.formato||'Online';
+  document.getElementById('e-cidade').value = p.cidade||'';
+  document.getElementById('e-publico').value = p.publico||'';
+  document.getElementById('e-email').value = p.email||'';
+  document.getElementById('e-whatsapp').value = p.whatsapp||'';
+  document.getElementById('e-valor').value = p.valor_sessao||'';
+  document.getElementById('e-especialidades').value = p.especialidades||'';
+  document.getElementById('e-bio').value = p.bio||'';
+  document.getElementById('e-foto').value = p.foto_url||'';
+  document.getElementById('e-status').value = p.status||'pendente';
+  document.getElementById('e-premium').value = p.premium ? 'true' : 'false';
+  document.getElementById('psi-modal').classList.add('open');
+}
+function fecharModal() {
+  document.getElementById('psi-modal').classList.remove('open');
+  editId = null;
+}
+async function salvarEd() {
+  if (!editId) return;
+  const updates = {
+    nome: document.getElementById('e-nome').value.trim(),
+    crp: document.getElementById('e-crp').value.trim(),
+    handle: document.getElementById('e-handle').value.trim().replace('@',''),
+    abordagem: document.getElementById('e-abordagem').value.trim(),
+    formato: document.getElementById('e-formato').value,
+    cidade: document.getElementById('e-cidade').value.trim(),
+    publico: document.getElementById('e-publico').value.trim(),
+    email: document.getElementById('e-email').value.trim(),
+    whatsapp: document.getElementById('e-whatsapp').value.trim().replace(/\D/g,''),
+    valor_sessao: document.getElementById('e-valor').value.trim(),
+    especialidades: document.getElementById('e-especialidades').value.trim(),
+    bio: document.getElementById('e-bio').value.trim(),
+    foto_url: document.getElementById('e-foto').value.trim(),
+    status: document.getElementById('e-status').value,
+    premium: document.getElementById('e-premium').value === 'true'
+  };
+  try {
+    await api('PATCH', `psis?id=eq.${editId}`, updates);
+    const p = todosRegistros.find(x => x.id === editId);
+    if (p) Object.assign(p, updates);
+    fecharModal(); atualizarStats(); renderTabs(); toast('✅ Salvo!');
+  } catch(e) { alert('Erro: '+e.message); }
+}
+function exportar() {
+  const cols = ['nome','email','crp','handle','abordagem','formato','cidade','publico','status','premium'];
+  const rows = todosRegistros.map(p => cols.map(c => `"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv = '\uFEFF' + [cols.join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  a.download = 'conexao-psi-psis.csv';
+  a.click();
+}
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'psi-toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+document.getElementById('psi-modal').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
 </script>
 
 </body>
