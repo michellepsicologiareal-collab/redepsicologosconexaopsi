@@ -1,695 +1,1266 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conexão Psi — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>HUB Conexão Psi — Painel Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0F0D1A;--cream:#FAF7F2;--warm:#F2EDE4;--card:#FFFFFF;--plum:#2D1B4E;--violet:#5B3FA0;--gold:#C8934A;--gold-light:#E8C98A;--sage:#3D7A5E;--muted:#7A7490;--border:#E8E2D8;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+/* ═══════════════════════════════════════════════
+   HUB CONEXÃO PSI — IDENTIDADE VISUAL OFICIAL
+   Azul #1B5EA6 · Ciano #29A8CC · Roxo #6B3FA0
+   Índigo #3B2E8A · Laranja #E8652A · Branco #FFF
+   ═══════════════════════════════════════════════ */
 
-#login{min-height:100vh;background:var(--plum);display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
-#login::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 20%,rgba(91,63,160,0.5) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(200,147,74,0.2) 0%,transparent 50%);}
-.lbox{position:relative;z-index:2;width:100%;max-width:400px;text-align:center;}
-.lbrand{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;margin-bottom:0.2rem;}
-.lbrand em{color:var(--gold-light);font-style:italic;}
-.ltag{font-size:0.68rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2rem;}
-.lcard{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;}
-.lcard h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:0.4rem;}
-.lcard p{font-size:0.8rem;color:rgba(255,255,255,0.45);margin-bottom:1.5rem;}
-.linput{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:0.95rem;margin-bottom:0.8rem;outline:none;}
-.linput:focus{border-color:var(--gold);}
-.linput::placeholder{color:rgba(255,255,255,0.3);}
-.lblogin{width:100%;padding:0.85rem;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;}
-.lerr{color:#ff8a80;font-size:0.8rem;margin-top:0.6rem;min-height:1.2rem;}
+:root {
+  --azul: #1B5EA6;
+  --ciano: #29A8CC;
+  --roxo: #6B3FA0;
+  --indigo: #3B2E8A;
+  --laranja: #E8652A;
+  --plum: #2D1B4E;
+  --plum-mid: #3D2660;
+  --gold: #C8934A;
+  --gold-pale: #F0D9B5;
+  --branco: #FFFFFF;
+  --creme: #FAF7F2;
+  --cinza-bg: #F0EBE1;
+  --cinza-borda: #E0DCD6;
+  --texto: #1E1530;
+  --texto-sub: #5A5770;
+  --texto-muted: #8E8AA0;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(45,27,78,0.07);
+  --shadow-lg: 0 8px 32px rgba(45,27,78,0.12);
+}
 
-#app{display:none;}
-.header{background:var(--plum);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(15,13,26,0.3);}
-.hbrand{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fff;}
-.hbrand em{color:var(--gold-light);font-style:italic;}
-.htag{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
-.chip{font-size:0.72rem;color:var(--gold-light);background:rgba(200,147,74,0.15);border:1px solid rgba(200,147,74,0.25);border-radius:999px;padding:4px 12px;}
-.bsair{padding:0.4rem 1rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;}
-.bback{padding:0.4rem 1rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:8px;font-size:0.77rem;text-decoration:none;display:inline-block;}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-.tabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;overflow-x:auto;}
-.tab{padding:1rem 1.2rem;font-size:0.82rem;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Outfit',sans-serif;transition:all 0.18s;}
-.tab.active{color:var(--plum);border-bottom-color:var(--violet);}
-.badge{display:inline-block;background:var(--gold);color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:999px;margin-left:5px;}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--creme);
+  color: var(--texto);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-.content{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
-.section-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--plum);margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
-.btn-refresh{padding:0.4rem 1rem;background:var(--plum);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.78rem;cursor:pointer;}
-.btn-export{padding:0.4rem 1rem;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.78rem;cursor:pointer;}
+/* ═══════ LOGIN ═══════ */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--plum);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+#login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.3rem;display:flex;flex-direction:column;gap:0.7rem;position:relative;overflow:hidden;}
-.card.pendente{border-left:4px solid var(--gold);}
-.card.aprovado{border-left:4px solid var(--sage);}
-.card.reprovado{border-left:4px solid #c0392b;opacity:0.7;}
+.login-box {
+  text-align: center;
+  padding: 48px;
+  max-width: 420px;
+  width: 90%;
+}
+.login-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--branco);
+  margin-bottom: 4px;
+}
+.login-brand span { color: var(--gold); }
+.login-slogan {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.login-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 32px;
+}
+.login-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: var(--branco);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.login-input::placeholder { color: rgba(255,255,255,0.3); letter-spacing: 0; }
+.login-input:focus { border-color: var(--gold); }
+.login-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--branco);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.15s;
+}
+.login-btn:hover { background: #B5822F; }
+.login-btn:active { transform: scale(0.98); }
+.login-error {
+  color: var(--laranja);
+  font-size: 13px;
+  margin-top: 12px;
+  min-height: 20px;
+}
 
-.card-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--plum);}
-.card-info{font-size:0.78rem;color:var(--muted);line-height:1.8;}
-.card-info span{display:block;}
-.card-status{font-size:0.68rem;font-weight:600;padding:3px 10px;border-radius:999px;align-self:flex-start;}
-.st-pendente{background:#FEF3E8;color:#B85C1A;}
-.st-aprovado{background:#E3F4ED;color:#3D7A5E;}
-.st-reprovado{background:#FCE8E8;color:#c0392b;}
+/* ═══════ HEADER ═══════ */
+header {
+  background: linear-gradient(135deg, var(--plum) 0%, var(--plum-mid) 50%, var(--roxo) 100%);
+  padding: 48px 24px 52px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -30%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(200,147,74,0.15), transparent 70%);
+  pointer-events: none;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -40%; left: -20%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(232,101,42,0.08), transparent 70%);
+  pointer-events: none;
+}
+.header-hub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  position: relative; z-index: 1;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--branco);
+  position: relative; z-index: 1;
+  margin-bottom: 4px;
+}
+.header-title span { color: var(--gold); }
+.header-slogan {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  position: relative; z-index: 1;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+}
+.header-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  position: relative; z-index: 1;
+  margin-top: 16px;
+  letter-spacing: 0.3px;
+}
 
-.card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;}
-.btn-aprovar{flex:1;padding:0.5rem;background:var(--sage);color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;}
-.btn-reprovar{flex:1;padding:0.5rem;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;}
-.btn-premium{padding:0.5rem;background:var(--gold);color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;}
-.btn-ver{padding:0.5rem 0.8rem;background:var(--plum);color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:none;display:inline-block;text-align:center;}
-.btn-del{padding:0.5rem;background:transparent;color:#ccc;border:1px solid var(--border);border-radius:8px;font-size:0.77rem;cursor:pointer;}
-.btn-del:hover{color:#c0392b;border-color:#c0392b;}
+/* ═══════ NAV TABS ═══════ */
+.nav-tabs {
+  background: rgba(45,27,78,0.95);
+  backdrop-filter: blur(12px);
+  padding: 14px 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.nav-tab {
+  padding: 9px 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.nav-tab:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+.nav-tab.active {
+  background: var(--gold);
+  color: var(--branco);
+  border-color: var(--gold);
+  font-weight: 600;
+}
 
-.empty{text-align:center;padding:3rem;color:var(--muted);}
-.loading{text-align:center;padding:2rem;color:var(--muted);}
-.toast{position:fixed;bottom:2rem;right:2rem;background:var(--plum);color:#fff;padding:0.8rem 1.4rem;border-radius:12px;font-size:0.85rem;z-index:999;box-shadow:0 8px 24px rgba(15,13,26,0.3);}
+/* ═══════ SECTIONS ═══════ */
+.section {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  animation: fadeIn 0.35s ease;
+}
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;text-align:center;}
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:var(--plum);line-height:1;}
-.stat-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
-.stat-card.gold{border-color:var(--gold);}
-.stat-card.gold .stat-num{color:var(--gold);}
+.section-label {
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--texto-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--plum);
+  margin-bottom: 8px;
+}
+.section-desc {
+  font-size: 14px;
+  color: var(--texto-sub);
+  margin-bottom: 28px;
+  max-width: 600px;
+}
 
-/* MODAL */
-#modal{display:none;position:fixed;inset:0;background:rgba(15,13,26,0.6);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px);}
-#modal.open{display:flex;}
-.modal-box{background:var(--card);border-radius:18px;padding:1.8rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
-.modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--plum);margin-bottom:1.2rem;}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.modal-grid label{font-size:0.72rem;color:var(--muted);display:block;margin-bottom:3px;}
-.modal-grid input,.modal-grid select,.modal-grid textarea{width:100%;padding:0.55rem 0.8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;}
-.modal-grid input:focus,.modal-grid select:focus{border-color:var(--violet);}
-.mfull{grid-column:span 2;}
-.modal-actions{display:flex;gap:8px;margin-top:1.2rem;}
-.btn-save{flex:1;padding:0.65rem;background:var(--plum);color:#fff;border:none;border-radius:9px;font-family:'Outfit',sans-serif;font-size:0.88rem;cursor:pointer;}
-.btn-cancel{padding:0.65rem 1rem;background:transparent;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:0.88rem;cursor:pointer;color:var(--muted);}
+/* ═══════ CARDS ═══════ */
+.card {
+  background: var(--branco);
+  border-radius: var(--radius);
+  border: 1px solid var(--cinza-borda);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.25s;
+}
+.card:hover { box-shadow: var(--shadow-lg); }
 
-@media(max-width:500px){.modal-grid{grid-template-columns:1fr;}.mfull{grid-column:span 1;}.content{padding:1.5rem 1rem;}}
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.card-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  flex-shrink: 0;
+  color: var(--branco);
+}
+.num-azul { background: var(--azul); }
+.num-ciano { background: var(--ciano); }
+.num-roxo { background: var(--roxo); }
+.num-indigo { background: var(--plum); }
+.num-laranja { background: var(--laranja); }
+.num-grad { background: linear-gradient(135deg, var(--plum), var(--roxo)); }
+
+.card-info { flex: 1; }
+.card-title { font-size: 16px; font-weight: 600; color: var(--texto); margin-bottom: 2px; }
+.card-sub { font-size: 13px; color: var(--texto-muted); }
+.card-toggle {
+  font-size: 18px;
+  color: var(--texto-muted);
+  transition: transform 0.3s;
+  margin-top: 4px;
+}
+.card.open .card-toggle { transform: rotate(180deg); }
+.card-body {
+  display: none;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--cinza-borda);
+}
+.card.open .card-body { display: block; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid var(--cinza-borda);
+  background: var(--creme);
+}
+.chip-label { font-weight: 600; color: var(--texto); }
+.chip-val { color: var(--texto-sub); font-family: monospace; font-size: 11px; }
+.chip-link {
+  color: var(--gold);
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 11px;
+}
+.chip-link:hover { text-decoration: underline; }
+
+/* Flow */
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.flow-step {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  border: 1px solid var(--cinza-borda);
+  background: var(--creme);
+  color: var(--texto);
+}
+.flow-step.gold { background: #FFF3DB; border-color: #E8C76A; color: #6B4E00; }
+.flow-arrow { color: var(--texto-muted); font-size: 13px; }
+
+.note {
+  font-size: 12px;
+  color: var(--texto-sub);
+  background: var(--creme);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--gold);
+  margin-top: 12px;
+  line-height: 1.7;
+}
+
+/* ═══════ IDENTIDADE VISUAL ═══════ */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.swatch-card {
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--branco);
+  box-shadow: var(--shadow);
+}
+.swatch-color {
+  height: 90px;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 14px;
+}
+.swatch-color span { font-size: 22px; font-weight: 600; }
+.swatch-meta { padding: 14px; }
+.swatch-name { font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 2px; }
+.swatch-hex { font-size: 13px; font-family: monospace; color: var(--texto-sub); margin-bottom: 2px; }
+.swatch-use { font-size: 11px; color: var(--texto-muted); margin-bottom: 8px; }
+.copy-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--cinza-borda);
+  background: var(--creme);
+  color: var(--texto-sub);
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { background: var(--cinza-bg); border-color: var(--gold); color: var(--gold); }
+
+.tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+.tipo-card {
+  background: var(--branco);
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.tipo-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--texto-muted); margin-bottom: 8px; font-weight: 600; }
+.tipo-preview-serif {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--plum);
+  margin-bottom: 4px;
+}
+.tipo-preview-sans {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--texto);
+  margin-bottom: 4px;
+}
+.tipo-font { font-size: 12px; color: var(--texto-muted); font-family: monospace; }
+
+.style-section { margin-top: 24px; }
+.style-title { font-size: 15px; font-weight: 600; color: var(--texto); margin-bottom: 12px; }
+.style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.style-item {
+  padding: 14px;
+  background: var(--creme);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--cinza-borda);
+}
+.style-item-label { font-size: 12px; font-weight: 600; color: var(--plum); margin-bottom: 4px; }
+.style-item-val { font-size: 12px; color: var(--texto-sub); line-height: 1.5; }
+
+/* ═══════ INSTAGRAM ═══════ */
+.bio-box {
+  background: var(--branco);
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.bio-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--texto-muted); margin-bottom: 10px; font-weight: 600; }
+.bio-text {
+  font-size: 14px;
+  color: var(--texto);
+  line-height: 1.8;
+  white-space: pre-line;
+  margin-bottom: 14px;
+}
+.bio-copy-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bio-copy-btn:hover { background: var(--gold); color: var(--branco); }
+
+.pilares-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.pilar-card {
+  background: var(--branco);
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.pilar-emoji { font-size: 28px; margin-bottom: 8px; }
+.pilar-name { font-size: 13px; font-weight: 600; color: var(--texto); margin-bottom: 4px; }
+.pilar-freq { font-size: 11px; color: var(--gold); font-weight: 500; }
+.pilar-desc { font-size: 11px; color: var(--texto-muted); margin-top: 6px; line-height: 1.4; }
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.post-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  text-align: center;
+  transition: transform 0.2s;
+  cursor: default;
+}
+.post-cell:hover { transform: scale(1.02); z-index: 1; }
+.post-dark {
+  background: var(--plum);
+  color: var(--branco);
+}
+.post-light {
+  background: var(--branco);
+  color: var(--plum);
+  border: 1px solid var(--cinza-borda);
+}
+.post-accent {
+  background: linear-gradient(135deg, var(--plum), var(--roxo));
+  color: var(--branco);
+}
+.post-warm {
+  background: var(--laranja);
+  color: var(--branco);
+}
+.post-icon { font-size: 24px; margin-bottom: 6px; }
+.post-type { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.65; margin-bottom: 4px; font-weight: 600; }
+.post-title { font-size: 11px; font-weight: 600; line-height: 1.3; }
+
+/* ═══════ SQL ═══════ */
+.sql-card {
+  background: var(--branco);
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.sql-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--creme);
+  border-bottom: 1px solid var(--cinza-borda);
+}
+.sql-label { font-size: 14px; font-weight: 600; color: var(--texto); }
+.sql-tag {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sql-tag.manu { background: #E3F0FF; color: var(--gold); }
+.sql-tag.auto { background: #E6F9F0; color: #0D6B4A; }
+.sql-tag.seg { background: #FFF0E3; color: #9A4A00; }
+.sql-body { padding: 16px 18px; }
+.sql-desc { font-size: 12px; color: var(--texto-sub); margin-bottom: 10px; }
+.sql-code {
+  background: #1E1E2E;
+  color: #CDD6F4;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  margin-bottom: 10px;
+  position: relative;
+}
+.sql-code .kw { color: #CBA6F7; }
+.sql-code .fn { color: #89B4FA; }
+.sql-code .str { color: #A6E3A1; }
+.sql-code .cm { color: #6C7086; font-style: italic; }
+.sql-code .op { color: #F38BA8; }
+.sql-copy {
+  padding: 7px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--cinza-borda);
+  background: var(--creme);
+  color: var(--texto-sub);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sql-copy:hover { background: var(--gold); color: var(--branco); border-color: var(--gold); }
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 640px) {
+  .header-title { font-size: 28px; }
+  .nav-tabs { gap: 6px; padding: 10px 12px; }
+  .nav-tab { padding: 7px 12px; font-size: 12px; }
+  .section { padding: 24px 14px 48px; }
+  .tipo-grid { grid-template-columns: 1fr; }
+  .style-grid { grid-template-columns: 1fr; }
+  .swatches { grid-template-columns: repeat(2, 1fr); }
+  .pilares-grid { grid-template-columns: repeat(2, 1fr); }
+  .posts-grid { gap: 3px; }
+  .post-cell { padding: 10px 6px; }
+  .post-title { font-size: 10px; }
+}
+
+/* ═══════ FOOTER ═══════ */
+footer {
+  background: var(--plum);
+  padding: 28px 20px;
+  text-align: center;
+}
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--branco);
+  margin-bottom: 4px;
+}
+.footer-brand span { color: var(--gold); }
+.footer-text {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 </style>
 </head>
 <body>
 
-<div id="login">
-  <div class="lbox">
-    <div class="lbrand">Conexão <em>Psi</em></div>
-    <div class="ltag">Painel Administrativo</div>
-    <div class="lcard">
-      <h2>Acesso Restrito</h2>
-      <p>Exclusivo para administradores da plataforma</p>
-      <input type="password" class="linput" id="senha" placeholder="Senha admin" onkeydown="if(event.key==='Enter')entrar()">
-      <button class="lblogin" onclick="entrar()">Entrar →</button>
-      <div class="lerr" id="lerr"></div>
+<!-- ═══════ LOGIN ═══════ -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-brand">Conexão <span>Psi</span></div>
+    <div class="login-slogan">Mais do que conexão, somos uma comunidade de psis.</div>
+    <div class="login-sub">HUB Admin — Acesso restrito</div>
+    <input type="password" class="login-input" id="login-pw" placeholder="Senha do Hub" autofocus>
+    <button class="login-btn" onclick="tryLogin()">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════ HEADER ═══════ -->
+<header>
+  <div class="header-hub">Hub Admin</div>
+  <div class="header-title">Conexão <span>Psi</span></div>
+  <div class="header-slogan">Mais do que conexão, somos uma comunidade de psis.</div>
+  <div class="header-desc">Sua rede de indicações — todos os braços da plataforma em um só lugar</div>
+</header>
+
+<!-- ═══════ NAV TABS ═══════ -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('sistema')">🗂️ Sistema</button>
+  <button class="nav-tab" onclick="showTab('visual')">🎨 Identidade Visual</button>
+  <button class="nav-tab" onclick="showTab('instagram')">📱 Instagram</button>
+  <button class="nav-tab" onclick="showTab('sql')">🗄️ SQL Úteis</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SEÇÃO 1 — SISTEMA
+     ═══════════════════════════════════════ -->
+<div class="section active" id="tab-sistema">
+  <div class="section-label">Guia do sistema</div>
+  <div class="section-title">Links e Etapas</div>
+  <div class="section-desc">Todos os links, senhas e fluxos da Conexão Psi organizados por etapa.</div>
+
+  <!-- 1 Diretório público -->
+  <div class="card open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-azul">1</div>
+      <div class="card-info">
+        <div class="card-title">Diretório público</div>
+        <div class="card-sub">Pacientes encontram psicólogos — sem senha</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">LINK</span><a class="chip-link" href="https://tinyurl.com/ConexaoPsiRede" target="_blank">tinyurl.com/ConexaoPsiRede ↗</a></div>
+        <div class="chip"><span class="chip-label">ACESSO</span><span class="chip-val">Público</span></div>
+      </div>
+      <div class="flow">
+        <span class="flow-step">Paciente abre o site</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step gold">Vê psis Premium ⭐ e Gratuitas</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Clica no WhatsApp</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 Cadastro -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-ciano">2</div>
+      <div class="card-info">
+        <div class="card-title">Cadastro de psicóloga</div>
+        <div class="card-sub">Tally → Supabase → aguarda aprovação</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">LINK</span><a class="chip-link" href="https://tally.so/r/b5OGYZ" target="_blank">tally.so/r/b5OGYZ ↗</a></div>
+        <div class="chip"><span class="chip-label">ACESSO</span><span class="chip-val">Público</span></div>
+      </div>
+      <div class="flow">
+        <span class="flow-step">Psi preenche Tally</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Entra como pendente</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step gold">Admin aprova</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Aparece no site</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Editar perfil -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-roxo">3</div>
+      <div class="card-info">
+        <div class="card-title">Editar meu perfil</div>
+        <div class="card-sub">Login pelo e-mail cadastrado no Tally</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">LINK</span><span class="chip-val">…/perfil.html</span></div>
+        <div class="chip"><span class="chip-label">LOGIN</span><span class="chip-val">e-mail do cadastro</span></div>
+      </div>
+      <div class="flow">
+        <span class="flow-step">Entra com e-mail</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Edita WhatsApp, bio, valor, disponibilidade</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Salva</span>
+      </div>
+      <div class="note">Dados salvos aparecem automaticamente no diretório.</div>
+    </div>
+  </div>
+
+  <!-- 4 Área de pacientes -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-indigo">4</div>
+      <div class="card-info">
+        <div class="card-title">Área de pacientes</div>
+        <div class="card-sub">Encaminhamentos da rede — restrita às psis cadastradas</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">LINK</span><span class="chip-val">…/pacientes.html</span></div>
+        <div class="chip"><span class="chip-label">SENHA</span><span class="chip-val">psiredepsi2026</span></div>
+      </div>
+      <div class="flow">
+        <span class="flow-step">Entra com senha</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Vê pacientes disponíveis</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Registra interesse</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step gold">Admin libera contato</span>
+      </div>
+      <div class="note">Máximo 3 psis por paciente. Dados do paciente visíveis só após admin liberar.</div>
+    </div>
+  </div>
+
+  <!-- 5 Indicar paciente -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-laranja">5</div>
+      <div class="card-info">
+        <div class="card-title">Indicar um paciente</div>
+        <div class="card-sub">Formulário confidencial — sem senha</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">LINK</span><a class="chip-link" href="https://tally.so/r/gD46z1" target="_blank">tally.so/r/gD46z1 ↗</a></div>
+        <div class="chip"><span class="chip-label">ACESSO</span><span class="chip-val">Psis da rede</span></div>
+      </div>
+      <div class="flow">
+        <span class="flow-step">Psi preenche perfil do paciente</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Aparece em pacientes.html</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Outra psi pega o caso</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 Plano Premium / Fundadora -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-num num-grad">6</div>
+      <div class="card-info">
+        <div class="card-title">Assinar Perfil Premium ⭐</div>
+        <div class="card-sub">Destaque dourado + bio + WhatsApp no perfil</div>
+      </div>
+      <div class="card-toggle">▾</div>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <div class="chip"><span class="chip-label">PÁGINA</span><span class="chip-val">…/planos.html</span></div>
+        <div class="chip"><span class="chip-label">CHECKOUT</span><a class="chip-link" href="https://pay.kiwify.com.br/O5SVu87" target="_blank">pay.kiwify.com.br/O5SVu87 ↗</a></div>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--plum);">Plano Fundadora — oferta exclusiva para as 64 cadastradas</div>
+      <div class="chips" style="margin-top: 10px;">
+        <div class="chip"><span class="chip-label">PÁGINA</span><a class="chip-link" href="https://michellepsicologiareal-collab.github.io/conexao-psi-fundadoras" target="_blank">…/conexao-psi-fundadoras ↗</a></div>
+        <div class="chip"><span class="chip-label">SENHA</span><span class="chip-val">fundadora</span></div>
+        <div class="chip"><span class="chip-label">CUPOM</span><span class="chip-val" style="color: var(--laranja); font-weight: 700; font-size: 13px;">FUNDADORA</span></div>
+      </div>
+      <div class="note">Aplica R$14,00/mês nos primeiros 3 meses → depois R$27,90/mês</div>
+
+      <div class="flow" style="margin-top: 14px;">
+        <span class="flow-step">Acessa fundadora.html</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Digita senha: fundadora</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Clica em Assinar</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Kiwify aplica cupom</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Paga R$14,00</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">obrigado.html</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step gold">Admin ativa premium</span>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--plum);">Plano normal — novas entrantes</div>
+      <div class="flow" style="margin-top: 10px;">
+        <span class="flow-step">Acessa planos.html</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Clica em assinar Premium</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Kiwify — R$20 primeiro mês</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">obrigado.html</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step gold">Admin ativa premium</span>
+      </div>
+      <div class="note">Após pagar: psi deve entrar em perfil.html para completar bio, WhatsApp e especialidades antes de ser ativada.</div>
     </div>
   </div>
 </div>
 
-<div id="app">
-  <header class="header">
-    <div>
-      <div class="hbrand">Conexão <em>Psi</em></div>
-      <div class="htag">Painel Admin</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
-      <span class="chip">⚙️ Admin</span>
-      <a href="index.html" class="bback">← Site</a>
-      <button class="bsair" onclick="sair()">Sair</button>
-    </div>
-  </header>
+<!-- ═══════════════════════════════════════
+     SEÇÃO 2 — IDENTIDADE VISUAL
+     ═══════════════════════════════════════ -->
+<div class="section" id="tab-visual">
+  <div class="section-label">Brand guidelines</div>
+  <div class="section-title">Identidade Visual</div>
+  <div class="section-desc">Cores oficiais, tipografia e diretrizes visuais da marca Conexão Psi.</div>
 
-  <div class="tabs">
-    <button class="tab active" onclick="mudarAba('pendentes',this)">⏳ Pendentes <span class="badge" id="n-pend">0</span></button>
-    <button class="tab" onclick="mudarAba('aprovados',this)">✅ Aprovados <span class="badge" id="n-aprov" style="background:var(--sage)">0</span></button>
-    <button class="tab" onclick="mudarAba('premium',this)">✨ Premium <span class="badge" id="n-prem" style="background:var(--gold)">0</span></button>
-    <button class="tab" onclick="mudarAba('todos',this)">📋 Todos</button>
-    <button class="tab" onclick="abrirHub(this)">🧭 Hub</button>
+  <!-- Swatches -->
+  <div style="font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 12px;">Paleta de cores oficiais</div>
+  <div class="swatches">
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #1B5EA6;"><span style="color: #fff;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Azul Principal</div>
+        <div class="swatch-hex">#1B5EA6</div>
+        <div class="swatch-use">Tipografia "Conexão", ícone Ψ, links</div>
+        <button class="copy-btn" onclick="copyText('#1B5EA6', this)">Copiar</button>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #29A8CC;"><span style="color: #fff;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Ciano / Azul Claro</div>
+        <div class="swatch-hex">#29A8CC</div>
+        <div class="swatch-use">Figura central do logo, destaques, CTAs</div>
+        <button class="copy-btn" onclick="copyText('#29A8CC', this)">Copiar</button>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #6B3FA0;"><span style="color: #fff;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Roxo Principal</div>
+        <div class="swatch-hex">#6B3FA0</div>
+        <div class="swatch-use">Tipografia "Psi", detalhes do logo</div>
+        <button class="copy-btn" onclick="copyText('#6B3FA0', this)">Copiar</button>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #3B2E8A;"><span style="color: #fff;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Índigo Profundo</div>
+        <div class="swatch-hex">#3B2E8A</div>
+        <div class="swatch-use">Fundos escuros, header, cards dark</div>
+        <button class="copy-btn" onclick="copyText('#3B2E8A', this)">Copiar</button>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #E8652A;"><span style="color: #fff;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Laranja Energia</div>
+        <div class="swatch-hex">#E8652A</div>
+        <div class="swatch-use">Figura inferior do logo, alertas, accent</div>
+        <button class="copy-btn" onclick="copyText('#E8652A', this)">Copiar</button>
+      </div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-color" style="background: #FFFFFF; border-bottom: 1px solid #eee;"><span style="color: #bbb;">Aa</span></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Branco</div>
+        <div class="swatch-hex">#FFFFFF</div>
+        <div class="swatch-use">Fundo, ícone Ψ, textos sobre cor</div>
+        <button class="copy-btn" onclick="copyText('#FFFFFF', this)">Copiar</button>
+      </div>
+    </div>
   </div>
 
-  <div class="content">
-    <!-- STATS -->
-    <div class="stats" id="stats"></div>
-    <!-- ACTIONS -->
-    <div class="section-title">
-      <span id="section-label">Psicólogos Pendentes</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-refresh" onclick="carregar()">🔄 Atualizar</button>
-        <button class="btn-export" onclick="exportar()">📥 CSV</button>
+  <!-- Tipografia -->
+  <div style="font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 12px; margin-top: 28px;">Tipografia</div>
+  <div class="tipo-grid">
+    <div class="tipo-card">
+      <div class="tipo-label">Display / Títulos</div>
+      <div class="tipo-preview-serif">Conexão Psi</div>
+      <div class="tipo-font">Cormorant Garamond · 500/600</div>
+    </div>
+    <div class="tipo-card">
+      <div class="tipo-label">Corpo / Interface</div>
+      <div class="tipo-preview-sans">Sua rede de indicações profissionais</div>
+      <div class="tipo-font">DM Sans · 400/500/600</div>
+    </div>
+  </div>
+
+  <!-- Estilo de posts -->
+  <div class="style-section">
+    <div class="style-title">Estilo de posts e comunicação</div>
+    <div class="style-grid">
+      <div class="style-item">
+        <div class="style-item-label">Tom de voz</div>
+        <div class="style-item-val">Profissional, acolhedor e direto. Sem jargões corporativos. Fala de psi para psi.</div>
+      </div>
+      <div class="style-item">
+        <div class="style-item-label">Visual do feed</div>
+        <div class="style-item-val">Grid alternando fundo escuro (índigo) e claro (branco). Tipografia serifada nos títulos.</div>
+      </div>
+      <div class="style-item">
+        <div class="style-item-label">Referências visuais</div>
+        <div class="style-item-val">Minimalista editorial. Sem excesso de ícones. Espaço negativo generoso. Fotografias com filtro frio.</div>
+      </div>
+      <div class="style-item">
+        <div class="style-item-label">Perfis de referência</div>
+        <div class="style-item-val">@vittude · @psicologiareal_terapias · @endeavor_brasil</div>
       </div>
     </div>
-    <div id="grid" class="grid"></div>
-    <!-- HUB SECTION -->
-    <div id="hub-section" style="display:none;">
-      <div style="max-width:680px;margin:0 auto;padding:8px 0 40px;">
-
-        <!-- SENHA DO HUB -->
-        <div id="hub-gate" style="text-align:center;padding:40px 20px;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--plum);margin-bottom:8px;">Hub Conexão Psi</div>
-          <div style="font-size:12px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;">Acesso restrito</div>
-          <input id="hub-pwd" type="password" placeholder="Senha do Hub"
-            style="width:100%;max-width:280px;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(45,27,78,0.2);font-family:'Outfit',sans-serif;font-size:14px;outline:none;display:block;margin:0 auto 12px;"
-            onkeydown="if(event.key==='Enter') verificarHub()"/>
-          <button onclick="verificarHub()" style="background:var(--plum);color:white;border:none;padding:12px 28px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;max-width:280px;">Entrar no Hub</button>
-          <div id="hub-err" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;">Senha incorreta.</div>
-        </div>
-
-        <!-- CONTEÚDO DO HUB -->
-        <div id="hub-content" style="display:none;">
-
-          <!-- IDENTIDADE VISUAL -->
-          <div style="margin-bottom:24px;">
-            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">🎨 Identidade Visual</div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-              <div style="background:#4A5240;border-radius:12px;padding:16px;color:#D9C4B0;">
-                <div style="font-size:13px;font-weight:600;">Verde-oliva</div>
-                <div style="font-family:monospace;font-size:11px;opacity:0.7;margin-top:2px;">#4A5240</div>
-                <div style="font-size:11px;margin-top:6px;opacity:0.8;">Fundos, headers</div>
-              </div>
-              <div style="background:#D9C4B0;border-radius:12px;padding:16px;color:#2a1f3d;border:1px solid rgba(45,27,78,0.1);">
-                <div style="font-size:13px;font-weight:600;">Nude rosado</div>
-                <div style="font-family:monospace;font-size:11px;opacity:0.6;margin-top:2px;">#D9C4B0</div>
-                <div style="font-size:11px;margin-top:6px;opacity:0.7;">Texto, cards</div>
-              </div>
-              <div style="background:#B5603A;border-radius:12px;padding:16px;color:#fff;">
-                <div style="font-size:13px;font-weight:600;">Terracota</div>
-                <div style="font-family:monospace;font-size:11px;opacity:0.7;margin-top:2px;">#B5603A</div>
-                <div style="font-size:11px;margin-top:6px;opacity:0.8;">CTAs, destaques</div>
-              </div>
-              <div style="background:#F5F0EA;border-radius:12px;padding:16px;color:#2a1f3d;border:1px solid rgba(45,27,78,0.1);">
-                <div style="font-size:13px;font-weight:600;">Off-white</div>
-                <div style="font-family:monospace;font-size:11px;opacity:0.6;margin-top:2px;">#F5F0EA</div>
-                <div style="font-size:11px;margin-top:6px;opacity:0.7;">Fundos claros</div>
-              </div>
-            </div>
-
-            <div style="background:rgba(45,27,78,0.04);border-radius:10px;padding:14px;font-size:13px;color:var(--text);line-height:1.7;">
-              <strong>Tipografia:</strong> Cormorant Garamond (títulos) · DM Sans (corpo) · DM Sans Bold (dados)<br>
-              <strong>Estilo:</strong> Fundo escuro = autoridade · Fundo claro = educativo · Sem fotos de banco<br>
-              <strong>Grid:</strong> Escuro → Claro → Escuro alternado<br>
-              <strong>Referências:</strong> @vittude · @psicologiareal_terapias · @endeavor_brasil
-            </div>
-          </div>
-
-          <!-- INSTAGRAM -->
-          <div style="margin-bottom:24px;">
-            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">📱 Instagram @conexaopsi</div>
-
-            <!-- BIO -->
-            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Bio otimizada</div>
-            <div style="background:white;border:1px solid rgba(45,27,78,0.1);border-radius:10px;padding:14px;font-size:14px;line-height:1.9;color:var(--text);margin-bottom:16px;position:relative;">
-              🔗 A rede de encaminhamento entre psicólogos<br>
-              Encaminhe com confiança. Receba pacientes qualificados.<br>
-              Cadastre-se gratuitamente 👇<br>
-              <span style="color:var(--gold);font-size:12px;">tally.so/r/b5OGYZ</span>
-              <button onclick="copiarBio()" style="position:absolute;top:10px;right:10px;background:var(--plum);color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;" id="btn-bio-copy">📋 Copiar</button>
-            </div>
-
-            <!-- PILARES -->
-            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">5 Pilares de conteúdo</div>
-            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
-              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
-                <div style="background:#EEEDFE;color:#3C3489;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
-                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Encaminhamento na prática</span> <span style="font-size:12px;color:var(--muted);">· 2x/semana</span></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
-                <div style="background:#E1F5EE;color:#085041;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
-                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Psi da rede — perfil de membro</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
-                <div style="background:#E6F1FB;color:#0C447C;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
-                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Dados e mercado</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
-                <div style="background:#FAEEDA;color:#854F0B;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</div>
-                <div><span style="font-size:13px;font-weight:600;color:var(--text);">Bastidores da rede</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid rgba(45,27,78,0.07);">
-                <div style="background:#FCEBEB;color:#A32D2D;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">5</div>
-                <div><span style="font-size:13px;font-weight:600;color:var(--text);">CTA de cadastro</span> <span style="font-size:12px;color:var(--muted);">· 1x/semana</span></div>
-              </div>
-            </div>
-
-            <!-- 9 POSTS -->
-            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">9 Posts de lançamento</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
-                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">01</div>
-                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Apresentação — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">"Você já perdeu um paciente porque não sabia para quem encaminhar?"</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
-                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">02</div>
-                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dado de mercado — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"O Brasil tem +500 mil psicólogos. A maioria ainda encaminha pelo WhatsApp."</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
-                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">03</div>
-                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Como funciona — carrossel escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">5 slides explicando o fluxo. Zero comissão. CTA de cadastro.</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
-                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">04</div>
-                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dor do psi — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"3 situações em que você precisou encaminhar e não sabia para quem."</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
-                <div style="background:rgba(200,147,74,0.25);color:#C8934A;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">05</div>
-                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Perfil de membro — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">Apresentação de uma psi cadastrada. Pode ser você no lançamento.</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
-                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">06</div>
-                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Diferencial vs mercado — carrossel</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Encaminhamento entre psis vs. diretório para pacientes.</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
-                <div style="background:#B5603A;color:#fff;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">07</div>
-                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Bastidores — Reels 60s ⭐ maior alcance</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">Michelle fala: "Por que criei a Conexão Psi." História pessoal.</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#F5F0EA;border-radius:10px;border:1px solid rgba(45,27,78,0.08);align-items:flex-start;">
-                <div style="background:#e8e0d5;color:#4A5240;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">08</div>
-                <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dado + prova social — fundo claro</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">"[X] psicólogos já fazem parte da rede." Atualizar com o número real.</div></div>
-              </div>
-              <div style="display:flex;gap:10px;padding:12px;background:#2a1f3d;border-radius:10px;align-items:flex-start;">
-                <div style="background:#B5603A;color:#fff;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">09</div>
-                <div><div style="font-size:13px;font-weight:600;color:#FAF7F2;">Convite direto — fundo escuro</div><div style="font-size:12px;color:rgba(250,247,242,0.55);margin-top:2px;">"Se você é psicóloga e quer receber encaminhamentos — seu lugar é aqui." CTA Tally.</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SQL ÚTEIS -->
-          <div>
-            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(45,27,78,0.08);">🗄️ SQL Úteis</div>
-            <div style="display:flex;flex-direction:column;gap:10px;" id="sql-list"></div>
-          </div>
-
-        </div><!-- fim hub-content -->
-      </div>
-    </div><!-- fim hub-section -->
-    <div id="empty" class="empty" style="display:none;">Nenhum registro aqui.</div>
-    <div id="loading" class="loading">Carregando...</div>
   </div>
 </div>
 
-<!-- MODAL EDITAR -->
-<div id="modal">
-  <div class="modal-box">
-    <h3>✏️ Editar Psicóloga</h3>
-    <div class="modal-grid">
-      <div class="mfull"><label>Nome</label><input id="e-nome"></div>
-      <div><label>CRP</label><input id="e-crp"></div>
-      <div><label>Instagram</label><input id="e-handle" placeholder="sem @"></div>
-      <div><label>Abordagem</label><input id="e-abordagem"></div>
-      <div><label>Formato</label>
-        <select id="e-formato"><option>Online</option><option>Presencial</option><option>Ambos</option></select>
-      </div>
-      <div class="mfull"><label>Cidade/Estado</label><input id="e-cidade"></div>
-      <div class="mfull"><label>Público Atendido</label><input id="e-publico"></div>
-      <div class="mfull"><label>Email</label><input id="e-email" type="email"></div>
-      <div><label>WhatsApp</label><input id="e-whatsapp" placeholder="só números"></div>
-      <div><label>Valor da Sessão</label><input id="e-valor"></div>
-      <div class="mfull"><label>Especialidades</label><input id="e-especialidades" placeholder="separadas por vírgula"></div>
-      <div class="mfull"><label>Mini Bio (Premium)</label><textarea id="e-bio" style="min-height:60px;"></textarea></div>
-      <div><label>Status</label>
-        <select id="e-status">
-          <option value="pendente">Pendente</option>
-          <option value="aprovado">Aprovado</option>
-          <option value="reprovado">Reprovado</option>
-        </select>
-      </div>
-      <div><label>Premium</label>
-        <select id="e-premium">
-          <option value="false">Não</option>
-          <option value="true">Sim ✨</option>
-        </select>
-      </div>
+<!-- ═══════════════════════════════════════
+     SEÇÃO 3 — INSTAGRAM
+     ═══════════════════════════════════════ -->
+<div class="section" id="tab-instagram">
+  <div class="section-label">Estratégia de conteúdo</div>
+  <div class="section-title">Instagram</div>
+  <div class="section-desc">Bio pronta, pilares de conteúdo e grid visual para a conta @conexaopsi.</div>
+
+  <!-- Bio -->
+  <div class="bio-box">
+    <div class="bio-label">Bio pronta — @conexaopsi</div>
+    <div class="bio-text" id="bio-content">🔗 Rede de indicações entre psicólogos
+Encontre o profissional certo para o seu paciente.
+✔ Encaminhamentos reais entre colegas
+✔ Diretório público para pacientes
+📥 Cadastre-se gratuitamente
+👇 Acesse o diretório</div>
+    <button class="bio-copy-btn" onclick="copyBio()">📋 Copiar Bio</button>
+  </div>
+
+  <!-- Pilares -->
+  <div style="font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 12px;">5 Pilares de conteúdo</div>
+  <div class="pilares-grid">
+    <div class="pilar-card">
+      <div class="pilar-emoji">🤝</div>
+      <div class="pilar-name">Conexão</div>
+      <div class="pilar-freq">2x por semana</div>
+      <div class="pilar-desc">Valor da rede, depoimentos, histórias de encaminhamento</div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-save" onclick="salvarEd()">Salvar</button>
-      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+    <div class="pilar-card">
+      <div class="pilar-emoji">📋</div>
+      <div class="pilar-name">Educação clínica</div>
+      <div class="pilar-freq">2x por semana</div>
+      <div class="pilar-desc">Quando encaminhar, como avaliar demanda, critérios de indicação</div>
+    </div>
+    <div class="pilar-card">
+      <div class="pilar-emoji">⭐</div>
+      <div class="pilar-name">Premium Spotlight</div>
+      <div class="pilar-freq">1x por semana</div>
+      <div class="pilar-desc">Destaque de psi premium, card do perfil, print do site</div>
+    </div>
+    <div class="pilar-card">
+      <div class="pilar-emoji">🧠</div>
+      <div class="pilar-name">Bastidores</div>
+      <div class="pilar-freq">1x por semana</div>
+      <div class="pilar-desc">Como a rede funciona, dados, métricas, construção da plataforma</div>
+    </div>
+    <div class="pilar-card">
+      <div class="pilar-emoji">📣</div>
+      <div class="pilar-name">CTA / Conversão</div>
+      <div class="pilar-freq">1x por semana</div>
+      <div class="pilar-desc">Cadastre-se, seja premium, indique um paciente, link do diretório</div>
+    </div>
+  </div>
+
+  <!-- Grid de posts -->
+  <div style="font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 12px; margin-top: 20px;">Grid visual — 9 posts (escuro/claro alternado)</div>
+  <div class="posts-grid">
+    <div class="post-cell post-dark">
+      <div class="post-icon">🤝</div>
+      <div class="post-type">Conexão</div>
+      <div class="post-title">Você não precisa atender todo mundo</div>
+    </div>
+    <div class="post-cell post-light">
+      <div class="post-icon">📋</div>
+      <div class="post-type">Educação</div>
+      <div class="post-title">5 sinais de que é hora de encaminhar</div>
+    </div>
+    <div class="post-cell post-accent">
+      <div class="post-icon">⭐</div>
+      <div class="post-type">Premium</div>
+      <div class="post-title">Conheça quem está na rede</div>
+    </div>
+    <div class="post-cell post-light">
+      <div class="post-icon">🧠</div>
+      <div class="post-type">Bastidores</div>
+      <div class="post-title">64 psis em 2 semanas — como começamos</div>
+    </div>
+    <div class="post-cell post-dark">
+      <div class="post-icon">📣</div>
+      <div class="post-type">CTA</div>
+      <div class="post-title">Seu perfil está invisível? Cadastre-se agora</div>
+    </div>
+    <div class="post-cell post-light">
+      <div class="post-icon">🤝</div>
+      <div class="post-type">Conexão</div>
+      <div class="post-title">Encaminhamento não é perder paciente</div>
+    </div>
+    <div class="post-cell post-warm">
+      <div class="post-icon">📋</div>
+      <div class="post-type">Educação</div>
+      <div class="post-title">Como descrever uma demanda sem expor</div>
+    </div>
+    <div class="post-cell post-light">
+      <div class="post-icon">⭐</div>
+      <div class="post-type">Premium</div>
+      <div class="post-title">Premium vs Gratuito — o que muda</div>
+    </div>
+    <div class="post-cell post-dark">
+      <div class="post-icon">🧠</div>
+      <div class="post-type">Bastidores</div>
+      <div class="post-title">De grupo de WhatsApp a plataforma real</div>
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════
+     SEÇÃO 4 — SQL ÚTEIS
+     ═══════════════════════════════════════ -->
+<div class="section" id="tab-sql">
+  <div class="section-label">Banco de dados</div>
+  <div class="section-title">SQL Úteis</div>
+  <div class="section-desc">Queries prontas para rodar no Supabase SQL Editor. Clique em "Copiar" e cole diretamente.</div>
+
+  <!-- SQL 1 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">1. Encontrar duplicatas por nome</span>
+      <span class="sql-tag manu">Manutenção</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Mostra psis com nomes repetidos para limpeza manual.</div>
+      <div class="sql-code"><span class="kw">SELECT</span> nome, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total
+<span class="kw">FROM</span> psis
+<span class="kw">GROUP BY</span> nome
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) <span class="op">></span> <span class="str">1</span>
+<span class="kw">ORDER BY</span> total <span class="kw">DESC</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT nome, COUNT(*) AS total\nFROM psis\nGROUP BY nome\nHAVING COUNT(*) > 1\nORDER BY total DESC;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 2 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">2. Duplicatas por CRP</span>
+      <span class="sql-tag manu">Manutenção</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Identifica CRPs cadastrados mais de uma vez.</div>
+      <div class="sql-code"><span class="kw">SELECT</span> crp, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total,
+       <span class="fn">STRING_AGG</span>(nome, <span class="str">', '</span>) <span class="kw">AS</span> nomes
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> crp <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> crp
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) <span class="op">></span> <span class="str">1</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT crp, COUNT(*) AS total,\n       STRING_AGG(nome, ', ') AS nomes\nFROM psis\nWHERE crp IS NOT NULL\nGROUP BY crp\nHAVING COUNT(*) > 1;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 3 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">3. Listar psis Premium</span>
+      <span class="sql-tag auto">Consulta</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Todas as psis com status premium ativo, ordenadas por nome.</div>
+      <div class="sql-code"><span class="kw">SELECT</span> nome, crp, email, cidade, created_at
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> status <span class="op">=</span> <span class="str">'premium'</span>
+<span class="kw">ORDER BY</span> nome <span class="kw">ASC</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT nome, crp, email, cidade, created_at\nFROM psis\nWHERE status = 'premium'\nORDER BY nome ASC;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 4 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">4. Psis com dados incompletos</span>
+      <span class="sql-tag manu">Manutenção</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Encontra perfis sem cidade, abordagem, formato ou CRP.</div>
+      <div class="sql-code"><span class="kw">SELECT</span> nome, email, crp, cidade, abordagem, formato
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> cidade <span class="kw">IS NULL</span> <span class="kw">OR</span> cidade <span class="op">=</span> <span class="str">''</span>
+   <span class="kw">OR</span> abordagem <span class="kw">IS NULL</span> <span class="kw">OR</span> abordagem <span class="op">=</span> <span class="str">''</span>
+   <span class="kw">OR</span> formato <span class="kw">IS NULL</span> <span class="kw">OR</span> formato <span class="op">=</span> <span class="str">''</span>
+   <span class="kw">OR</span> crp <span class="kw">IS NULL</span> <span class="kw">OR</span> crp <span class="op">=</span> <span class="str">''</span>
+<span class="kw">ORDER BY</span> nome;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT nome, email, crp, cidade, abordagem, formato\nFROM psis\nWHERE cidade IS NULL OR cidade = ''\n   OR abordagem IS NULL OR abordagem = ''\n   OR formato IS NULL OR formato = ''\n   OR crp IS NULL OR crp = ''\nORDER BY nome;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 5 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">5. Fotos com URL corrompida</span>
+      <span class="sql-tag manu">Manutenção</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Encontra foto_url que não começa com https:// — pode estar quebrada no site.</div>
+      <div class="sql-code"><span class="kw">SELECT</span> nome, crp, foto_url
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> foto_url <span class="kw">IS NOT NULL</span>
+  <span class="kw">AND</span> foto_url <span class="op">!=</span> <span class="str">''</span>
+  <span class="kw">AND</span> foto_url <span class="kw">NOT LIKE</span> <span class="str">'https://%'</span>
+<span class="kw">ORDER BY</span> nome;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT nome, crp, foto_url\nFROM psis\nWHERE foto_url IS NOT NULL\n  AND foto_url != ''\n  AND foto_url NOT LIKE 'https://%'\nORDER BY nome;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 6 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">6. Verificar RLS (Row Level Security)</span>
+      <span class="sql-tag seg">Segurança</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Confirma se RLS está ativado na tabela psis e lista as policies existentes.</div>
+      <div class="sql-code"><span class="cm">-- Verificar se RLS está ON</span>
+<span class="kw">SELECT</span> tablename, rowsecurity
+<span class="kw">FROM</span> pg_tables
+<span class="kw">WHERE</span> tablename <span class="op">=</span> <span class="str">'psis'</span>;
+
+<span class="cm">-- Listar policies</span>
+<span class="kw">SELECT</span> policyname, cmd, qual
+<span class="kw">FROM</span> pg_policies
+<span class="kw">WHERE</span> tablename <span class="op">=</span> <span class="str">'psis'</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `-- Verificar se RLS está ON\nSELECT tablename, rowsecurity\nFROM pg_tables\nWHERE tablename = 'psis';\n\n-- Listar policies\nSELECT policyname, cmd, qual\nFROM pg_policies\nWHERE tablename = 'psis';`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 7 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">7. Contagem por status</span>
+      <span class="sql-tag auto">Consulta</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Resumo rápido: quantas psis em cada status (pendente, ativo, premium, etc).</div>
+      <div class="sql-code"><span class="kw">SELECT</span> status, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total
+<span class="kw">FROM</span> psis
+<span class="kw">GROUP BY</span> status
+<span class="kw">ORDER BY</span> total <span class="kw">DESC</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `SELECT status, COUNT(*) AS total\nFROM psis\nGROUP BY status\nORDER BY total DESC;`)">📋 Copiar</button>
+    </div>
+  </div>
+
+  <!-- SQL 8 -->
+  <div class="sql-card">
+    <div class="sql-header">
+      <span class="sql-label">8. Premium por CRP (busca rápida)</span>
+      <span class="sql-tag auto">Consulta</span>
+    </div>
+    <div class="sql-body">
+      <div class="sql-desc">Busca uma psi específica pelo CRP para verificar se é premium.</div>
+      <div class="sql-code"><span class="cm">-- Troque 'XX/XXXXX' pelo CRP desejado</span>
+<span class="kw">SELECT</span> nome, crp, status, email, cidade
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> crp <span class="kw">ILIKE</span> <span class="str">'%XX/XXXXX%'</span>;</div>
+      <button class="sql-copy" onclick="copySQL(this, `-- Troque 'XX/XXXXX' pelo CRP desejado\nSELECT nome, crp, status, email, cidade\nFROM psis\nWHERE crp ILIKE '%XX/XXXXX%';`)">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div class="footer-brand">Conexão <span>Psi</span></div>
+  <div class="footer-text">Hub Admin · Acesso restrito</div>
+</footer>
 
 <script>
-const SB = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
-const PASS = 'conexaopsi2026';
-const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
-
-let aba = 'pendentes', todos = [], editId = null;
-
-async function api(method, path, body) {
-  const r = await fetch(SB+'/rest/v1/'+path, {method, headers:H, body: body ? JSON.stringify(body) : undefined});
-  const text = await r.text();
-  if (!r.ok) throw new Error(text);
-  return text ? JSON.parse(text) : null;
-}
-
-function entrar() {
-  if (document.getElementById('senha').value.trim() === PASS) {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    carregar();
+// ═══════ LOGIN ═══════
+function tryLogin() {
+  const pw = document.getElementById('login-pw').value;
+  if (pw === 'hub2026' || pw === 'conexaopsi2026') {
+    document.getElementById('login-overlay').classList.add('hidden');
+    sessionStorage.setItem('hub-auth', '1');
   } else {
-    document.getElementById('lerr').textContent = 'Senha incorreta.';
+    document.getElementById('login-error').textContent = 'Senha incorreta. Tente novamente.';
+    document.getElementById('login-pw').value = '';
+    document.getElementById('login-pw').focus();
   }
 }
-function sair() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login').style.display = 'flex';
-  document.getElementById('senha').value = '';
+document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+// Auto-login se já autenticado na sessão
+if (sessionStorage.getItem('hub-auth') === '1') {
+  document.getElementById('login-overlay').classList.add('hidden');
 }
 
-function mudarAba(a, btn) {
-  fecharHub();
-  aba = a;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  const labels = {pendentes:'Psicólogos Pendentes', aprovados:'Psicólogos Aprovados', premium:'Perfis Premium', todos:'Todos os Psicólogos'};
-  document.getElementById('section-label').textContent = labels[a];
-  render();
+// ═══════ TABS ═══════
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-async function carregar() {
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('grid').innerHTML = '';
-  document.getElementById('empty').style.display = 'none';
-  try {
-    todos = await api('GET', 'psis?select=*&order=created_at.desc&limit=500') || [];
-    atualizarStats();
-    render();
-  } catch(e) {
-    document.getElementById('loading').textContent = 'Erro: ' + e.message;
-  }
-  document.getElementById('loading').style.display = 'none';
+// ═══════ CARDS ═══════
+function toggleCard(header) {
+  header.closest('.card').classList.toggle('open');
 }
 
-function atualizarStats() {
-  const pend = todos.filter(p => p.status === 'pendente').length;
-  const aprov = todos.filter(p => p.status === 'aprovado').length;
-  const prem = todos.filter(p => p.premium === true).length;
-  const reprov = todos.filter(p => p.status === 'reprovado').length;
-  document.getElementById('n-pend').textContent = pend;
-  document.getElementById('n-aprov').textContent = aprov;
-  document.getElementById('n-prem').textContent = prem;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${todos.length}</div><div class="stat-label">Total</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--gold)">${pend}</div><div class="stat-label">Pendentes</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--sage)">${aprov}</div><div class="stat-label">Aprovados</div></div>
-    <div class="stat-card gold"><div class="stat-num">${prem}</div><div class="stat-label">Premium ✨</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:#c0392b">${reprov}</div><div class="stat-label">Reprovados</div></div>
-  `;
-}
-
-function render() {
-  const filtros = {
-    pendentes: p => p.status === 'pendente',
-    aprovados: p => p.status === 'aprovado',
-    premium: p => p.premium === true,
-    todos: () => true
-  };
-  const lista = todos.filter(filtros[aba]);
-  const g = document.getElementById('grid'), e = document.getElementById('empty');
-  if (!lista.length) { g.innerHTML = ''; e.style.display = 'block'; return; }
-  e.style.display = 'none';
-  g.innerHTML = lista.map(p => {
-    const stClass = `st-${p.status}`;
-    const stLabel = {pendente:'⏳ Pendente', aprovado:'✅ Aprovado', reprovado:'❌ Reprovado'}[p.status] || p.status;
-    const h = (p.handle||'').replace('@','');
-    const COLORS = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
-    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const cor = COLORS[Math.abs(ini.charCodeAt(0)||0) % COLORS.length];
-    const avatar = p.foto_url
-      ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0;">`
-      : `<div style="width:44px;height:44px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">${ini}</div>`;
-    return `<div class="card ${p.status}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div style="display:flex;align-items:center;gap:10px;">${avatar}<div class="card-name">${p.nome||'—'}</div></div>
-        <span class="card-status ${stClass}">${stLabel}</span>
-      </div>
-      <div class="card-info">
-        <span>📋 ${p.crp||'—'}</span>
-        <span>📷 @${h||'—'}</span>
-        <span>🧠 ${p.abordagem||'—'} · ${p.formato||'—'}</span>
-        <span>📍 ${p.cidade||'—'}</span>
-        <span>✉️ ${p.email||'—'}</span>
-        ${p.premium ? '<span style="color:var(--gold);font-weight:600;">✨ Premium</span>' : ''}
-      </div>
-      <div class="card-actions">
-        ${p.status === 'pendente' ? `
-          <button class="btn-aprovar" onclick="aprovar('${p.id}')">✅ Aprovar</button>
-          <button class="btn-reprovar" onclick="reprovar('${p.id}')">❌ Reprovar</button>
-        ` : ''}
-        ${p.status === 'aprovado' && !p.premium ? `<button class="btn-premium" onclick="ativarPremium('${p.id}')">✨ Premium</button>` : ''}
-        ${p.status === 'aprovado' && p.premium ? `<button class="btn-premium" style="background:var(--muted)" onclick="desativarPremium('${p.id}')">Remover Premium</button>` : ''}
-        <button class="btn-ver" onclick="abrirEd('${p.id}')">✏️</button>
-        <button class="btn-del" onclick="excluir('${p.id}')">🗑️</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function aprovar(id) {
-  try {
-    await api('PATCH', `psis?id=eq.${id}`, {status:'aprovado'});
-    const p = todos.find(x => x.id === id);
-    if (p) p.status = 'aprovado';
-    atualizarStats(); render();
-    toast('✅ Psicóloga aprovada!');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function reprovar(id) {
-  if (!confirm('Reprovar esta psicóloga?')) return;
-  try {
-    await api('PATCH', `psis?id=eq.${id}`, {status:'reprovado'});
-    const p = todos.find(x => x.id === id);
-    if (p) p.status = 'reprovado';
-    atualizarStats(); render();
-    toast('❌ Psicóloga reprovada.');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function ativarPremium(id) {
-  try {
-    await api('PATCH', `psis?id=eq.${id}`, {premium:true});
-    const p = todos.find(x => x.id === id);
-    if (p) p.premium = true;
-    atualizarStats(); render();
-    toast('✨ Premium ativado!');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function desativarPremium(id) {
-  if (!confirm('Remover premium?')) return;
-  try {
-    await api('PATCH', `psis?id=eq.${id}`, {premium:false});
-    const p = todos.find(x => x.id === id);
-    if (p) p.premium = false;
-    atualizarStats(); render();
-    toast('Premium removido.');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function excluir(id) {
-  if (!confirm('Excluir permanentemente?')) return;
-  try {
-    await api('DELETE', `psis?id=eq.${id}`);
-    todos = todos.filter(x => x.id !== id);
-    atualizarStats(); render();
-    toast('Registro excluído.');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-function abrirEd(id) {
-  const p = todos.find(x => x.id === id);
-  if (!p) return;
-  editId = id;
-  document.getElementById('e-nome').value = p.nome||'';
-  document.getElementById('e-crp').value = p.crp||'';
-  document.getElementById('e-handle').value = (p.handle||'').replace('@','');
-  document.getElementById('e-abordagem').value = p.abordagem||'';
-  document.getElementById('e-formato').value = p.formato||'Online';
-  document.getElementById('e-cidade').value = p.cidade||'';
-  document.getElementById('e-publico').value = p.publico||'';
-  document.getElementById('e-email').value = p.email||'';
-  document.getElementById('e-whatsapp').value = p.whatsapp||'';
-  document.getElementById('e-valor').value = p.valor_sessao||'';
-  document.getElementById('e-especialidades').value = p.especialidades||'';
-  document.getElementById('e-bio').value = p.bio||'';
-  document.getElementById('e-status').value = p.status||'pendente';
-  document.getElementById('e-premium').value = p.premium ? 'true' : 'false';
-  document.getElementById('modal').classList.add('open');
-}
-
-function fecharModal() {
-  document.getElementById('modal').classList.remove('open');
-  editId = null;
-}
-
-async function salvarEd() {
-  if (!editId) return;
-  const updates = {
-    nome: document.getElementById('e-nome').value.trim(),
-    crp: document.getElementById('e-crp').value.trim(),
-    handle: document.getElementById('e-handle').value.trim().replace('@',''),
-    abordagem: document.getElementById('e-abordagem').value.trim(),
-    formato: document.getElementById('e-formato').value,
-    cidade: document.getElementById('e-cidade').value.trim(),
-    publico: document.getElementById('e-publico').value.trim(),
-    email: document.getElementById('e-email').value.trim(),
-    whatsapp: document.getElementById('e-whatsapp').value.trim().replace(/\D/g,''),
-    valor_sessao: document.getElementById('e-valor').value.trim(),
-    especialidades: document.getElementById('e-especialidades').value.trim(),
-    bio: document.getElementById('e-bio').value.trim(),
-    status: document.getElementById('e-status').value,
-    premium: document.getElementById('e-premium').value === 'true'
-  };
-  try {
-    await api('PATCH', `psis?id=eq.${editId}`, updates);
-    const p = todos.find(x => x.id === editId);
-    if (p) Object.assign(p, updates);
-    fecharModal();
-    atualizarStats(); render();
-    toast('✅ Salvo com sucesso!');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-function exportar() {
-  const lista = todos;
-  const cols = ['nome','email','crp','handle','abordagem','formato','cidade','publico','status','premium'];
-  const rows = lista.map(p => cols.map(c => `"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(','));
-  const csv = '\uFEFF' + [cols.join(','), ...rows].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
-  a.download = 'conexao-psi-psis.csv';
-  a.click();
-}
-
-function toast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) fecharModal();
-});
-
-const SQL_QUERIES = [
-  {
-    titulo: "Ver duplicatas por nome",
-    desc: "Encontra psis com o mesmo nome cadastradas mais de uma vez",
-    sql: `SELECT nome, COUNT(*) as total, array_agg(id) as ids\nFROM psis\nGROUP BY nome\nHAVING COUNT(*) > 1\nORDER BY nome;`
-  },
-  {
-    titulo: "Deletar duplicata mais antiga",
-    desc: "Remove a versão mais antiga quando há nome duplicado",
-    sql: `DELETE FROM psis\nWHERE id = (\n  SELECT id FROM psis\n  WHERE nome ILIKE '%NOME_AQUI%'\n  ORDER BY created_at ASC\n  LIMIT 1\n);`
-  },
-  {
-    titulo: "Ativar premium por CRP",
-    desc: "Ativa o perfil premium de uma psi específica",
-    sql: `UPDATE psis\nSET premium = true,\n    premium_ativo_ate = NOW() + INTERVAL '30 days'\nWHERE crp = 'XX/XXXXXX';`
-  },
-  {
-    titulo: "Ver psis com dados incompletos",
-    desc: "Lista psis aprovadas sem WhatsApp, valor ou bio",
-    sql: `SELECT nome, crp,\n  CASE WHEN whatsapp IS NULL OR whatsapp = '' THEN '❌' ELSE '✅' END as whats,\n  CASE WHEN valor_sessao IS NULL OR valor_sessao = '' THEN '❌' ELSE '✅' END as valor,\n  CASE WHEN bio IS NULL OR bio = '' THEN '❌' ELSE '✅' END as bio\nFROM psis\nWHERE status ILIKE 'aprovado'\nORDER BY nome;`
-  },
-  {
-    titulo: "Limpar foto corrompida [object Object]",
-    desc: "Remove URLs de foto inválidas do banco",
-    sql: `UPDATE psis\nSET foto_url = NULL\nWHERE foto_url = '[object Object]'\n   OR (foto_url IS NOT NULL AND foto_url NOT LIKE 'http%');`
-  },
-  {
-    titulo: "Atualizar foto por CRP",
-    desc: "Adiciona ou troca a foto de uma psi específica",
-    sql: `UPDATE psis\nSET foto_url = 'https://LINK_DA_IMAGEM_AQUI'\nWHERE crp = 'XX/XXXXXX';`
-  },
-  {
-    titulo: "Verificar RLS nas tabelas",
-    desc: "Confirma se Row Level Security está ativo ou desativado",
-    sql: `SELECT tablename, rowsecurity\nFROM pg_tables\nWHERE tablename IN ('psis', 'pacientes');`
-  },
-  {
-    titulo: "Contagem por status",
-    desc: "Mostra quantas psis existem em cada status",
-    sql: `SELECT status, COUNT(*) as total\nFROM psis\nGROUP BY status\nORDER BY status;`
-  }
-];
-
-function abrirHub(btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('stats').style.display = 'none';
-  document.querySelector('.section-title') && (document.querySelector('.section-title').style.display = 'none');
-  document.getElementById('grid').style.display = 'none';
-  document.getElementById('empty').style.display = 'none';
-  document.getElementById('hub-section').style.display = 'block';
-  renderSQLs();
-}
-
-function fecharHub() {
-  document.getElementById('hub-section').style.display = 'none';
-  document.getElementById('grid').style.display = '';
-  document.getElementById('stats').style.display = '';
-  const st = document.querySelector('.section-title');
-  if (st) st.style.display = '';
-}
-
-function verificarHub() {
-  const pwd = document.getElementById('hub-pwd').value.trim();
-  if (pwd === 'hub2026' || pwd === 'conexaopsi2026') {
-    document.getElementById('hub-gate').style.display = 'none';
-    document.getElementById('hub-content').style.display = 'block';
-  } else {
-    document.getElementById('hub-err').style.display = 'block';
-    document.getElementById('hub-pwd').value = '';
-  }
-}
-
-function renderSQLs() {
-  const container = document.getElementById('sql-list');
-  if (!container) return;
-  container.innerHTML = SQL_QUERIES.map((q, i) => `
-    <div style="background:white;border:1px solid rgba(45,27,78,0.08);border-radius:12px;overflow:hidden;">
-      <div style="padding:14px 16px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-        <div>
-          <div style="font-size:14px;font-weight:600;color:var(--plum);">${q.titulo}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${q.desc}</div>
-        </div>
-        <button onclick="copiarSQL(${i})" id="sql-btn-${i}"
-          style="background:var(--plum);color:white;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">
-          📋 Copiar
-        </button>
-      </div>
-      <pre style="margin:0;padding:12px 16px;background:#1e1530;color:#a89bc2;font-size:12px;line-height:1.6;overflow-x:auto;border-top:1px solid rgba(45,27,78,0.08);">${q.sql.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
-    </div>
-  `).join('');
-}
-
-function copiarSQL(i) {
-  const sql = SQL_QUERIES[i].sql.replace(/\\n/g, '\n');
-  navigator.clipboard.writeText(sql).then(() => {
-    const btn = document.getElementById('sql-btn-'+i);
-    btn.textContent = '✅ Copiado!';
-    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+// ═══════ COPY ═══════
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 1500);
   });
 }
 
-function copiarBio() {
-  const bio = `🔗 A rede de encaminhamento entre psicólogos\nEncaminhe com confiança. Receba pacientes qualificados.\nCadastre-se gratuitamente 👇\ntally.so/r/b5OGYZ`;
-  navigator.clipboard.writeText(bio).then(() => {
-    const btn = document.getElementById('btn-bio-copy');
-    btn.textContent = '✅ Copiado!';
-    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+function copySQL(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado!';
+    btn.style.background = 'var(--gold)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--gold)';
+    setTimeout(() => {
+      btn.textContent = '📋 Copiar';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1800);
   });
 }
 
+function copyBio() {
+  const text = document.getElementById('bio-content').textContent;
+  const btn = document.querySelector('.bio-copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Bio copiada!';
+    btn.style.background = 'var(--gold)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = '📋 Copiar Bio';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 1800);
+  });
+}
 </script>
+
 </body>
 </html>
