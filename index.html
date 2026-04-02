@@ -531,7 +531,7 @@ const H = {'apikey':KEY,'Authorization':'Bearer '+KEY};
 
 async function carregarPsis() {
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=ilike.aprovado&order=nome.asc&limit=500`, {
+    const r = await fetch(`${SB}/rest/v1/psis?select=*&status=eq.aprovado&order=nome.asc&limit=500`, {
       method: 'GET',
       headers: H,
       mode: 'cors'
@@ -624,7 +624,7 @@ function renderGrid() {
     const fc = {Online:'tag-o',Presencial:'tag-pr',Ambos:'tag-a'}[p.formato]||'tag-a';
     const fl = p.formato==='Ambos'?'Online + Presencial':(p.formato||'');
     const fT = fl ? `<span class="tag ${fc}">${fl}</span>` : '';
-    const wB = p.whatsapp ? `<a href="https://wa.me/${p.whatsapp}" target="_blank" class="bw">${WA_SVG}WhatsApp</a>` : '';
+    const wB = (p.whatsapp && p.premium) ? `<a href="https://wa.me/${p.whatsapp}" target="_blank" class="bw">${WA_SVG}WhatsApp</a>` : '';
     const espsArr = p.especialidades ? p.especialidades.split(',').map(e=>e.trim()).filter(Boolean) : [];
     const espTag = espsArr.length ? `<div class="cesp">🎯 ${espsArr.slice(0,2).join(' · ')}</div>` : '';
     const valorTag = p.valor_sessao ? `<div class="cvalor">💰 ${p.valor_sessao}</div>` : '';

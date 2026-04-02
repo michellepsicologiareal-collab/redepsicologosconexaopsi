@@ -208,6 +208,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <button class="nav-tab" onclick="showTab('encaminhamentos')">🔄 Encaminhamentos <span class="nbadge" id="n-enc">0</span></button>
   <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
   <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
+  <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico')" style="display:none;">🩺 Diagnóstico</button>
 </div>
 
 <!-- ── PENDENTES ── -->
@@ -395,6 +396,58 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   </div>
 </div>
 
+<!-- ── DIAGNÓSTICO (Master only) ── -->
+<div class="section" id="tab-diagnostico">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">🩺 Diagnóstico do Sistema</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Verifica conexão, tabelas e dados — visível apenas para Master</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="rodarDiagnostico()">▶ Rodar diagnóstico</button>
+  </div>
+
+  <!-- Steps -->
+  <div class="info-section" id="diag-steps-card">
+    <div class="info-title">⚡ Status das tabelas</div>
+    <div id="diag-steps">
+      <div style="color:var(--muted);font-size:13px;">Clique em "Rodar diagnóstico" para verificar.</div>
+    </div>
+  </div>
+
+  <!-- Dados encontrados -->
+  <div class="info-section">
+    <div class="info-title">👥 Dados encontrados</div>
+    <div id="diag-dados"><span style="color:var(--muted);font-size:13px;">Aguardando...</span></div>
+  </div>
+
+  <!-- Teste de login -->
+  <div class="info-section">
+    <div class="info-title">🔐 Simular login — met.html</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Verifica se um e-mail específico consegue acessar o PsiMed</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <input type="email" id="diag-email" placeholder="email@exemplo.com" style="padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;flex:1;min-width:200px;">
+      <button class="btn-action btn-refresh" onclick="testarLoginDiag()" style="white-space:nowrap;">Testar acesso</button>
+    </div>
+    <div id="diag-login" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- Teste de escrita -->
+  <div class="info-section">
+    <div class="info-title">✍️ Teste de escrita — encaminhamentos</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Insere e apaga um registro de teste para confirmar permissões</p>
+    <button class="btn-action btn-refresh" onclick="testarEscritaDiag()">Testar inserção</button>
+    <div id="diag-escrita" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- Psis sem email -->
+  <div class="info-section">
+    <div class="info-title">⚠️ Psis sem e-mail cadastrado</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Essas psis não conseguem fazer login no met.html</p>
+    <button class="btn-action btn-refresh" onclick="buscarSemEmail()">Verificar</button>
+    <div id="diag-sem-email" style="margin-top:12px;"></div>
+  </div>
+</div>
+
 <footer>Conexão Psi · Painel Admin · <span id="footer-nivel"></span></footer>
 
 <script>
@@ -451,9 +504,9 @@ function aplicarNivel() {
   document.getElementById('header-user').textContent = nivelAtual === 'master' ? '👑' : '🔑';
   document.getElementById('footer-nivel').textContent = `Acesso ${nomeAtual}`;
 
-  // Botões destrutivos só para master
   if (nivelAtual === 'master') {
     document.body.classList.add('is-master');
+    document.getElementById('tab-btn-diagnostico').style.display = 'inline-block';
   }
 }
 
@@ -880,6 +933,137 @@ document.querySelectorAll('.modal').forEach(m => {
 
 function copySQL(btn, text) {
   navigator.clipboard.writeText(text).then(() => { btn.textContent='✅ Copiado!'; setTimeout(()=>btn.textContent='📋 Copiar',2000); });
+}
+
+// ═══════════════════════════════════════════════
+// DIAGNÓSTICO (Master only)
+// ═══════════════════════════════════════════════
+function diagRow(label, badge, badgeTipo, extra='') {
+  const cores = {ok:'#eafaf1;color:#27ae60',err:'#fdecea;color:#c0392b',warn:'#fef3e8;color:#e67e22',info:'#e8f4f6;color:#1B5E6B'};
+  const cor = cores[badgeTipo] || cores.info;
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f4f2ef;font-size:13px;flex-wrap:wrap;gap:6px;">
+    <span style="color:var(--muted)">${label}</span>
+    <span style="display:flex;align-items:center;gap:8px;">
+      <span style="background:${cor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;">${badge}</span>
+      ${extra ? `<span style="font-size:12px;color:var(--muted)">${extra}</span>` : ''}
+    </span>
+  </div>`;
+}
+
+async function rodarDiagnostico() {
+  const el = document.getElementById('diag-steps');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Verificando...</span>';
+
+  const resultados = [];
+
+  // Tabela psis
+  try {
+    const r = await api('GET', 'psis?select=*&limit=500');
+    const total = r?.length || 0;
+    const aprov = r?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0;
+    const prem  = r?.filter(p => p.premium === true).length || 0;
+    const semEmail = r?.filter(p => !p.email).length || 0;
+    resultados.push(diagRow('Tabela <strong>psis</strong>', '✓ existe', 'ok', `${total} registros · ${aprov} aprovados · ${prem} premium · ${semEmail} sem e-mail`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>psis</strong>', '✗ erro', 'err', e.message));
+  }
+
+  // Tabela profissionais_saude
+  try {
+    const r = await api('GET', 'profissionais_saude?select=id,status&limit=200');
+    const total = r?.length || 0;
+    const aprov = r?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0;
+    resultados.push(diagRow('Tabela <strong>profissionais_saude</strong>', '✓ existe', 'ok', `${total} registros · ${aprov} aprovados`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>profissionais_saude</strong>', '✗ não existe', 'err', 'rode o SQL de criação'));
+  }
+
+  // Tabela encaminhamentos_cruzados
+  try {
+    const r = await api('GET', 'encaminhamentos_cruzados?select=id,status&limit=200');
+    const total = r?.length || 0;
+    const disp  = r?.filter(e => e.status === 'disponivel').length || 0;
+    resultados.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>', '✓ existe', 'ok', `${total} registros · ${disp} em aberto`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>', '✗ não existe', 'err', 'rode o SQL de criação'));
+  }
+
+  el.innerHTML = resultados.join('') +
+    `<div style="padding-top:10px;font-size:12px;color:var(--muted);">Diagnóstico concluído — ${new Date().toLocaleTimeString('pt-BR')}</div>`;
+
+  // Dados por status
+  await renderDadosDiag();
+}
+
+async function renderDadosDiag() {
+  try {
+    const r = await api('GET', 'psis?select=nome,email,status,premium&limit=500');
+    if (!r?.length) { document.getElementById('diag-dados').innerHTML = '<span style="color:var(--muted);font-size:13px;">Nenhum dado.</span>'; return; }
+    const statusMap = {};
+    r.forEach(p => { const s = p.status||'sem status'; statusMap[s] = (statusMap[s]||0)+1; });
+    const semEmail = r.filter(p => !p.email).length;
+    let html = Object.entries(statusMap).map(([s,n]) =>
+      diagRow(`Status: <strong>${s}</strong>`, n + ' psis', s.toLowerCase()==='aprovado'?'ok':'warn', '')
+    ).join('');
+    html += diagRow('Psis sem e-mail', semEmail > 0 ? semEmail + ' registros' : '0 — tudo ok', semEmail > 0 ? 'warn' : 'ok',
+      semEmail > 0 ? 'não conseguem logar no met.html' : '');
+    document.getElementById('diag-dados').innerHTML = html;
+  } catch(e) { document.getElementById('diag-dados').innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+async function testarLoginDiag() {
+  const email = document.getElementById('diag-email').value.trim().toLowerCase();
+  const el = document.getElementById('diag-login');
+  if (!email) { el.innerHTML = '<span style="color:var(--red);font-size:13px;">Informe um e-mail.</span>'; return; }
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Verificando...</span>';
+
+  try {
+    const [rPsi, rMed] = await Promise.all([
+      api('GET', `psis?select=nome,crp,email,status,premium&email=eq.${encodeURIComponent(email)}&limit=1`),
+      api('GET', `profissionais_saude?select=nome,registro,email,status,premium&email=eq.${encodeURIComponent(email)}&limit=1`)
+    ]);
+    const psi = rPsi?.[0], med = rMed?.[0], prof = psi || med;
+    if (!prof) { el.innerHTML = diagRow('Resultado', '✗ não encontrado', 'err', 'e-mail não cadastrado em nenhuma tabela'); return; }
+    const rede = psi ? 'Conexão Psi' : 'Psi Med';
+    const statusOk = prof.status?.toLowerCase() === 'aprovado';
+    const premOk = prof.premium === true;
+    el.innerHTML =
+      diagRow('Rede', rede, 'info') +
+      diagRow('Nome', prof.nome||'—', 'info') +
+      diagRow('Status', prof.status||'—', statusOk?'ok':'err', statusOk?'':'← precisa ser "aprovado"') +
+      diagRow('Premium', premOk?'sim':'não', premOk?'ok':'warn', premOk?'':'← precisa de premium para acessar o Met') +
+      diagRow('Acesso ao met.html', (statusOk&&premOk)?'✓ LIBERADO':'✗ NEGADO', (statusOk&&premOk)?'ok':'err');
+  } catch(e) { el.innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+async function testarEscritaDiag() {
+  const el = document.getElementById('diag-escrita');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Testando...</span>';
+  try {
+    const r = await api('POST', 'encaminhamentos_cruzados', {
+      indicado_por:'TESTE_ADMIN', crp_ou_registro:'TESTE',
+      tipo_buscado:'psi', demanda:'Teste automático — apagar', urgencia:'baixa', status:'disponivel'
+    });
+    const id = r?.[0]?.id;
+    if (id) await api('DELETE', `encaminhamentos_cruzados?id=eq.${id}`);
+    el.innerHTML = diagRow('Resultado', '✓ SUCESSO', 'ok', `id ${id} inserido e apagado`);
+  } catch(e) {
+    el.innerHTML = diagRow('Resultado', '✗ FALHOU', 'err', 'tabela não existe ou sem permissão de escrita');
+  }
+}
+
+async function buscarSemEmail() {
+  const el = document.getElementById('diag-sem-email');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Buscando...</span>';
+  try {
+    const r = await api('GET', 'psis?select=nome,crp,handle,status&email=is.null&limit=200');
+    const r2 = await api('GET', `psis?select=nome,crp,handle,status&email=eq.&limit=200`);
+    const lista = [...(r||[]), ...(r2||[])];
+    if (!lista.length) { el.innerHTML = diagRow('Resultado', '✓ Todas têm e-mail', 'ok'); return; }
+    el.innerHTML = lista.map(p =>
+      diagRow(`${p.nome||'—'} · ${p.crp||'—'}`, p.status||'—', p.status?.toLowerCase()==='aprovado'?'warn':'info', `@${p.handle||'—'}`)
+    ).join('');
+  } catch(e) { el.innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
 }
 
 function toast(msg, tipo='ok') {
