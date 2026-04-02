@@ -628,7 +628,10 @@ function renderGrid() {
     const espsArr = p.especialidades ? p.especialidades.split(',').map(e=>e.trim()).filter(Boolean) : [];
     const espTag = espsArr.length ? `<div class="cesp">🎯 ${espsArr.slice(0,2).join(' · ')}</div>` : '';
     const valorTag = p.valor_sessao ? `<div class="cvalor">💰 ${p.valor_sessao}</div>` : '';
-    const btnPerfil = `<a href="perfil.html" class="btn-perfil">✏️ Atualizar perfil</a>`;
+    const semWhats = !p.whatsapp;
+    const btnPerfil = semWhats
+      ? `<a href="perfil.html" class="btn-perfil" style="color:var(--plum);border-color:rgba(45,27,78,0.3);">✏️ Completar perfil</a>`
+      : `<a href="perfil.html" class="btn-perfil">✏️ Editar perfil</a>`;
     return `<div class="card" style="animation-delay:${Math.min(i,15)*0.05}s">
       <div class="ctop">${av}<div>
         <div class="cname">${p.nome||''}</div>
