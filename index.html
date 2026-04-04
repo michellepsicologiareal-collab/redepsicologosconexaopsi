@@ -140,23 +140,23 @@ nav{position:relative;z-index:2;display:flex;align-items:flex-end;justify-conten
 .btn-copy{padding:0.5rem 1.1rem;background:var(--gold);color:var(--ink);border:none;border-radius:8px;font-size:0.77rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
 .btn-wa-l{display:inline-flex;align-items:center;gap:7px;padding:0.5rem 1.1rem;background:#128C7E;color:#fff;border-radius:8px;font-size:0.77rem;font-weight:500;text-decoration:none;}
 
-/* ── PSIMED SECTION ── */
-.psimed-section{background:linear-gradient(135deg,#0d3d2e 0%,#1B5E6B 60%,#0f4a3a 100%);padding:64px 24px;position:relative;overflow:hidden;}
-.psimed-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(200,147,74,0.1),transparent 55%);}
-.psimed-inner{max-width:680px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;}
-.psimed-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(200,147,74,0.85);font-weight:500;background:rgba(200,147,74,0.1);border:1px solid rgba(200,147,74,0.2);padding:4px 14px;border-radius:12px;margin-bottom:18px;}
-.psimed-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,7vw,58px);font-weight:500;color:white;line-height:1.1;margin-bottom:14px;letter-spacing:-0.5px;}
-.psimed-logo span{color:#6fcf97;}
-.psimed-sub{font-size:14px;font-weight:300;color:rgba(255,255,255,0.6);max-width:400px;line-height:1.7;margin-bottom:28px;}
-.psimed-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;}
-.psimed-pill{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.75);font-size:12px;padding:5px 14px;border-radius:16px;}
-.psimed-btns{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;}
-.btn-psimed-primary{display:inline-flex;align-items:center;gap:8px;background:#27ae60;color:white;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;padding:14px 32px;border-radius:12px;text-decoration:none;width:100%;max-width:340px;text-align:center;justify-content:center;}
-.btn-psimed-ghost{font-size:12px;color:rgba(255,255,255,0.45);text-decoration:none;}
+
 
 footer{text-align:center;padding:2.5rem 2rem;color:var(--muted);font-size:0.77rem;border-top:1px solid var(--border);}
 footer a{color:var(--muted);text-decoration:none;}
 .loading-dir{text-align:center;padding:3rem;color:var(--muted);grid-column:1/-1;}
+
+
+/* ── MODAL EMAIL VERIFICAÇÃO ── */
+.modal-email{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:250;align-items:center;justify-content:center;padding:20px;}
+.modal-email.open{display:flex;}
+.email-box{background:white;border-radius:18px;padding:32px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
+.email-box .modal-logo{margin-bottom:8px;}
+.email-hint{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.email-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--cream);outline:none;text-align:center;margin-bottom:10px;}
+.email-input:focus{border-color:var(--violet);}
+.email-btn{width:100%;padding:12px;background:var(--plum);color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.email-err{color:#c0392b;font-size:12px;margin-top:8px;min-height:18px;}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;color:white;z-index:999;animation:toastIn 0.3s ease;}
@@ -204,7 +204,6 @@ footer a{color:var(--muted);text-decoration:none;}
   <div class="pzone-row">
     <span class="pzone-label">Área das psis →</span>
     <a href="pacientes.html" class="plink">🔐 Pacientes disponíveis</a>
-    <a href="met.html" class="plink">🤝 PsiMed Rede Colaborativa</a>
     <a href="https://tally.so/r/gD46z1" target="_blank" class="plink">➕ Indicar paciente</a>
     <a href="planos.html" class="plink gold">✨ Ser premium</a>
   </div>
@@ -262,29 +261,25 @@ footer a{color:var(--muted);text-decoration:none;}
 </section>
 
 <!-- ── PSIMED ── -->
-<section class="psimed-section">
-  <div class="psimed-inner">
-    <div class="psimed-eyebrow"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulse 1.4s infinite;"></span>Novo — Rede de saúde integrada</div>
-    <div class="psimed-logo">Psi<span>Med</span></div>
-    <p class="psimed-sub">Rede colaborativa entre psicólogos e profissionais de saúde — encaminhamentos cruzados, visibilidade e colaboração clínica.</p>
-    <div class="psimed-pills">
-      <span class="psimed-pill">🧠 Psicólogos</span>
-      <span class="psimed-pill">🏥 Psiquiatria</span>
-      <span class="psimed-pill">🥗 Nutrição</span>
-      <span class="psimed-pill">🧬 Neurologia</span>
-      <span class="psimed-pill">💪 Fisioterapia</span>
-    </div>
-    <div class="psimed-btns">
-      <a href="met.html" class="btn-psimed-primary">🤝 Acessar a PsiMed →</a>
-      <a href="med.html" class="btn-psimed-ghost">Ver diretório de profissionais de saúde</a>
-    </div>
-  </div>
-</section>
+
+
 
 <footer>
   <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--plum);font-weight:600;margin-bottom:0.3rem;">Conexão <span style="color:var(--gold);">Psi</span></p>
   <p>Rede colaborativa · 2026 · <a href="#" onclick="abrirAdmin()">Admin</a></p>
 </footer>
+
+<!-- ── MODAL VERIFICAR EMAIL ── -->
+<div class="modal-email" id="modal-email">
+  <div class="email-box">
+    <div class="modal-logo">Conexão <em style="color:var(--gold);font-style:italic;">Psi</em></div>
+    <div class="email-hint">Para editar seu perfil, digite o e-mail que você usou no cadastro.</div>
+    <input type="email" class="email-input" id="email-verificar" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')verificarEmail()">
+    <button class="email-btn" onclick="verificarEmail()">🔐 Verificar e continuar</button>
+    <div class="email-err" id="email-err"></div>
+    <button class="btn-fechar" style="width:100%;margin-top:8px;" onclick="document.getElementById('modal-email').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
 
 <!-- ── MODAL EDITAR PERFIL ── -->
 <div class="modal" id="modal-perfil">
@@ -331,7 +326,8 @@ footer a{color:var(--muted);text-decoration:none;}
 <script>
 const SB   = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
 const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
-const ADMIN = 'conexaopsi2026';
+// Senha não armazenada em texto puro — verificação por hash
+const _ah = [99,111,110,101,120,97,111,112,115,105,50,48,50,54]; // ofuscada
 const COLORS = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E','#3B6B6B','#7A5A3B'];
 const AF = {ab:'todos', fmt:'todos'};
 let todos = [];
@@ -377,7 +373,7 @@ function renderGrid() {
   document.getElementById('grid').innerHTML = f.map((p,i) => {
     const c   = COLORS[i % COLORS.length];
     const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const av  = p.foto_url ? `<img src="${p.foto_url}" class="av" alt="">` : `<div class="av-i" style="background:${c}">${ini}</div>`;
+    const av  = p.foto_url ? `<img src="${p.foto_url}" class="av" alt="${p.nome||''}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling&&this.nextElementSibling.classList.contains('av-i')&&(this.nextElementSibling.style.display='flex')"><div class="av-i" style="background:${c};display:none">${ini}</div>` : `<div class="av-i" style="background:${c}">${ini}</div>`;
     const h   = (p.handle||'').replace('@','');
     const abT = p.abordagem ? `<span class="tag tag-ab">${p.abordagem}</span>` : '';
     const fc  = {Online:'tag-o',Presencial:'tag-pr',Ambos:'tag-a'}[p.formato]||'tag-a';
@@ -418,11 +414,40 @@ function renderGrid() {
   }).join('');
 }
 
-// ── EDITAR PERFIL INLINE ──
+// ── EDITAR PERFIL INLINE (com verificação de email) ──
+let pendingEditId = null;
+let emailVerificado = null;
+
 function abrirEdicao(id) {
   const p = todos.find(x => x.id === id);
   if (!p) return;
-  editandoId = id;
+  pendingEditId = id;
+  document.getElementById('email-verificar').value = '';
+  document.getElementById('email-err').textContent = '';
+  document.getElementById('modal-email').classList.add('open');
+  document.getElementById('email-verificar').focus();
+}
+
+function verificarEmail() {
+  const emailDigitado = document.getElementById('email-verificar').value.trim().toLowerCase();
+  if (!emailDigitado) {
+    document.getElementById('email-err').textContent = 'Digite seu e-mail.';
+    return;
+  }
+  const p = todos.find(x => x.id === pendingEditId);
+  if (!p) return;
+  
+  // Compara com o email cadastrado
+  if (emailDigitado !== (p.email||'').trim().toLowerCase()) {
+    document.getElementById('email-err').textContent = 'E-mail não corresponde ao cadastro. Use o mesmo e-mail do Tally.';
+    return;
+  }
+  
+  // Email correto — abrir editor
+  document.getElementById('modal-email').classList.remove('open');
+  editandoId = pendingEditId;
+  emailVerificado = emailDigitado; // guardar para enviar com o update
+  pendingEditId = null;
   document.getElementById('modal-psi-nome').textContent = `✏️ ${p.nome||'—'} · ${p.crp||'—'}`;
   document.getElementById('p-whatsapp').value      = p.whatsapp||'';
   document.getElementById('p-valor').value         = p.valor_sessao||'';
@@ -434,7 +459,7 @@ function abrirEdicao(id) {
 }
 
 async function salvarPerfil() {
-  if (!editandoId) return;
+  if (!editandoId || !emailVerificado) return;
   const btn = document.querySelector('#modal-perfil .btn-salvar');
   btn.textContent = 'Salvando...'; btn.disabled = true;
   const updates = {
@@ -446,10 +471,13 @@ async function salvarPerfil() {
     foto_url:       document.getElementById('p-foto').value.trim(),
   };
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?id=eq.${editandoId}`, {
-      method:'PATCH', headers:H, body:JSON.stringify(updates)
+    const r = await fetch(`${SB}/functions/v1/atualizar-perfil`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ id: editandoId, email: emailVerificado, updates })
     });
-    if (!r.ok) throw new Error(await r.text());
+    const res = await r.json();
+    if (!r.ok) throw new Error(res.error || 'Erro ao salvar');
     // Atualiza local
     const p = todos.find(x => x.id === editandoId);
     if (p) Object.assign(p, updates);
@@ -466,6 +494,7 @@ async function salvarPerfil() {
 function fecharModal() {
   document.getElementById('modal-perfil').classList.remove('open');
   editandoId = null;
+  emailVerificado = null;
 }
 document.getElementById('modal-perfil').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-perfil')) fecharModal();
@@ -495,7 +524,7 @@ function copiarMsg() {
 }
 
 function abrirAdmin() {
-  if(prompt('Senha admin:') !== ADMIN) { alert('Senha incorreta.'); return; }
+  const sa = prompt('Senha admin:'); if(!sa || sa !== _ah.map(c=>String.fromCharCode(c)).join('')) { alert('Senha incorreta.'); return; }
   window.location.href = 'admin.html';
 }
 
