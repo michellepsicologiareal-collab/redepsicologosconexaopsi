@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsiMed Rede Colaborativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum: #2D1B4E;
+  --teal: #1B5E6B;
+  --met: #1a3d4f;          /* cor do Met — entre os dois mundos */
+  --met-mid: #245060;
+  --gold: #C8934A;
+  --gold-pale: #f0d9b5;
+  --cream: #F5F8F9;
+  --cream-dark: #E8EFF0;
+  --text: #0f2830;
+  --muted: #5a7580;
+  --border: rgba(27,94,107,0.12);
+  --red: #c0392b;
+  --green: #27ae60;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
+
+/* ─── LOGIN ─── */
+#login {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh;
+  background: linear-gradient(135deg, var(--plum) 0%, var(--met) 50%, var(--teal) 100%);
+  position:relative; overflow:hidden;
+}
+#login::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(200,147,74,0.1), transparent 60%);
+}
+.lbox {
+  background:rgba(255,255,255,0.97);
+  border-radius:20px; padding:44px 36px;
+  width:100%; max-width:380px;
+  text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,0.3);
+  position:relative; z-index:1;
+}
+.llogo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px; font-weight:500; color:var(--met);
+  margin-bottom:4px; letter-spacing:-0.5px;
+}
+.llogo span { color:var(--gold); }
+.lsub {
+  font-size:11px; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:6px;
+}
+.ldesc {
+  font-size:13px; color:var(--muted); line-height:1.6;
+  margin-bottom:28px; padding:0 8px;
+}
+.linput {
+  width:100%; padding:14px 16px;
+  border:1.5px solid var(--border); border-radius:11px;
+  font-family:'Outfit',sans-serif; font-size:14px;
+  color:var(--text); background:var(--cream);
+  outline:none; margin-bottom:10px;
+  transition:border-color 0.2s;
+}
+.linput:focus { border-color:var(--met); }
+.lbtn {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--met),var(--teal));
+  color:white; border:none; border-radius:11px;
+  font-family:'Outfit',sans-serif; font-size:14px; font-weight:600;
+  cursor:pointer; transition:opacity 0.2s;
+}
+.lbtn:hover { opacity:0.9; }
+#lerr { color:var(--red); font-size:12px; margin-top:8px; min-height:16px; }
+.llinks { margin-top:20px; display:flex; justify-content:center; gap:20px; }
+.llinks a { font-size:12px; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+.llinks a:hover { color:var(--met); }
+.lbadge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(200,147,74,0.1); border:1px solid rgba(200,147,74,0.25);
+  color:var(--gold); font-size:10px; font-weight:600;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding:4px 12px; border-radius:12px; margin-bottom:16px;
+}
+
+/* ─── APP ─── */
+#app { display:none; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, var(--plum) 0%, var(--met) 50%, var(--teal) 100%);
+  padding:0 20px; height:58px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 16px rgba(0,0,0,0.2);
+}
+.hlogo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px; font-weight:500; color:white;
+}
+.hlogo span { color:var(--gold); }
+.hlogo-sub { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+.hright { display:flex; align-items:center; gap:10px; }
+.huser { font-size:12px; color:rgba(255,255,255,0.6); }
+.btn-sair {
+  background:rgba(255,255,255,0.1); color:white;
+  border:none; padding:6px 14px; border-radius:8px;
+  font-family:'Outfit',sans-serif; font-size:12px; cursor:pointer;
+}
+
+/* TABS */
+.tabs {
+  display:flex; background:white;
+  border-bottom:1px solid var(--border);
+  padding:0 20px; overflow-x:auto;
+}
+.tab {
+  padding:14px 20px; background:none; border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:500;
+  color:var(--muted); cursor:pointer;
+  border-bottom:2.5px solid transparent;
+  white-space:nowrap; transition:all 0.15s;
+}
+.tab.active { color:var(--met); border-bottom-color:var(--met); }
+.tab:hover { color:var(--met); }
+.badge {
+  font-size:10px; padding:1px 7px; border-radius:8px;
+  margin-left:4px; background:var(--met); color:white;
+}
+
+/* CONTENT */
+.content { max-width:780px; margin:0 auto; padding:28px 20px; }
+
+/* ─── ABA: CASOS DISPONÍVEIS ─── */
+.section-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px; flex-wrap:wrap; gap:12px;
+}
+.section-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px; font-weight:500; color:var(--text);
+}
+.btn-refresh {
+  padding:7px 16px; background:var(--cream-dark);
+  color:var(--met); border:1px solid var(--border);
+  border-radius:8px; font-family:'Outfit',sans-serif;
+  font-size:12px; cursor:pointer; transition:0.2s;
+}
+.btn-refresh:hover { background:var(--met); color:white; }
+
+/* FILTROS */
+.filtros {
+  display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;
+}
+.fb {
+  padding:6px 14px; border-radius:8px; font-size:12px; font-weight:500;
+  border:1.5px solid var(--border); background:white; color:var(--muted);
+  cursor:pointer; transition:all 0.15s; font-family:'Outfit',sans-serif;
+}
+.fb.active { background:var(--met); border-color:var(--met); color:white; }
+
+/* CARDS DE CASOS */
+.casos-grid { display:flex; flex-direction:column; gap:12px; }
+
+.caso-card {
+  background:white; border-radius:14px;
+  border:1px solid var(--border);
+  padding:20px; transition:all 0.2s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.caso-card:hover { box-shadow:0 6px 20px rgba(27,94,107,0.1); border-color:rgba(27,94,107,0.2); }
+
+.caso-top {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; margin-bottom:12px;
+}
+.caso-tipo {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:10px; font-size:12px; font-weight:600;
+}
+.tipo-psi { background:#EEEDFE; color:#3C3489; }
+.tipo-psi-icon::before { content:'🧠'; }
+.tipo-psiq { background:#FDECEA; color:#922; }
+.tipo-nutri { background:#EAF7EE; color:#1a7a3a; }
+.tipo-neuro { background:#E6F1FB; color:#0C447C; }
+.tipo-fisio { background:#FEF3E8; color:#B85C1A; }
+.tipo-clinica { background:#F0EBF8; color:#5a3489; }
+
+.caso-urgencia {
+  font-size:10px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; padding:3px 10px; border-radius:8px;
+}
+.urg-alta { background:#FDECEA; color:var(--red); }
+.urg-media { background:#FEF3E8; color:#B85C1A; }
+.urg-baixa { background:#EAF7EE; color:var(--green); }
+
+.caso-demanda {
+  font-size:14px; font-weight:500; color:var(--text);
+  margin-bottom:10px; line-height:1.5;
+}
+
+.caso-chips {
+  display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;
+}
+.caso-chip {
+  font-size:11px; padding:4px 10px; border-radius:6px;
+  background:var(--cream); border:1px solid var(--border);
+  color:var(--muted);
+}
+
+.caso-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:12px; border-top:1px solid var(--cream-dark);
+  flex-wrap:wrap; gap:8px;
+}
+.caso-indicador { font-size:12px; color:var(--muted); }
+.caso-indicador strong { color:var(--text); }
+.caso-int { font-size:11px; color:var(--muted); }
+
+.caso-actions { display:flex; gap:8px; }
+.btn-interesse {
+  padding:8px 16px; border-radius:8px;
+  background:var(--met); color:white;
+  border:none; font-family:'Outfit',sans-serif;
+  font-size:12px; font-weight:600; cursor:pointer;
+  transition:0.2s;
+}
+.btn-interesse:hover { background:var(--met-mid); }
+.btn-interesse:disabled { background:var(--muted); cursor:not-allowed; }
+.btn-interesse.ja-tenho { background:var(--green); }
+
+.caso-obs {
+  font-size:12px; color:var(--muted);
+  font-style:italic; margin-bottom:10px;
+  padding:8px 12px; background:var(--cream);
+  border-radius:8px; border-left:2px solid var(--gold);
+  line-height:1.6;
+}
+
+/* STATUS BADGES */
+.st-disponivel { display:none; }
+.st-em_atendimento { background:#FEF3E8; color:#B85C1A; }
+.st-concluido { background:#EAF7EE; color:var(--green); }
+
+/* EMPTY */
+.empty {
+  text-align:center; padding:48px 20px;
+  color:var(--muted); font-size:14px;
+}
+.empty-icon { font-size:40px; margin-bottom:12px; opacity:0.4; }
+
+/* ─── ABA: INDICAR ─── */
+.form-card {
+  background:white; border-radius:16px;
+  border:1px solid var(--border); padding:28px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.form-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px; font-weight:500; color:var(--text);
+  margin-bottom:6px;
+}
+.form-sub { font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6; }
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.form-full { grid-column:span 2; }
+
+.form-group label {
+  display:block; font-size:11px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width:100%; padding:11px 14px;
+  border:1.5px solid var(--border); border-radius:10px;
+  font-family:'Outfit',sans-serif; font-size:13px;
+  color:var(--text); background:var(--cream);
+  outline:none; transition:border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color:var(--met); }
+.form-group textarea { min-height:80px; resize:vertical; }
+
+.form-divider {
+  font-size:11px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--gold);
+  margin:20px 0 16px;
+  display:flex; align-items:center; gap:10px;
+}
+.form-divider::after { content:''; flex:1; height:1px; background:rgba(200,147,74,0.2); }
+
+.btn-enviar {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--met),var(--teal));
+  color:white; border:none; border-radius:11px;
+  font-family:'Outfit',sans-serif; font-size:14px; font-weight:600;
+  cursor:pointer; transition:opacity 0.2s; margin-top:20px;
+}
+.btn-enviar:hover { opacity:0.9; }
+.btn-enviar:disabled { opacity:0.6; cursor:not-allowed; }
+
+.nota-etica {
+  font-size:12px; color:var(--muted); line-height:1.6;
+  background:var(--cream); padding:12px 16px;
+  border-radius:10px; border-left:2px solid var(--gold);
+  margin-bottom:20px; margin-top:16px;
+}
+.nota-etica strong { color:var(--text); }
+
+/* Tally alternativo */
+.tally-alt {
+  text-align:center; padding:16px;
+  border-top:1px solid var(--cream-dark); margin-top:20px;
+  font-size:12px; color:var(--muted);
+}
+.tally-alt a { color:var(--met); font-weight:600; }
+
+/* ─── ABA: PROFISSIONAIS ─── */
+.prof-intro {
+  font-size:13px; color:var(--muted); margin-bottom:20px;
+  line-height:1.6;
+}
+.prof-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+@media(max-width:500px) { .prof-grid { grid-template-columns:1fr; } }
+
+.prof-card {
+  background:white; border-radius:12px;
+  border:1px solid var(--border); padding:16px;
+  transition:all 0.2s; cursor:default;
+}
+.prof-card:hover { border-color:rgba(27,94,107,0.25); box-shadow:0 4px 16px rgba(27,94,107,0.08); }
+
+.prof-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.prof-avatar {
+  width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600; color:white; flex-shrink:0;
+}
+.prof-nome { font-size:14px; font-weight:600; color:var(--text); }
+.prof-tipo { font-size:11px; color:var(--met); font-weight:500; margin-top:1px; }
+.prof-reg { font-size:11px; color:var(--muted); }
+.prof-chips { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px; }
+.prof-chip {
+  font-size:10px; padding:2px 8px; border-radius:5px;
+  background:var(--cream); border:1px solid var(--border); color:var(--muted);
+}
+.prof-cidade { font-size:11px; color:var(--muted); margin-bottom:10px; }
+.prof-rede {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10px; font-weight:600; letter-spacing:0.5px;
+  padding:3px 9px; border-radius:8px; margin-bottom:10px;
+}
+.rede-psi { background:#EEEDFE; color:#3C3489; }
+.rede-med { background:#E8F4F6; color:#1B5E6B; }
+.btn-whats-prof {
+  width:100%; padding:8px; border-radius:8px;
+  background:var(--met); color:white;
+  border:none; font-family:'Outfit',sans-serif;
+  font-size:12px; font-weight:600; cursor:pointer;
+  text-decoration:none; display:block; text-align:center;
+  transition:0.2s;
+}
+.btn-whats-prof:hover { background:var(--met-mid); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:24px; right:24px;
+  padding:12px 20px; border-radius:10px;
+  font-size:13px; color:white; z-index:999;
+  animation:slideIn 0.3s ease;
+}
+.toast-ok { background:var(--met); }
+.toast-err { background:var(--red); }
+@keyframes slideIn { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+/* MODAL ADMIN */
+#modal-admin {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.5); z-index:200;
+  align-items:center; justify-content:center; padding:20px;
+}
+#modal-admin.open { display:flex; }
+.modal-box {
+  background:white; border-radius:16px;
+  padding:28px; width:100%; max-width:480px;
+  max-height:90vh; overflow-y:auto;
+}
+.modal-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px; color:var(--met); margin-bottom:16px;
+}
+.modal-info { font-size:13px; line-height:1.8; color:var(--text); margin-bottom:20px; }
+.modal-info strong { color:var(--met); }
+.modal-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.btn-liberar {
+  flex:1; padding:12px; border-radius:10px;
+  background:var(--green); color:white; border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer;
+}
+.btn-concluir {
+  flex:1; padding:12px; border-radius:10px;
+  background:var(--met); color:white; border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer;
+}
+.btn-fechar {
+  padding:12px 20px; border-radius:10px;
+  background:var(--cream-dark); color:var(--muted); border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; cursor:pointer;
+}
+
+@media(max-width:600px) {
+  .form-grid { grid-template-columns:1fr; }
+  .form-full { grid-column:span 1; }
+  .content { padding:20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─── -->
+<div id="login">
+  <div class="lbox">
+    <div class="lbadge">✦ PsiMed — Área Premium</div>
+    <div class="llogo">PsiMed <span>·</span> Rede Colaborativa</div>
+    <div class="lsub">Rede Colaborativa de Saúde</div>
+    <p class="ldesc">Indicações cruzadas entre psicólogas e profissionais de saúde. Acesso pelo e-mail cadastrado na Conexão Psi ou Psi Med.</p>
+    <input type="text" class="linput" id="nome-login" placeholder="Seu nome">
+    <input type="text" class="linput" id="registro-login" placeholder="CRP / CRM / CRN">
+    <input type="password" class="linput" id="senha-login" placeholder="Senha premium" onkeydown="if(event.key==='Enter')entrar()">
+    <button class="lbtn" onclick="entrar()">Entrar na PsiMed</button>
+    <div id="lerr"></div>
+    <div class="llinks">
+      <a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/">← Diretório Psi</a>
+      <a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/med.html">Diretório Med →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP ─── -->
+<div id="app">
+  <header>
+    <div>
+      <div class="hlogo">PsiMed <span>·</span> Rede Colaborativa</div>
+      <div class="hlogo-sub">Rede Colaborativa de Saúde</div>
+    </div>
+    <div class="hright">
+      <span class="huser" id="huser-nome"></span>
+      <button class="btn-sair" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="mudarAba('casos',this)">🔄 Indicações recebidas <span class="badge" id="badge-casos">0</span></button>
+    <button class="tab" onclick="mudarAba('indicar',this)">➕ Indicar paciente</button>
+    <button class="tab" onclick="mudarAba('profissionais',this)">👥 Profissionais da rede</button>
+  </div>
+
+  <!-- ─── ABA: CASOS ─── -->
+  <div id="aba-casos" class="content">
+    <div class="section-header">
+      <div class="section-title">Indicações aguardando</div>
+      <button class="btn-refresh" onclick="carregarCasos()">🔄 Atualizar</button>
+    </div>
+
+    <div class="filtros">
+      <button class="fb active" data-tipo="todos" onclick="setFiltro(this)">Todos</button>
+      <button class="fb" data-tipo="psi" onclick="setFiltro(this)">🧠 Precisa de psi</button>
+      <button class="fb" data-tipo="psiquiatra" onclick="setFiltro(this)">Psiquiatria</button>
+      <button class="fb" data-tipo="nutricionista" onclick="setFiltro(this)">Nutrição</button>
+      <button class="fb" data-tipo="neurologista" onclick="setFiltro(this)">Neurologia</button>
+      <button class="fb" data-tipo="fisioterapeuta" onclick="setFiltro(this)">Fisio</button>
+    </div>
+
+    <div class="casos-grid" id="casos-grid">
+      <div class="empty"><div class="empty-icon">🔄</div>Carregando indicações...</div>
+    </div>
+  </div>
+
+  <!-- ─── ABA: INDICAR ─── -->
+  <div id="aba-indicar" class="content" style="display:none;">
+    <div class="form-card">
+      <div class="form-title">Indicar paciente para a rede</div>
+      <p class="form-sub">Preencha o perfil do paciente sem dados pessoais identificáveis. Profissionais da rede verão a demanda e poderão se oferecer para atender.</p>
+
+      <div class="nota-etica">
+        <strong>Ética em primeiro lugar:</strong> não insira nome, CPF ou dados que identifiquem o paciente. Apenas perfil clínico, demanda e localização.
+      </div>
+
+      <div class="form-divider">O paciente precisa de</div>
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>Tipo de profissional buscado *</label>
+          <select id="f-tipo-buscado">
+            <option value="">Selecione...</option>
+            <option value="psi">Psicólogo(a)</option>
+            <option value="psiquiatra">Psiquiatra</option>
+            <option value="nutricionista">Nutricionista</option>
+            <option value="neurologista">Neurologista</option>
+            <option value="fisioterapeuta">Fisioterapeuta</option>
+            <option value="clinica geral">Clínica Geral</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label>Demanda clínica (sem dados pessoais) *</label>
+          <textarea id="f-demanda" placeholder="Ex: Paciente adulto com sintomas depressivos, em processo terapêutico, precisa de avaliação psiquiátrica para suporte medicamentoso..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-divider">Perfil e preferências</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Público</label>
+          <select id="f-publico">
+            <option value="">Qualquer</option>
+            <option value="Criança">Criança</option>
+            <option value="Adolescente">Adolescente</option>
+            <option value="Adulto">Adulto</option>
+            <option value="Idoso">Idoso</option>
+            <option value="Casal">Casal</option>
+            <option value="Família">Família</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Formato</label>
+          <select id="f-formato">
+            <option value="Ambos">Indiferente</option>
+            <option value="Online">Online</option>
+            <option value="Presencial">Presencial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" id="f-cidade" placeholder="Ex: São Paulo - SP">
+        </div>
+        <div class="form-group">
+          <label>Faixa de valor</label>
+          <input type="text" id="f-valor" placeholder="Ex: até R$150, social, plano...">
+        </div>
+        <div class="form-group form-full">
+          <label>Urgência</label>
+          <select id="f-urgencia">
+            <option value="media">Média — pode aguardar alguns dias</option>
+            <option value="alta">Alta — precisa de atendimento urgente</option>
+            <option value="baixa">Baixa — sem pressa</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label>Observações clínicas relevantes (opcional)</label>
+          <textarea id="f-obs" placeholder="Informações que ajudam o profissional a avaliar se pode atender. Sem dados pessoais."></textarea>
+        </div>
+      </div>
+
+      <div class="form-divider">Seus dados (para contato)</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Seu nome *</label>
+          <input type="text" id="f-indicador">
+        </div>
+        <div class="form-group">
+          <label>Seu registro (CRP/CRM/CRN) *</label>
+          <input type="text" id="f-registro">
+        </div>
+        <div class="form-group">
+          <label>Você é...</label>
+          <select id="f-tipo-indicador">
+            <option value="psi">Psicólogo(a)</option>
+            <option value="medico">Médico(a) / Prof. de Saúde</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp (para retorno)</label>
+          <input type="tel" id="f-contato" placeholder="11 99999-9999">
+        </div>
+      </div>
+
+      <button class="btn-enviar" id="btn-enviar" onclick="enviarIndicacao()">
+        Publicar indicação na rede →
+      </button>
+
+      <div class="tally-alt">
+        Prefere usar formulário externo?
+        <a href="#" id="link-tally-met" target="_blank">Acessar formulário Tally</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ABA: PROFISSIONAIS ─── -->
+  <div id="aba-profissionais" class="content" style="display:none;">
+    <p class="prof-intro">Profissionais premium de ambas as redes — disponíveis para indicações e colaboração clínica.</p>
+    <div class="prof-grid" id="prof-grid">
+      <div class="empty"><div class="empty-icon">👥</div>Carregando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN (liberar contato) -->
+<div id="modal-admin">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-titulo">Gerenciar indicação</div>
+    <div class="modal-info" id="modal-info"></div>
+    <div class="modal-actions">
+      <button class="btn-liberar" id="btn-liberar">📲 Liberar contato via WhatsApp</button>
+      <button class="btn-concluir" id="btn-concluir">✅ Marcar como concluído</button>
+      <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const PASS_ADMIN = 'conexaopsi2026';
+const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+const ADMIN_WA = '5511947388423'; // WhatsApp da admin — atualizar
+
+const CORES = ['#2D1B4E','#1B5E6B','#1a5e3a','#5e3a1a','#1a3a5e','#5e1a3a'];
+const TIPO_LABEL = {
+  psi:'🧠 Psicólogo(a)', psiquiatra:'🏥 Psiquiatra',
+  nutricionista:'🥗 Nutricionista', neurologista:'🧬 Neurologista',
+  fisioterapeuta:'💪 Fisioterapeuta', 'clinica geral':'🩺 Clínica Geral'
+};
+const TIPO_CLASS = {
+  psi:'tipo-psi', psiquiatra:'tipo-psiq',
+  nutricionista:'tipo-nutri', neurologista:'tipo-neuro',
+  fisioterapeuta:'tipo-fisio', 'clinica geral':'tipo-clinica'
+};
+
+let usuarioNome = '', usuarioRegistro = '', isAdmin = false;
+let casos = [], filtroAtual = 'todos';
+let casoSelecionado = null;
+
+async function api(method, path, body) {
+  const r = await fetch(`${SB}/rest/v1/${path}`, {
+    method, headers: H,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await r.text();
+  if (!r.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
+}
+
+async function entrar() {
+  const email = document.getElementById('email-login').value.trim().toLowerCase();
+  const err   = document.getElementById('lerr');
+  const btn   = document.querySelector('.lbtn');
+
+  if (!email) { err.textContent = 'Informe seu e-mail cadastrado.'; return; }
+
+  btn.textContent = 'Verificando...'; btn.disabled = true;
+  err.textContent = '';
+
+  // Verificar se é admin
+  if (email === 'michellepsicologiareal@gmail.com' || email === 'admin') {
+    isAdmin = true;
+    usuarioNome = 'Admin';
+    usuarioRegistro = 'Admin';
+    acessarMet();
+    btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
+    return;
+  }
+
+  try {
+    // Verificar nas duas tabelas — psis e profissionais_saude
+    const [resPsis, resMed] = await Promise.all([
+      fetch(`${SB}/rest/v1/psis?select=nome,crp,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H}),
+      fetch(`${SB}/rest/v1/profissionais_saude?select=nome,registro,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H})
+    ]);
+
+    const psis = await resPsis.json();
+    const meds = await resMed.json();
+
+    const psi = psis?.[0];
+    const med = meds?.[0];
+    const prof = psi || med;
+
+    if (!prof) {
+      err.textContent = 'E-mail não encontrado na rede. Verifique ou faça seu cadastro.';
+      btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
+      return;
+    }
+
+    if (prof.status !== 'aprovado') {
+      err.textContent = 'Seu cadastro ainda está pendente de aprovação.';
+      btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
+      return;
+    }
+
+    if (!prof.premium) {
+      err.textContent = 'O Met é exclusivo para membros premium. Faça o upgrade no diretório.';
+      btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
+      return;
+    }
+
+    usuarioNome     = prof.nome || '';
+    usuarioRegistro = prof.crp || prof.registro || '';
+    isAdmin         = false;
+
+    acessarMet();
+  } catch(e) {
+    err.textContent = 'Erro de conexão. Tente novamente.';
+    console.error(e);
+  }
+
+  btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
+}
+
+function acessarMet() {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('huser-nome').textContent = usuarioNome + (usuarioRegistro ? ' · ' + usuarioRegistro : '');
+  document.getElementById('f-indicador').value = usuarioNome;
+  document.getElementById('f-registro').value  = usuarioRegistro;
+  carregarCasos();
+}
+
+function sair() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('email-login').value = '';
+  document.getElementById('lerr').textContent = '';
+  usuarioNome = ''; usuarioRegistro = ''; isAdmin = false;
+}
+
+function mudarAba(aba, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('aba-casos').style.display = 'none';
+  document.getElementById('aba-indicar').style.display = 'none';
+  document.getElementById('aba-profissionais').style.display = 'none';
+  document.getElementById('aba-'+aba).style.display = 'block';
+  if (aba === 'profissionais') carregarProfissionais();
+}
+
+function setFiltro(btn) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtroAtual = btn.dataset.tipo;
+  renderCasos();
+}
+
+// ─── CASOS ───
+async function carregarCasos() {
+  document.getElementById('casos-grid').innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
+  try {
+    casos = await api('GET', "encaminhamentos_cruzados?select=*&status=eq.disponivel&order=created_at.desc&limit=100") || [];
+    document.getElementById('badge-casos').textContent = casos.length;
+    renderCasos();
+  } catch(e) {
+    document.getElementById('casos-grid').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar. Tente novamente.</div>`;
+    console.error(e);
+  }
+}
+
+function renderCasos() {
+  const lista = filtroAtual === 'todos' ? casos : casos.filter(c => c.tipo_buscado === filtroAtual);
+  const grid  = document.getElementById('casos-grid');
+
+  if (!lista.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">✨</div>Nenhuma indicação ${filtroAtual === 'todos' ? '' : 'deste tipo '}disponível no momento.</div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(c => {
+    const tipoLabel = TIPO_LABEL[c.tipo_buscado] || c.tipo_buscado;
+    const tipoClass = TIPO_CLASS[c.tipo_buscado] || 'tipo-psi';
+    const urgClass  = {alta:'urg-alta', media:'urg-media', baixa:'urg-baixa'}[c.urgencia] || 'urg-media';
+    const urgLabel  = {alta:'🔴 Urgente', media:'🟡 Média urgência', baixa:'🟢 Sem pressa'}[c.urgencia] || '';
+    const numInt    = (c.interessados||[]).length;
+    const euTenho   = (c.interessados||[]).includes(usuarioRegistro);
+    const chips = [
+      c.publico ? c.publico : null,
+      c.formato && c.formato !== 'Ambos' ? c.formato : 'Online ou Presencial',
+      c.cidade || null,
+      c.valor_maximo ? 'Valor: '+c.valor_maximo : null
+    ].filter(Boolean);
+
+    const dataStr = new Date(c.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+
+    return `<div class="caso-card" id="caso-${c.id}">
+      <div class="caso-top">
+        <div>
+          <span class="caso-tipo ${tipoClass}">${tipoLabel}</span>
+          <span class="caso-urgencia ${urgClass}">${urgLabel}</span>
+        </div>
+        <span style="font-size:11px;color:var(--muted);">${dataStr}</span>
+      </div>
+      <div class="caso-demanda">${c.demanda || '—'}</div>
+      ${c.observacoes ? `<div class="caso-obs">${c.observacoes}</div>` : ''}
+      <div class="caso-chips">
+        ${chips.map(ch => `<span class="caso-chip">${ch}</span>`).join('')}
+      </div>
+      <div class="caso-footer">
+        <div>
+          <div class="caso-indicador">Indicado por <strong>${c.indicado_por}</strong> (${c.crp_ou_registro||'—'})</div>
+          <div class="caso-int">${numInt} ${numInt===1?'profissional':' profissionais'} com interesse</div>
+        </div>
+        <div class="caso-actions">
+          ${isAdmin
+            ? `<button class="btn-interesse" onclick="abrirAdmin('${c.id}')" style="background:var(--gold)">⚙️ Gerenciar</button>`
+            : `<button class="btn-interesse ${euTenho?'ja-tenho':''}"
+                onclick="registrarInteresse('${c.id}',this)"
+                ${euTenho?'disabled':''}>
+                ${euTenho ? '✅ Interesse registrado' : 'Tenho interesse'}
+              </button>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function registrarInteresse(id, btn) {
+  btn.disabled = true; btn.textContent = 'Registrando...';
+  try {
+    const caso = casos.find(c => c.id === id);
+    if (!caso) return;
+    const novosInt = [...(caso.interessados||[]), usuarioRegistro];
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${id}`, { interessados: novosInt });
+    caso.interessados = novosInt;
+
+    // WhatsApp para admin
+    const numInt = novosInt.length;
+    const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
+    const waMsg = encodeURIComponent(
+      `🔔 *Nova indicação no PsiMed Rede Colaborativa*\n\n` +
+      `*Caso:* ${caso.demanda?.substring(0,80)}...\n` +
+      `*Buscando:* ${tipoLabel}\n` +
+      `*Interessado:* ${usuarioNome} (${usuarioRegistro})\n` +
+      `*Total de interessados:* ${numInt}\n\n` +
+      `Acesse o admin para liberar o contato.`
+    );
+    window.open(`https://wa.me/${ADMIN_WA}?text=${waMsg}`, '_blank');
+
+    btn.textContent = '✅ Interesse registrado';
+    btn.classList.add('ja-tenho');
+    toast('Interesse registrado! A admin será notificada.', 'ok');
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Tenho interesse';
+    toast('Erro ao registrar. Tente novamente.', 'err');
+  }
+}
+
+// ─── ADMIN ───
+function abrirAdmin(id) {
+  const caso = casos.find(c => c.id === id);
+  if (!caso) return;
+  casoSelecionado = caso;
+  const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
+  document.getElementById('modal-titulo').textContent = 'Gerenciar — ' + tipoLabel;
+  document.getElementById('modal-info').innerHTML = `
+    <strong>Demanda:</strong> ${caso.demanda}<br>
+    <strong>Indicado por:</strong> ${caso.indicado_por} (${caso.crp_ou_registro})<br>
+    <strong>WhatsApp do indicador:</strong> ${caso.contato_indicador || 'não informado'}<br>
+    <strong>Interessados:</strong> ${(caso.interessados||[]).join(', ') || 'nenhum ainda'}<br>
+    <strong>Cidade:</strong> ${caso.cidade || '—'}<br>
+    <strong>Urgência:</strong> ${caso.urgencia}
+  `;
+  document.getElementById('btn-liberar').onclick = () => liberarContato(caso);
+  document.getElementById('btn-concluir').onclick = () => marcarConcluido(caso.id);
+  document.getElementById('modal-admin').classList.add('open');
+}
+
+async function liberarContato(caso) {
+  const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
+  const int = (caso.interessados||[]).join(', ') || 'ninguém ainda';
+  const waMsg = encodeURIComponent(
+    `📋 *Indicação no PsiMed Rede Colaborativa*\n\n` +
+    `Olá ${caso.indicado_por}! Seu caso foi visualizado por profissionais da rede.\n\n` +
+    `*Buscando:* ${tipoLabel}\n` +
+    `*Interessados:* ${int}\n\n` +
+    `Entre em contato com os interessados para combinar o encaminhamento. 💙`
+  );
+  const tel = (caso.contato_indicador||'').replace(/\D/g,'');
+  if (tel) window.open(`https://wa.me/55${tel}?text=${waMsg}`, '_blank');
+  else { alert('WhatsApp do indicador não cadastrado.'); }
+  fecharModal();
+}
+
+async function marcarConcluido(id) {
+  try {
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${id}`, { status: 'concluido' });
+    casos = casos.filter(c => c.id !== id);
+    renderCasos();
+    document.getElementById('badge-casos').textContent = casos.length;
+    fecharModal();
+    toast('✅ Caso marcado como concluído!', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+function fecharModal() { document.getElementById('modal-admin').classList.remove('open'); }
+
+// ─── INDICAR ───
+async function enviarIndicacao() {
+  const btn = document.getElementById('btn-enviar');
+  const tipoBuscado  = document.getElementById('f-tipo-buscado').value;
+  const demanda      = document.getElementById('f-demanda').value.trim();
+  const indicador    = document.getElementById('f-indicador').value.trim();
+  const registro     = document.getElementById('f-registro').value.trim();
+
+  if (!tipoBuscado)  { toast('Selecione o tipo de profissional buscado.', 'err'); return; }
+  if (!demanda)      { toast('Descreva a demanda clínica.', 'err'); return; }
+  if (!indicador || !registro) { toast('Informe seu nome e registro.', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Publicando...';
+
+  let contato = document.getElementById('f-contato').value.trim().replace(/\D/g,'');
+  if (contato && !contato.startsWith('55')) contato = '55' + contato;
+
+  try {
+    await api('POST', 'encaminhamentos_cruzados', {
+      indicado_por:        indicador,
+      crp_ou_registro:     registro,
+      tipo_indicador:      document.getElementById('f-tipo-indicador').value,
+      contato_indicador:   contato,
+      tipo_buscado:        tipoBuscado,
+      demanda,
+      publico:             document.getElementById('f-publico').value,
+      formato:             document.getElementById('f-formato').value,
+      cidade:              document.getElementById('f-cidade').value.trim(),
+      valor_maximo:        document.getElementById('f-valor').value.trim(),
+      urgencia:            document.getElementById('f-urgencia').value,
+      observacoes:         document.getElementById('f-obs').value.trim(),
+      status:              'disponivel'
+    });
+
+    // Notifica admin via WhatsApp
+    const tipoLabel = TIPO_LABEL[tipoBuscado] || tipoBuscado;
+    const waMsg = encodeURIComponent(
+      `🔔 *Nova indicação no PsiMed Rede Colaborativa*\n\n` +
+      `*De:* ${indicador} (${registro})\n` +
+      `*Buscando:* ${tipoLabel}\n` +
+      `*Demanda:* ${demanda.substring(0,100)}\n\n` +
+      `Acesse o painel PsiMed para gerenciar.`
+    );
+    window.open(`https://wa.me/${ADMIN_WA}?text=${waMsg}`, '_blank');
+
+    toast('✅ Indicação publicada com sucesso!', 'ok');
+    // Limpar formulário
+    ['f-tipo-buscado','f-demanda','f-publico','f-formato','f-cidade','f-valor','f-obs','f-contato']
+      .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('f-urgencia').value = 'media';
+
+    // Vai para aba de casos e recarrega
+    setTimeout(() => {
+      document.querySelectorAll('.tab')[0].click();
+      carregarCasos();
+    }, 1500);
+  } catch(e) {
+    toast('Erro ao publicar: '+e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Publicar indicação na rede →';
+  }
+}
+
+// ─── PROFISSIONAIS ───
+async function carregarProfissionais() {
+  const grid = document.getElementById('prof-grid');
+  grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div>Carregando...</div>';
+  try {
+    const [psis, meds] = await Promise.all([
+      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&limit=100'),
+      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&limit=100')
+    ]);
+
+    const profis = [
+      ...(psis||[]).map(p => ({...p, _rede:'psi', _nome:p.nome, _reg:p.crp, _esp:p.abordagem, _tipo:'Psicólogo(a)'})),
+      ...(meds||[]).map(p => ({...p, _rede:'med', _nome:p.nome, _reg:p.registro, _esp:p.especialidade, _tipo:p.tipo}))
+    ].sort((a,b) => (a._nome||'').localeCompare(b._nome||''));
+
+    if (!profis.length) {
+      grid.innerHTML = '<div class="empty"><div class="empty-icon">✨</div>Em breve profissionais premium aparecem aqui.</div>';
+      return;
+    }
+
+    grid.innerHTML = profis.map((p,i) => {
+      const ini = (p._nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const cor = CORES[i % CORES.length];
+      const av  = p.foto_url
+        ? `<img src="${p.foto_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+        : `<div class="prof-avatar" style="background:${cor}">${ini}</div>`;
+      const h   = (p.handle||'').replace('@','');
+      const wa  = (p.whatsapp||'').replace(/\D/g,'');
+      const waMsg = encodeURIComponent(`Olá ${p._nome?p._nome.split(' ')[0]:''}! Vi seu perfil na PsiMed Rede Colaborativa e gostaria de conversar sobre um encaminhamento. 💙`);
+
+      return `<div class="prof-card">
+        <div class="prof-top">
+          ${av}
+          <div>
+            <div class="prof-nome">${p._nome||'—'}</div>
+            <div class="prof-tipo">${p._tipo||'—'}</div>
+            <div class="prof-reg">${p._reg||''}</div>
+          </div>
+        </div>
+        <span class="prof-rede ${p._rede==='psi'?'rede-psi':'rede-med'}">${p._rede==='psi'?'🧠 Conexão Psi':'🏥 Psi Med'}</span>
+        ${p._esp?`<div class="prof-chips"><span class="prof-chip">${p._esp}</span></div>`:''}
+        ${p.cidade?`<div class="prof-cidade">📍 ${p.cidade}</div>`:''}
+        ${wa?`<a href="https://wa.me/${wa}?text=${waMsg}" target="_blank" class="btn-whats-prof">📲 Contato via WhatsApp</a>`:''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar. ${e.message}</div>`;
+  }
+}
+
+function toast(msg, tipo) {
+  const t = document.createElement('div');
+  t.className = `toast toast-${tipo}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+</body>
+</html>

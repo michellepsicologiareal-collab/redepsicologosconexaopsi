@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsiMed — Diagnóstico do Sistema</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',sans-serif; background:#f0f4f6; color:#1a2a30; padding:24px; }
+h1 { font-size:22px; font-weight:600; color:#1B5E6B; margin-bottom:4px; }
+.sub { font-size:13px; color:#888; margin-bottom:28px; }
+.card { background:white; border-radius:14px; border:1px solid #e0eaed; padding:22px; margin-bottom:16px; }
+.card-title { font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#1B5E6B; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0f4f6; font-size:13px; }
+.row:last-child { border-bottom:none; }
+.label { color:#555; }
+.val { font-weight:500; }
+.ok  { color:#27ae60; }
+.err { color:#c0392b; }
+.warn { color:#e67e22; }
+.badge { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+.badge-ok   { background:#eafaf1; color:#27ae60; }
+.badge-err  { background:#fdecea; color:#c0392b; }
+.badge-warn { background:#fef3e8; color:#e67e22; }
+.badge-info { background:#e8f4f6; color:#1B5E6B; }
+.btn {
+  padding:10px 20px; border:none; border-radius:9px;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:0.2s; margin-right:8px; margin-top:8px;
+}
+.btn-run { background:#1B5E6B; color:white; }
+.btn-run:hover { background:#245060; }
+.btn-sec { background:#f0f4f6; color:#555; border:1px solid #ddd; }
+input { 
+  padding:10px 14px; border:1.5px solid #ddd; border-radius:9px;
+  font-family:'Outfit',sans-serif; font-size:13px; width:100%; margin-bottom:10px;
+  outline:none;
+}
+input:focus { border-color:#1B5E6B; }
+pre { background:#f8fafb; border-radius:8px; padding:14px; font-size:11px; overflow-x:auto; border:1px solid #e8eef0; margin-top:10px; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid #ddd; border-top-color:#1B5E6B; border-radius:50%; animation:spin 0.6s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.step { display:flex; align-items:center; gap:8px; font-size:13px; padding:8px 0; }
+.dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dot-ok { background:#27ae60; }
+.dot-err { background:#c0392b; }
+.dot-wait { background:#ddd; }
+.dot-run { background:#1B5E6B; animation:pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+</head>
+<body>
+
+<h1>🩺 PsiMed — Diagnóstico do Sistema</h1>
+<p class="sub">Verifica conexão Supabase, tabelas e login antes de ir ao ar</p>
+
+<!-- STATUS GERAL -->
+<div class="card">
+  <div class="card-title">⚡ Status geral</div>
+  <div id="steps">
+    <div class="step"><div class="dot dot-wait" id="d1"></div><span id="s1">Aguardando...</span></div>
+    <div class="step"><div class="dot dot-wait" id="d2"></div><span id="s2">—</span></div>
+    <div class="step"><div class="dot dot-wait" id="d3"></div><span id="s3">—</span></div>
+    <div class="step"><div class="dot dot-wait" id="d4"></div><span id="s4">—</span></div>
+    <div class="step"><div class="dot dot-wait" id="d5"></div><span id="s5">—</span></div>
+  </div>
+  <button class="btn btn-run" onclick="rodarDiagnostico()" id="btn-diag">▶ Rodar diagnóstico completo</button>
+</div>
+
+<!-- TABELAS -->
+<div class="card">
+  <div class="card-title">🗄 Tabelas no Supabase</div>
+  <div id="tabelas-resultado"><span style="color:#aaa;font-size:13px;">Clique em "Rodar diagnóstico" acima</span></div>
+</div>
+
+<!-- DADOS -->
+<div class="card">
+  <div class="card-title">👥 Dados encontrados</div>
+  <div id="dados-resultado"><span style="color:#aaa;font-size:13px;">Aguardando...</span></div>
+</div>
+
+<!-- TESTE DE LOGIN -->
+<div class="card">
+  <div class="card-title">🔐 Teste de login (met.html)</div>
+  <p style="font-size:12px;color:#888;margin-bottom:14px;">Digite um e-mail cadastrado na rede para simular o login do PsiMed</p>
+  <input type="email" id="email-teste" placeholder="email@exemplo.com">
+  <div>
+    <button class="btn btn-run" onclick="testarLogin()">Testar login</button>
+  </div>
+  <div id="login-resultado" style="margin-top:12px;"></div>
+</div>
+
+<!-- TESTE DE ESCRITA -->
+<div class="card">
+  <div class="card-title">✍️ Teste de escrita — encaminhamentos_cruzados</div>
+  <p style="font-size:12px;color:#888;margin-bottom:14px;">Insere e depois apaga um registro de teste para verificar se a tabela existe e tem permissão de escrita</p>
+  <button class="btn btn-run" onclick="testarEscrita()">Testar criação de indicação</button>
+  <button class="btn btn-sec" onclick="document.getElementById('escrita-resultado').innerHTML=''">Limpar</button>
+  <div id="escrita-resultado" style="margin-top:12px;"></div>
+</div>
+
+<script>
+const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const H   = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+async function api(method, path, body) {
+  const r = await fetch(`${SB}/rest/v1/${path}`, {
+    method, headers: H,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await r.text();
+  return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
+}
+
+function setStep(n, status, msg) {
+  const d = document.getElementById('d' + n);
+  const s = document.getElementById('s' + n);
+  d.className = 'dot dot-' + status;
+  s.textContent = msg;
+}
+
+function badge(tipo, txt) {
+  return `<span class="badge badge-${tipo}">${txt}</span>`;
+}
+
+async function rodarDiagnostico() {
+  const btn = document.getElementById('btn-diag');
+  btn.disabled = true; btn.textContent = 'Rodando...';
+
+  // Step 1 — conexão
+  setStep(1, 'run', 'Testando conexão com Supabase...');
+  setStep(2, 'wait', '—'); setStep(3, 'wait', '—'); setStep(4, 'wait', '—'); setStep(5, 'wait', '—');
+
+  let r;
+
+  // Step 1 — tabela psis
+  r = await api('GET', 'psis?select=count&limit=1');
+  if (!r.ok) {
+    setStep(1, 'err', '✗ Conexão falhou — verifique URL e KEY do Supabase (status ' + r.status + ')');
+    btn.disabled = false; btn.textContent = '▶ Rodar diagnóstico completo';
+    return;
+  }
+  setStep(1, 'ok', '✓ Supabase conectado com sucesso');
+
+  // Step 2 — tabela psis contagem
+  setStep(2, 'run', 'Verificando tabela psis...');
+  r = await api('GET', 'psis?select=*&limit=500');
+  const totalPsis = r.ok ? (r.data?.length || 0) : 0;
+  const aprovPsis = r.ok ? (r.data?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0) : 0;
+  const premPsis  = r.ok ? (r.data?.filter(p => p.premium === true).length || 0) : 0;
+
+  if (!r.ok) {
+    setStep(2, 'err', '✗ Tabela "psis" não encontrada ou sem permissão');
+  } else {
+    setStep(2, 'ok', `✓ Tabela "psis" — ${totalPsis} registros (${aprovPsis} aprovados, ${premPsis} premium)`);
+  }
+
+  // Step 3 — tabela profissionais_saude
+  setStep(3, 'run', 'Verificando tabela profissionais_saude...');
+  r = await api('GET', 'profissionais_saude?select=*&limit=500');
+  const totalMed = r.ok ? (r.data?.length || 0) : 0;
+  const aprovMed = r.ok ? (r.data?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0) : 0;
+
+  if (!r.ok) {
+    setStep(3, 'warn', '⚠ Tabela "profissionais_saude" não encontrada — med.html não vai funcionar');
+  } else {
+    setStep(3, 'ok', `✓ Tabela "profissionais_saude" — ${totalMed} registros (${aprovMed} aprovados)`);
+  }
+
+  // Step 4 — tabela encaminhamentos_cruzados
+  setStep(4, 'run', 'Verificando tabela encaminhamentos_cruzados...');
+  r = await api('GET', 'encaminhamentos_cruzados?select=count&limit=1');
+  if (!r.ok) {
+    setStep(4, 'err', '✗ Tabela "encaminhamentos_cruzados" NÃO existe — rode o SQL antes de usar o met.html');
+  } else {
+    const totalEnc = r.data?.length || 0;
+    setStep(4, 'ok', `✓ Tabela "encaminhamentos_cruzados" existe — ${totalEnc} indicações`);
+  }
+
+  // Step 5 — resumo
+  setStep(5, 'ok', '✓ Diagnóstico concluído — veja detalhes abaixo');
+
+  // Renderizar tabelas
+  renderTabelas(totalPsis, aprovPsis, premPsis, totalMed, aprovMed, r.ok);
+
+  // Renderizar dados
+  await renderDados();
+
+  btn.disabled = false; btn.textContent = '▶ Rodar novamente';
+}
+
+function renderTabelas(totalPsis, aprovPsis, premPsis, totalMed, aprovMed, encOk) {
+  document.getElementById('tabelas-resultado').innerHTML = `
+    <div class="row"><span class="label">psis</span><span>${badge('ok','✓ existe')} ${totalPsis} registros · ${aprovPsis} aprovados · ${premPsis} premium</span></div>
+    <div class="row"><span class="label">profissionais_saude</span><span>${totalMed >= 0 ? badge('ok','✓ existe') : badge('err','✗ não existe')} ${totalMed} registros · ${aprovMed} aprovados</span></div>
+    <div class="row"><span class="label">encaminhamentos_cruzados</span><span>${encOk ? badge('ok','✓ existe') : badge('err','✗ NÃO existe — rode o SQL')}</span></div>
+  `;
+}
+
+async function renderDados() {
+  const r = await api('GET', 'psis?select=nome,email,status,premium&limit=500');
+  if (!r.ok || !r.data?.length) {
+    document.getElementById('dados-resultado').innerHTML = `<span style="color:#c0392b;font-size:13px;">Nenhum dado encontrado na tabela psis</span>`;
+    return;
+  }
+
+  const statusMap = {};
+  r.data.forEach(p => {
+    const s = p.status || 'sem status';
+    statusMap[s] = (statusMap[s] || 0) + 1;
+  });
+
+  const statusHtml = Object.entries(statusMap).map(([s, n]) => `
+    <div class="row"><span class="label">status: <strong>${s}</strong></span><span>${badge(s.toLowerCase()==='aprovado'?'ok':'warn', n + ' registros')}</span></div>
+  `).join('');
+
+  const semEmail = r.data.filter(p => !p.email).length;
+
+  document.getElementById('dados-resultado').innerHTML = `
+    ${statusHtml}
+    <div class="row"><span class="label">sem e-mail cadastrado</span><span>${badge(semEmail > 0 ? 'warn' : 'ok', semEmail + ' psis sem e-mail')}</span></div>
+    <div class="row" style="margin-top:8px;"><span style="font-size:11px;color:#aaa;">⚠ Psis sem e-mail não conseguem fazer login no met.html</span></div>
+  `;
+}
+
+async function testarLogin() {
+  const email = document.getElementById('email-teste').value.trim().toLowerCase();
+  const el = document.getElementById('login-resultado');
+  if (!email) { el.innerHTML = '<span style="color:#c0392b;font-size:13px;">Informe um e-mail</span>'; return; }
+
+  el.innerHTML = '<span style="font-size:13px;color:#888;"><span class="spinner"></span> Verificando...</span>';
+
+  const [rPsi, rMed] = await Promise.all([
+    api('GET', `psis?select=nome,crp,email,status,premium&email=eq.${encodeURIComponent(email)}&limit=1`),
+    api('GET', `profissionais_saude?select=nome,registro,email,status,premium&email=eq.${encodeURIComponent(email)}&limit=1`)
+  ]);
+
+  const psi = rPsi.data?.[0];
+  const med = rMed.data?.[0];
+  const prof = psi || med;
+  const rede = psi ? 'Conexão Psi (psis)' : med ? 'Psi Med (profissionais_saude)' : null;
+
+  if (!prof) {
+    el.innerHTML = `
+      <div class="row"><span class="label">Resultado</span><span>${badge('err','✗ não encontrado')}</span></div>
+      <div class="row"><span class="label">Motivo</span><span style="color:#c0392b;font-size:13px;">E-mail não está cadastrado em nenhuma tabela</span></div>
+    `;
+    return;
+  }
+
+  const statusOk  = prof.status?.toLowerCase() === 'aprovado';
+  const premiumOk = prof.premium === true;
+  const acessaOk  = statusOk && premiumOk;
+
+  el.innerHTML = `
+    <div class="row"><span class="label">Encontrado em</span><span>${badge('info', rede)}</span></div>
+    <div class="row"><span class="label">Nome</span><span class="val">${prof.nome || '—'}</span></div>
+    <div class="row"><span class="label">Registro</span><span class="val">${prof.crp || prof.registro || '—'}</span></div>
+    <div class="row"><span class="label">Status</span><span>${badge(statusOk ? 'ok' : 'err', prof.status || 'sem status')} ${!statusOk ? '← precisa ser "aprovado"' : ''}</span></div>
+    <div class="row"><span class="label">Premium</span><span>${badge(premiumOk ? 'ok' : 'warn', premiumOk ? 'sim' : 'não')} ${!premiumOk ? '← precisa de premium para acessar o Met' : ''}</span></div>
+    <div class="row" style="padding-top:14px;border-top:2px solid #e8f4f6;margin-top:4px;">
+      <span class="label" style="font-weight:600;">Acesso ao met.html</span>
+      <span>${badge(acessaOk ? 'ok' : 'err', acessaOk ? '✓ ACESSO LIBERADO' : '✗ ACESSO NEGADO')}</span>
+    </div>
+  `;
+}
+
+async function testarEscrita() {
+  const el = document.getElementById('escrita-resultado');
+  el.innerHTML = '<span style="font-size:13px;color:#888;"><span class="spinner"></span> Testando...</span>';
+
+  // Tenta inserir
+  const r = await api('POST', 'encaminhamentos_cruzados', {
+    indicado_por: 'TESTE_SISTEMA',
+    crp_ou_registro: 'TESTE',
+    tipo_buscado: 'psi',
+    demanda: 'Registro de teste automático — pode apagar',
+    urgencia: 'baixa',
+    status: 'disponivel'
+  });
+
+  if (!r.ok) {
+    el.innerHTML = `
+      <div class="row"><span class="label">Resultado</span><span>${badge('err', '✗ FALHOU')}</span></div>
+      <div class="row"><span class="label">Erro</span><span style="color:#c0392b;font-size:12px;">Tabela não existe ou sem permissão de escrita. Rode o SQL primeiro.</span></div>
+      <pre>${JSON.stringify(r.data, null, 2)}</pre>
+    `;
+    return;
+  }
+
+  const id = r.data?.[0]?.id;
+
+  // Apaga o registro de teste
+  if (id) {
+    await api('DELETE', `encaminhamentos_cruzados?id=eq.${id}`);
+  }
+
+  el.innerHTML = `
+    <div class="row"><span class="label">Resultado</span><span>${badge('ok', '✓ SUCESSO')}</span></div>
+    <div class="row"><span class="label">Inserção</span><span style="color:#27ae60;font-size:13px;">Registro criado com id: ${id}</span></div>
+    <div class="row"><span class="label">Limpeza</span><span style="color:#27ae60;font-size:13px;">Registro de teste apagado automaticamente</span></div>
+    <div class="row" style="padding-top:12px;"><span style="font-size:12px;color:#1B5E6B;font-weight:600;">✅ Tabela pronta — o met.html pode ser usado normalmente!</span></div>
+  `;
+}
+</script>
+</body>
+</html>
