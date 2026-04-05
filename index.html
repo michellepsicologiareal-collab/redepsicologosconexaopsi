@@ -251,10 +251,10 @@ footer a{color:var(--muted);text-decoration:none;}
     <p class="invite-sub">Convide um colega de confiança. Cada profissional fortalece toda a rede. 💜</p>
     <div class="msg-card">
       <div class="msg-lbl">💬 Mensagem sugerida</div>
-      <div class="msg-txt">Bem-vindo(a) à <strong>Conexão Psi</strong> — uma rede colaborativa que cresce a cada dia! 🤝<br>Aqui nos conectamos para encaminhamentos, parcerias e trocas entre colegas. 💜<br><br>Entre no grupo 👇<br><strong>https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK</strong></div>
+      <div class="msg-txt">Bem-vindo(a) à <strong>Conexão Psi</strong> — uma rede colaborativa que cresce a cada dia! 🤝<br>Aqui nos conectamos para encaminhamentos, parcerias e trocas entre colegas. 💜</div>
       <div class="msg-acts">
         <button class="btn-copy" id="btn-copy" onclick="copiarMsg()">📋 Copiar mensagem</button>
-        <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="btn-wa-l">Abrir WhatsApp</a>
+        <a href="#" onclick="compartilharWA();return false;" class="btn-wa-l">Abrir WhatsApp</a>
       </div>
     </div>
   </div>
@@ -312,8 +312,15 @@ footer a{color:var(--muted);text-decoration:none;}
         <input type="text" id="p-disponibilidade" placeholder="Ex: Seg-Sex, manhã e tarde">
       </div>
       <div class="fg">
-        <label>Foto (URL)</label>
-        <input type="url" id="p-foto" placeholder="https://...">
+        <label>Foto de perfil</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <img id="p-foto-preview" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none;">
+          <div style="flex:1;">
+            <input type="file" id="p-foto-file" accept="image/*" onchange="previewFoto(this)" style="font-size:12px;width:100%;">
+            <input type="hidden" id="p-foto" value="">
+            <div id="p-foto-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-actions">
@@ -357,7 +364,14 @@ function filtrar(list) {
   return list.filter(p => {
     const mq = !q || (p.nome||'').toLowerCase().includes(q) || (p.abordagem||'').toLowerCase().includes(q) || (p.cidade||'').toLowerCase().includes(q);
     const ma = AF_state.ab==='todos' || (p.abordagem||'').toLowerCase().includes(AF_state.ab);
-    const mf = AF_state.fmt==='todos' || (p.formato||'').toLowerCase()===AF_state.fmt;
+    const fmt = (p.formato||'').toLowerCase();
+    let mf = AF_state.fmt==='todos';
+    if (!mf) {
+      if (AF_state.fmt==='ambos') mf = fmt.includes('ambos') || (fmt.includes('online') && fmt.includes('presencial'));
+      else if (AF_state.fmt==='online') mf = fmt.includes('online') || fmt.includes('ambos');
+      else if (AF_state.fmt==='presencial') mf = fmt.includes('presencial') || fmt.includes('ambos');
+      else mf = fmt.includes(AF_state.fmt);
+    }
     const mc = !cq || (p.cidade||'').toLowerCase().includes(cq);
     return mq && ma && mf && mc;
   });
@@ -455,6 +469,11 @@ function verificarEmail() {
   document.getElementById('p-bio').value           = p.bio||'';
   document.getElementById('p-disponibilidade').value= p.disponibilidade||'';
   document.getElementById('p-foto').value          = p.foto_url||'';
+  // Show current photo preview
+  const preview = document.getElementById('p-foto-preview');
+  if (p.foto_url) { preview.src = p.foto_url; preview.style.display = 'block'; }
+  else { preview.style.display = 'none'; }
+  document.getElementById('p-foto-status').textContent = '';
   document.getElementById('modal-perfil').classList.add('open');
 }
 
@@ -462,15 +481,45 @@ async function salvarPerfil() {
   if (!editandoId || !emailVerificado) return;
   const btn = document.querySelector('#modal-perfil .btn-salvar');
   btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  let fotoUrl = document.getElementById('p-foto').value.trim();
+
+  // Se tem nova foto selecionada, faz upload primeiro
+  const fotoFile = document.getElementById('p-foto-file').files[0];
+  if (fotoFile) {
+    try {
+      btn.textContent = 'Enviando foto...';
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.onerror = () => rej(new Error('Erro ao ler arquivo'));
+        r.readAsDataURL(fotoFile);
+      });
+      const uploadR = await fetch(`${SB}/functions/v1/upload-foto`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id: editandoId, email: emailVerificado, foto: base64, filename: fotoFile.name })
+      });
+      const uploadRes = await uploadR.json();
+      if (!uploadR.ok) throw new Error(uploadRes.error || 'Erro no upload');
+      fotoUrl = uploadRes.url;
+    } catch(e) {
+      toast('Erro no upload da foto: '+e.message, 'err');
+      btn.textContent = '\u{1F4BE} Salvar perfil'; btn.disabled = false;
+      return;
+    }
+  }
+
   const updates = {
     whatsapp:       document.getElementById('p-whatsapp').value.trim().replace(/\D/g,''),
     valor_sessao:   document.getElementById('p-valor').value.trim(),
     especialidades: document.getElementById('p-especialidades').value.trim(),
     bio:            document.getElementById('p-bio').value.trim(),
     disponibilidade:document.getElementById('p-disponibilidade').value.trim(),
-    foto_url:       document.getElementById('p-foto').value.trim(),
+    foto_url:       fotoUrl,
   };
   try {
+    btn.textContent = 'Salvando perfil...';
     const r = await fetch(`${SB}/functions/v1/atualizar-perfil`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -478,16 +527,15 @@ async function salvarPerfil() {
     });
     const res = await r.json();
     if (!r.ok) throw new Error(res.error || 'Erro ao salvar');
-    // Atualiza local
     const p = todos.find(x => x.id === editandoId);
     if (p) Object.assign(p, updates);
     fecharModal();
     renderGrid();
-    toast('✅ Perfil atualizado!', 'ok');
+    toast('\u2705 Perfil atualizado!', 'ok');
   } catch(e) {
     toast('Erro ao salvar: '+e.message, 'err');
   } finally {
-    btn.textContent = '💾 Salvar perfil'; btn.disabled = false;
+    btn.textContent = '\u{1F4BE} Salvar perfil'; btn.disabled = false;
   }
 }
 
@@ -495,6 +543,29 @@ function fecharModal() {
   document.getElementById('modal-perfil').classList.remove('open');
   editandoId = null;
   emailVerificado = null;
+  // Reset foto preview
+  document.getElementById('p-foto-preview').style.display = 'none';
+  document.getElementById('p-foto-file').value = '';
+  document.getElementById('p-foto-status').textContent = '';
+}
+
+function previewFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    document.getElementById('p-foto-status').textContent = '⚠️ Máximo 2MB. Escolha outra.';
+    document.getElementById('p-foto-status').style.color = '#c0392b';
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('p-foto-preview').src = e.target.result;
+    document.getElementById('p-foto-preview').style.display = 'block';
+    document.getElementById('p-foto-status').textContent = '📷 Nova foto selecionada';
+    document.getElementById('p-foto-status').style.color = 'var(--green)';
+  };
+  reader.readAsDataURL(file);
 }
 document.getElementById('modal-perfil').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-perfil')) fecharModal();
@@ -515,12 +586,14 @@ document.querySelectorAll('.fb').forEach(b => {
 
 // ── UTILS ──
 function copiarMsg() {
-  const txt = 'Bem-vindo(a) à *Conexão Psi* — uma rede colaborativa que cresce a cada dia! 🤝\n\nAqui nos conectamos para encaminhamentos, parcerias e trocas entre colegas. 💜\n\nhttps://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK';
-  navigator.clipboard.writeText(txt).then(() => {
-    const btn = document.getElementById('btn-copy');
-    btn.textContent='✅ Copiado!';
-    setTimeout(()=>btn.textContent='📋 Copiar mensagem', 2000);
-  });
+  const txt = 'Bem-vindo(a) à *Conexão Psi* — uma rede colaborativa que cresce a cada dia! 🤝\n\nAqui nos conectamos para encaminhamentos, parcerias e trocas entre colegas. 💜\n\nCadastre-se no diretório:\nhttps://tally.so/r/b5OGYZ';
+  const btn = document.getElementById('btn-copy');
+  navigator.clipboard.writeText(txt).then(() => { btn.textContent='✅ Copiado!'; setTimeout(()=>btn.textContent='📋 Copiar mensagem',2000); });
+}
+
+function compartilharWA() {
+  const txt = 'Bem-vindo(a) à *Conexão Psi* — uma rede colaborativa que cresce a cada dia! 🤝\n\nAqui nos conectamos para encaminhamentos, parcerias e trocas entre colegas. 💜\n\nCadastre-se no diretório:\nhttps://tally.so/r/b5OGYZ';
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
 }
 
 function abrirAdmin() {
