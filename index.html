@@ -495,7 +495,7 @@ async function salvarPerfil() {
         r.onerror = () => rej(new Error('Erro ao ler arquivo'));
         r.readAsDataURL(fotoFile);
       });
-      const uploadR = await fetch(`${SB}/functions/v1/upload-foto`, {
+      const uploadR = await fetch(`${SB}/functions/v1/clever-handler`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id: editandoId, email: emailVerificado, foto: base64, filename: fotoFile.name })
@@ -520,7 +520,7 @@ async function salvarPerfil() {
   };
   try {
     btn.textContent = 'Salvando perfil...';
-    const r = await fetch(`${SB}/functions/v1/atualizar-perfil`, {
+    const r = await fetch(`${SB}/functions/v1/smart-worker`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ id: editandoId, email: emailVerificado, updates })
