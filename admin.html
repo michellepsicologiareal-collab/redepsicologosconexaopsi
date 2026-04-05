@@ -160,6 +160,11 @@ header{background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 100%);padding:0 
 .toast-info{background:var(--plum);}
 @keyframes toastIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
+/* ── REDE BADGES ── */
+.rede-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:2px 8px;border-radius:5px;white-space:nowrap;}
+.rede-psi{background:#EEEDFE;color:#3C3489;}
+.rede-med{background:#E8F4F6;color:#1B5E6B;}
+
 /* ── ACESSO RESTRITO ── */
 .locked{opacity:0.4;pointer-events:none;position:relative;}
 .lock-msg{font-size:11px;color:var(--orange);margin-top:4px;}
@@ -204,7 +209,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <button class="nav-tab active" onclick="showTab('pendentes')">⏳ Pendentes <span class="nbadge nbadge-red" id="n-pend">0</span></button>
   <button class="nav-tab" onclick="showTab('aprovados')">✅ Aprovados <span class="nbadge nbadge-green" id="n-aprov">0</span></button>
   <button class="nav-tab" onclick="showTab('premium')">✨ Premium <span class="nbadge nbadge-gold" id="n-prem">0</span></button>
-  <button class="nav-tab" onclick="showTab('medicos')">🏥 Médicos <span class="nbadge" id="n-med">0</span></button>
+  <button class="nav-tab" onclick="showTab('medicos')">🏥 Prof. Saúde <span class="nbadge" id="n-med">0</span></button>
   <button class="nav-tab" onclick="showTab('encaminhamentos')">🔄 Encaminhamentos <span class="nbadge" id="n-enc">0</span></button>
   <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
   <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
@@ -287,10 +292,10 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
 <!-- ── TODOS PSI ── -->
 <div class="section" id="tab-todos">
   <div class="sec-header">
-    <div class="sec-title">Todos os psicólogos</div>
+    <div class="sec-title">Todos os profissionais</div>
     <div style="display:flex;gap:8px;">
-      <input type="text" id="search-todos" placeholder="Buscar por nome, e-mail, CRP..." oninput="filtrarTodos()" style="padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:240px;">
-      <button class="btn-action btn-export" onclick="exportarCSV('psis')">⬇ CSV</button>
+      <input type="text" id="search-todos" placeholder="Buscar por nome, e-mail, CRP, registro..." oninput="filtrarTodos()" style="padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:260px;">
+      <button class="btn-action btn-export" onclick="exportarCSV('todos')">⬇ CSV</button>
     </div>
   </div>
   <div class="grid" id="grid-todos"><div class="loading">Carregando...</div></div>
@@ -468,6 +473,17 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
 // ═══════════════════════════════════════════════
 // CREDENCIAIS — ALTERE AQUI
 // ═══════════════════════════════════════════════
+// ⚠️  SEGURANÇA — AÇÕES RECOMENDADAS:
+// 1. Habilite RLS no Supabase para todas as tabelas
+//    (psis, profissionais_saude, encaminhamentos_cruzados)
+// 2. Crie policies RLS que restrinjam UPDATE/DELETE
+//    apenas a chamadas autenticadas via service_role
+// 3. A anon key exposta no JS é inevitável no GitHub
+//    Pages — mas sem RLS ela dá acesso TOTAL ao DB.
+// 4. Considere mover ações destrutivas (delete, patch)
+//    para uma Edge Function com verificação server-side.
+// 5. Troque as senhas do admin periodicamente.
+// ═══════════════════════════════════════════════
 const NIVEIS = {
   // Master: acesso total, pode deletar, vê senhas
   'MasterPsi2026!': { nivel: 'master', label: 'Master', nome: 'Michelle' },
@@ -589,24 +605,33 @@ const CORES = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
 
 async function carregar() {
   try {
-    todosPsis = await api('GET', 'psis?select=*&order=created_at.desc&limit=500') || [];
+    const [psis, meds] = await Promise.all([
+      api('GET', 'psis?select=*&order=created_at.desc&limit=500'),
+      api('GET', 'profissionais_saude?select=*&order=created_at.desc&limit=500')
+    ]);
+    todosPsis = (psis || []).map(p => ({...p, _rede:'psi'}));
+    todosMeds = (meds || []).map(p => ({...p, _rede:'med'}));
     atualizarStatsPsi();
     renderPsis();
-  } catch(e) { toast('Erro ao carregar psis: ' + e.message, 'err'); }
+  } catch(e) { toast('Erro ao carregar: ' + e.message, 'err'); }
 }
 
 function atualizarStatsPsi() {
-  const pend  = todosPsis.filter(p => (p.status||'').toLowerCase() === 'pendente').length;
-  const aprov = todosPsis.filter(p => (p.status||'').toLowerCase() === 'aprovado').length;
-  const prem  = todosPsis.filter(p => p.premium === true).length;
-  const reprov= todosPsis.filter(p => (p.status||'').toLowerCase() === 'reprovado').length;
+  // Stats unificados: psis + profissionais_saude
+  const todos = [...todosPsis, ...todosMeds];
+  const pend  = todos.filter(p => (p.status||'').toLowerCase() === 'pendente').length;
+  const aprov = todos.filter(p => (p.status||'').toLowerCase() === 'aprovado').length;
+  const prem  = todos.filter(p => p.premium === true).length;
+  const reprov= todos.filter(p => (p.status||'').toLowerCase() === 'reprovado').length;
 
   document.getElementById('n-pend').textContent  = pend;
   document.getElementById('n-aprov').textContent = aprov;
   document.getElementById('n-prem').textContent  = prem;
+  document.getElementById('n-med').textContent   = todosMeds.length;
 
   document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${todosPsis.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${todosPsis.length}</div><div class="stat-lbl">Psis</div></div>
+    <div class="stat-card"><div class="stat-num">${todosMeds.length}</div><div class="stat-lbl">Prof. Saúde</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${pend}</div><div class="stat-lbl">Pendentes</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--green)">${aprov}</div><div class="stat-lbl">Aprovados</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--gold)">${prem}</div><div class="stat-lbl">Premium</div></div>
@@ -615,38 +640,41 @@ function atualizarStatsPsi() {
 }
 
 function renderPsis() {
-  renderPsiGrid('pend',  todosPsis.filter(p => (p.status||'').toLowerCase() === 'pendente'));
-  renderPsiGrid('aprov', todosPsis.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
-  renderPsiGrid('prem',  todosPsis.filter(p => p.premium === true));
-  renderPsiGrid('todos', todosPsis);
+  const todos = [...todosPsis, ...todosMeds];
+  renderPsiGrid('pend',  todos.filter(p => (p.status||'').toLowerCase() === 'pendente'));
+  renderPsiGrid('aprov', todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
+  renderPsiGrid('prem',  todos.filter(p => p.premium === true));
+  renderPsiGrid('todos', todos);
 }
 
 function filtrarTodos() {
   const q = document.getElementById('search-todos').value.toLowerCase();
-  const lista = todosPsis.filter(p =>
+  const todos = [...todosPsis, ...todosMeds];
+  const lista = todos.filter(p =>
     !q ||
     (p.nome||'').toLowerCase().includes(q) ||
     (p.email||'').toLowerCase().includes(q) ||
-    (p.crp||'').toLowerCase().includes(q) ||
+    (p.crp||p.registro||'').toLowerCase().includes(q) ||
     (p.cidade||'').toLowerCase().includes(q) ||
-    (p.abordagem||'').toLowerCase().includes(q)
+    (p.abordagem||p.especialidade||p.tipo||'').toLowerCase().includes(q)
   );
   renderPsiGrid('todos', lista);
 }
 
 function filtrarAba(sufixo) {
   const q = (document.getElementById('search-'+sufixo)?.value||'').toLowerCase().trim();
+  const todos = [...todosPsis, ...todosMeds];
   const mapaFiltro = {
     aprov: p => (p.status||'').toLowerCase() === 'aprovado',
     prem:  p => p.premium === true,
     pend:  p => (p.status||'').toLowerCase() === 'pendente',
   };
-  const lista = todosPsis.filter(p => {
+  const lista = todos.filter(p => {
     if (!mapaFiltro[sufixo]?.(p)) return false;
     if (!q) return true;
     return (p.nome||'').toLowerCase().includes(q) ||
            (p.email||'').toLowerCase().includes(q) ||
-           (p.crp||'').toLowerCase().includes(q) ||
+           (p.crp||p.registro||'').toLowerCase().includes(q) ||
            (p.cidade||'').toLowerCase().includes(q);
   });
   renderPsiGrid(sufixo, lista);
@@ -655,6 +683,7 @@ function filtrarAba(sufixo) {
 function buscarGlobal() {
   const q = document.getElementById('busca-global').value.toLowerCase().trim();
   const abaAtiva = document.querySelector('.section.active')?.id?.replace('tab-','');
+  const todos = [...todosPsis, ...todosMeds];
   const mapaFiltro = {
     pendentes: p => (p.status||'').toLowerCase() === 'pendente',
     aprovados: p => (p.status||'').toLowerCase() === 'aprovado',
@@ -662,14 +691,14 @@ function buscarGlobal() {
     todos:     ()=> true
   };
   const filtroBase = mapaFiltro[abaAtiva] || (()=>true);
-  const lista = todosPsis.filter(p => {
+  const lista = todos.filter(p => {
     if (!filtroBase(p)) return false;
     if (!q) return true;
     return (p.nome||'').toLowerCase().includes(q) ||
            (p.email||'').toLowerCase().includes(q) ||
-           (p.crp||'').toLowerCase().includes(q) ||
+           (p.crp||p.registro||'').toLowerCase().includes(q) ||
            (p.cidade||'').toLowerCase().includes(q) ||
-           (p.abordagem||'').toLowerCase().includes(q);
+           (p.abordagem||p.especialidade||p.tipo||'').toLowerCase().includes(q);
   });
   const sufixo = {pendentes:'pend',aprovados:'aprov',premium:'prem',todos:'todos'}[abaAtiva];
   if (sufixo) renderPsiGrid(sufixo, lista);
@@ -688,68 +717,104 @@ function renderPsiGrid(sufixo, lista) {
   if (!g) return;
   if (!lista.length) { g.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Nenhum registro aqui.</div>`; return; }
   g.innerHTML = lista.map(p => {
-    const st = (p.status||'pendente').toLowerCase();
+    const st  = (p.status||'pendente').toLowerCase();
+    const isMed = p._rede === 'med';
+    const regStr = isMed ? (p.registro||'—') : (p.crp||'—');
+    const abStr  = isMed ? (p.tipo || p.especialidade || '') : (p.abordagem || '');
     const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
     const cor = CORES[Math.abs((ini.charCodeAt(0)||0)) % CORES.length];
-    const av = p.foto_url ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : `<div class="avatar" style="background:${cor}">${ini}</div>`;
+    const av  = p.foto_url
+      ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
+      : `<div class="avatar" style="background:${cor}">${ini}</div>`;
+    const redeBadge = isMed
+      ? `<span class="rede-badge rede-med">🏥 Psi Med</span>`
+      : `<span class="rede-badge rede-psi">🧠 Conexão Psi</span>`;
     return `<div class="pcard ${st}">
       <div class="pcard-top">
         <div class="pcard-identity">${av}<div>
           <div class="pcard-nome">${p.nome||'—'}</div>
-          <div class="pcard-reg">${p.crp||'—'}</div>
+          <div class="pcard-reg">${regStr}</div>
         </div></div>
-        <span class="status-badge st-${st}">${st}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          ${redeBadge}
+          <span class="status-badge st-${st}">${st}</span>
+        </div>
       </div>
       <div class="pcard-info">
         ${p.email ? `<span class="info-chip">✉ ${p.email}</span>` : ''}
         ${p.cidade ? `<span class="info-chip">📍 ${p.cidade}</span>` : ''}
-        ${p.abordagem ? `<span class="info-chip">${p.abordagem}</span>` : ''}
+        ${abStr ? `<span class="info-chip">${abStr}</span>` : ''}
         ${p.formato ? `<span class="info-chip">${p.formato}</span>` : ''}
         ${p.premium ? `<span class="info-chip premium">⭐ Premium</span>` : ''}
         ${p.whatsapp ? `<span class="info-chip">📱 ${p.whatsapp}</span>` : ''}
       </div>
       <div class="pcard-actions">
-        ${st === 'pendente' ? `<button class="btn-aprovar" onclick="aprovar('${p.id}')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovar('${p.id}')">❌ Reprovar</button>` : ''}
-        ${st === 'aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremium('${p.id}',true)">✨ Premium</button>` : ''}
-        ${p.premium ? `<button class="btn-unpremium" onclick="setPremium('${p.id}',false)">Remover ⭐</button>` : ''}
-        <button class="btn-edit" onclick="abrirEditPsi('${p.id}')">✏️</button>
-        <button class="btn-del master-only" onclick="excluirPsi('${p.id}')">🗑️</button>
+        ${st === 'pendente' ? `<button class="btn-aprovar" onclick="aprovar('${p.id}','${p._rede}')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovar('${p.id}','${p._rede}')">❌ Reprovar</button>` : ''}
+        ${st === 'aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremium('${p.id}','${p._rede}',true)">✨ Premium</button>` : ''}
+        ${p.premium ? `<button class="btn-unpremium" onclick="setPremium('${p.id}','${p._rede}',false)">Remover ⭐</button>` : ''}
+        <button class="btn-edit" onclick="abrirEdit('${p.id}','${p._rede}')">✏️</button>
+        <button class="btn-del master-only" onclick="excluir('${p.id}','${p._rede}')">🗑️</button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function aprovar(id) {
+// Helper: resolve tabela e array local
+function resolveRede(rede) {
+  return rede === 'psi'
+    ? { tbl: 'psis', arr: todosPsis }
+    : { tbl: 'profissionais_saude', arr: todosMeds };
+}
+
+async function aprovar(id, rede) {
   try {
-    await api('PATCH', `psis?id=eq.${id}`, {status:'aprovado'});
-    const p = todosPsis.find(x => x.id === id); if(p) p.status='aprovado';
-    atualizarStatsPsi(); renderPsis(); toast('✅ Psicóloga aprovada!');
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {status:'aprovado'});
+    const p = arr.find(x => x.id === id); if(p) p.status='aprovado';
+    atualizarStatsPsi(); renderPsis(); toast('✅ Aprovado!');
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
-async function reprovar(id) {
-  if (!confirm('Reprovar esta psicóloga?')) return;
+async function reprovar(id, rede) {
+  if (!confirm('Reprovar este cadastro?')) return;
   try {
-    await api('PATCH', `psis?id=eq.${id}`, {status:'reprovado'});
-    const p = todosPsis.find(x => x.id === id); if(p) p.status='reprovado';
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {status:'reprovado'});
+    const p = arr.find(x => x.id === id); if(p) p.status='reprovado';
     atualizarStatsPsi(); renderPsis(); toast('❌ Reprovado.');
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
-async function setPremium(id, val) {
+async function setPremium(id, rede, val) {
   try {
-    await api('PATCH', `psis?id=eq.${id}`, {premium:val});
-    const p = todosPsis.find(x => x.id === id); if(p) p.premium=val;
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {premium:val});
+    const p = arr.find(x => x.id === id); if(p) p.premium=val;
     atualizarStatsPsi(); renderPsis(); toast(val ? '✨ Premium ativado!' : 'Premium removido.');
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
-async function excluirPsi(id) {
+async function excluir(id, rede) {
   if (nivelAtual !== 'master') { toast('Apenas o Master pode excluir.','err'); return; }
   if (!confirm('Excluir permanentemente? Esta ação não pode ser desfeita.')) return;
   try {
-    await api('DELETE', `psis?id=eq.${id}`);
-    todosPsis = todosPsis.filter(x => x.id !== id);
+    const {tbl, arr} = resolveRede(rede);
+    await api('DELETE', `${tbl}?id=eq.${id}`);
+    if (rede === 'psi') todosPsis = todosPsis.filter(x => x.id !== id);
+    else todosMeds = todosMeds.filter(x => x.id !== id);
     atualizarStatsPsi(); renderPsis(); toast('Registro excluído.');
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
+
+// Dispatcher — abre modal correto
+function abrirEdit(id, rede) {
+  if (rede === 'psi') abrirEditPsi(id);
+  else abrirEditMed(id);
+}
+
+// Aliases legados (compatibilidade com código existente nos botões de edição interna)
+async function aprovarMed(id) { return aprovar(id, 'med'); }
+async function reprovarMed(id) { return reprovar(id, 'med'); }
+async function setPremiumMed(id, val) { return setPremium(id, 'med', val); }
+async function excluirMed(id) { return excluir(id, 'med'); }
+async function excluirPsi(id) { return excluir(id, 'psi'); }
 
 function abrirEditPsi(id) {
   const p = todosPsis.find(x => x.id === id); if(!p) return;
@@ -802,10 +867,14 @@ async function salvarPsi() {
 // ═══════════════════════════════════════════════
 async function carregarMedicos() {
   try {
-    todosMeds = await api('GET', 'profissionais_saude?select=*&order=created_at.desc&limit=500') || [];
+    const meds = await api('GET', 'profissionais_saude?select=*&order=created_at.desc&limit=500') || [];
+    todosMeds = meds.map(p => ({...p, _rede:'med'}));
     atualizarStatsMed();
     renderMeds();
-  } catch(e) { toast('Erro ao carregar médicos: '+e.message,'err'); }
+    // Atualiza tabs unificadas também
+    atualizarStatsPsi();
+    renderPsis();
+  } catch(e) { toast('Erro ao carregar Prof. Saúde: '+e.message,'err'); }
 }
 
 function atualizarStatsMed() {
@@ -844,31 +913,17 @@ function renderMeds() {
         ${p.premium ? `<span class="info-chip premium">⭐ Premium</span>` : ''}
       </div>
       <div class="pcard-actions">
-        ${st==='pendente' ? `<button class="btn-aprovar" onclick="aprovarMed('${p.id}')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovarMed('${p.id}')">❌ Reprovar</button>` : ''}
-        ${st==='aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremiumMed('${p.id}',true)">✨ Premium</button>` : ''}
-        ${p.premium ? `<button class="btn-unpremium" onclick="setPremiumMed('${p.id}',false)">Remover ⭐</button>` : ''}
+        ${st==='pendente' ? `<button class="btn-aprovar" onclick="aprovar('${p.id}','med')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovar('${p.id}','med')">❌ Reprovar</button>` : ''}
+        ${st==='aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremium('${p.id}','med',true)">✨ Premium</button>` : ''}
+        ${p.premium ? `<button class="btn-unpremium" onclick="setPremium('${p.id}','med',false)">Remover ⭐</button>` : ''}
         <button class="btn-edit" onclick="abrirEditMed('${p.id}')">✏️</button>
-        <button class="btn-del master-only" onclick="excluirMed('${p.id}')">🗑️</button>
+        <button class="btn-del master-only" onclick="excluir('${p.id}','med')">🗑️</button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function aprovarMed(id) {
-  try { await api('PATCH',`profissionais_saude?id=eq.${id}`,{status:'aprovado'}); const p=todosMeds.find(x=>x.id===id);if(p)p.status='aprovado'; atualizarStatsMed();renderMeds();toast('✅ Aprovado!'); } catch(e){toast('Erro: '+e.message,'err');}
-}
-async function reprovarMed(id) {
-  if(!confirm('Reprovar?'))return;
-  try { await api('PATCH',`profissionais_saude?id=eq.${id}`,{status:'reprovado'}); const p=todosMeds.find(x=>x.id===id);if(p)p.status='reprovado'; atualizarStatsMed();renderMeds();toast('❌ Reprovado.'); } catch(e){toast('Erro: '+e.message,'err');}
-}
-async function setPremiumMed(id,val) {
-  try { await api('PATCH',`profissionais_saude?id=eq.${id}`,{premium:val}); const p=todosMeds.find(x=>x.id===id);if(p)p.premium=val; atualizarStatsMed();renderMeds();toast(val?'✨ Premium ativado!':'Premium removido.'); } catch(e){toast('Erro: '+e.message,'err');}
-}
-async function excluirMed(id) {
-  if(nivelAtual!=='master'){toast('Apenas o Master pode excluir.','err');return;}
-  if(!confirm('Excluir permanentemente?'))return;
-  try { await api('DELETE',`profissionais_saude?id=eq.${id}`); todosMeds=todosMeds.filter(x=>x.id!==id); atualizarStatsMed();renderMeds();toast('Excluído.'); } catch(e){toast('Erro: '+e.message,'err');}
-}
+// (ver aliases em resolveRede — aprovarMed/reprovarMed/setPremiumMed/excluirMed definidos acima)
 
 function abrirEditMed(id) {
   const p = todosMeds.find(x=>x.id===id); if(!p) return;
@@ -978,10 +1033,18 @@ async function excluirEnc(id) {
 // EXPORT
 // ═══════════════════════════════════════════════
 function exportarCSV(tipo) {
-  const dados = tipo==='psis' ? todosPsis : todosMeds;
-  const cols = tipo==='psis'
-    ? ['nome','email','crp','handle','abordagem','formato','cidade','publico','status','premium','whatsapp','created_at']
-    : ['nome','email','registro','tipo','especialidade','formato','cidade','status','premium','whatsapp','created_at'];
+  let dados, cols;
+  if (tipo === 'psis') {
+    dados = todosPsis;
+    cols  = ['nome','email','crp','handle','abordagem','formato','cidade','publico','status','premium','whatsapp','created_at'];
+  } else if (tipo === 'medicos') {
+    dados = todosMeds;
+    cols  = ['nome','email','registro','tipo','especialidade','formato','cidade','status','premium','whatsapp','created_at'];
+  } else {
+    // 'todos' — exporta combinados com coluna extra _rede
+    dados = [...todosPsis, ...todosMeds];
+    cols  = ['_rede','nome','email','crp','registro','abordagem','tipo','formato','cidade','status','premium','whatsapp','created_at'];
+  }
   const rows = dados.map(p => cols.map(c=>`"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(','));
   const csv = '\uFEFF' + [cols.join(','), ...rows].join('\n');
   const a = document.createElement('a');

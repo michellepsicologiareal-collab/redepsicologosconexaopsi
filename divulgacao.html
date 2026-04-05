@@ -105,6 +105,11 @@ footer em{color:var(--gold);font-style:normal;}
       <span class="hero-tag" data-f="online">Online</span>
       <span class="hero-tag" data-f="presencial">Presencial</span>
     </div>
+    <div style="margin-top:1.2rem;">
+      <a href="https://tally.so/r/b5OGYZ" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1.2rem;background:var(--gold);color:#0F0D1A;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.8rem;font-weight:600;text-decoration:none;">
+        🧠 Sou psicólogo — quero aparecer aqui
+      </a>
+    </div>
   </div>
 </section>
 
@@ -199,8 +204,16 @@ function filtrar() {
     const mq = !q || (p.nome||'').toLowerCase().includes(q) || (p.abordagem||'').toLowerCase().includes(q) || (p.cidade||'').toLowerCase().includes(q) || (p.especialidades||'').toLowerCase().includes(q);
     let mf = true;
     if (filtroAtual !== 'todos') {
-      const f = filtroAtual.toLowerCase();
-      mf = (p.abordagem||'').toLowerCase().includes(f) || (p.formato||'').toLowerCase().includes(f);
+      const f   = filtroAtual.toLowerCase();
+      const fmt = (p.formato||'').toLowerCase();
+      if (f === 'online') {
+        mf = fmt === 'online' || fmt === 'ambos';
+      } else if (f === 'presencial') {
+        mf = fmt === 'presencial' || fmt === 'ambos';
+      } else {
+        // filtros de abordagem (tcc, psicanálise, humanista)
+        mf = (p.abordagem||'').toLowerCase().includes(f) || (p.especialidades||'').toLowerCase().includes(f);
+      }
     }
     return mq && mf;
   });
