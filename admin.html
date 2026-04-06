@@ -220,6 +220,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <button class="nav-tab" onclick="showTab('encaminhamentos')">🔄 Encaminhamentos <span class="nbadge" id="n-enc">0</span></button>
   <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
   <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
+  <button class="nav-tab" onclick="abrirDocumentacao()">📖 Documentação</button>
   <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico')" style="display:none;">🩺 Diagnóstico</button>
 </div>
 
@@ -317,6 +318,7 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
     <div class="info-row"><span class="info-key">PsiMed Rede Colaborativa</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/met.html" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Área de pacientes</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/pacientes.html" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Edição de perfil</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/perfil.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">📖 Documentação técnica</span><a href="documentacao_tecnica.html" target="_blank" class="chip-link" style="background:var(--plum);color:white;">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Cadastro Tally (psis)</span><a href="https://tally.so/r/b5OGYZ" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Grupo WhatsApp</span><a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="chip-link">abrir ↗</a></div>
   </div>
@@ -1391,6 +1393,10 @@ function fileToBase64(file) {
     r.onerror = () => rej(new Error('Erro ao ler arquivo'));
     r.readAsDataURL(file);
   });
+}
+
+function abrirDocumentacao() {
+  window.open('documentacao_tecnica.html', '_blank');
 }
 
 function toast(msg, tipo='ok') {
