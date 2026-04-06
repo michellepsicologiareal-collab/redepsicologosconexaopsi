@@ -371,8 +371,29 @@ header {
 }
 .btn-whats-prof:hover { background:var(--met-mid); }
 
-/* TOAST */
-.toast {
+/* ─── DIAGNÓSTICO ─── */
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:600px){.diag-grid{grid-template-columns:1fr;}}
+.diag-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px;}
+.diag-card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.diag-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--cream-dark);font-size:12px;flex-wrap:wrap;gap:4px;}
+.diag-row:last-child{border-bottom:none;}
+.diag-key{color:var(--muted);}
+.diag-val{font-weight:600;font-size:11px;padding:2px 8px;border-radius:5px;}
+.dv-ok{background:#eafaf1;color:var(--green);}
+.dv-err{background:#fdecea;color:var(--red);}
+.dv-warn{background:#fef3e8;color:#B85C1A;}
+.dv-info{background:#e8f4f6;color:var(--teal);}
+.dv-neutral{background:#f4f2ef;color:var(--muted);}
+.diag-stat{text-align:center;padding:12px;}
+.diag-stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;line-height:1;color:var(--met);}
+.diag-stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:4px;}
+.diag-email-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+.diag-email-row input{flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;}
+.diag-email-row input:focus{border-color:var(--met);}
+.btn-diag{padding:9px 16px;background:var(--met);color:white;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn-diag:hover{opacity:0.88;}
+.diag-result{margin-top:8px;}
   position:fixed; bottom:24px; right:24px;
   padding:12px 20px; border-radius:10px;
   font-size:13px; color:white; z-index:999;
@@ -462,6 +483,7 @@ header {
     <button class="tab active" onclick="mudarAba('casos',this)">🔄 Indicações recebidas <span class="badge" id="badge-casos">0</span></button>
     <button class="tab" onclick="mudarAba('indicar',this)">➕ Indicar paciente</button>
     <button class="tab" onclick="mudarAba('profissionais',this)">👥 Profissionais da rede</button>
+    <button class="tab" id="tab-diag-btn" onclick="mudarAba('diagnostico',this)" style="display:none;">🩺 Diagnóstico</button>
   </div>
 
   <!-- ─── ABA: CASOS ─── -->
@@ -602,7 +624,48 @@ header {
   </div>
 </div>
 
-<!-- MODAL ADMIN (liberar contato) -->
+  <!-- ─── ABA: DIAGNÓSTICO (admin only) ─── -->
+  <div id="aba-diagnostico" class="content" style="display:none;">
+    <div class="section-header">
+      <div class="section-title">Diagnóstico do sistema</div>
+      <button class="btn-refresh" onclick="rodarDiagMet()">▶ Rodar diagnóstico</button>
+    </div>
+
+    <!-- Stats rápidos -->
+    <div id="diag-stats-row" class="diag-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;"></div>
+
+    <!-- Status das tabelas -->
+    <div class="diag-card" style="margin-bottom:12px;">
+      <div class="diag-card-title">⚡ Status das tabelas</div>
+      <div id="diag-tabelas"><span style="font-size:12px;color:var(--muted);">Clique em "Rodar diagnóstico".</span></div>
+    </div>
+
+    <!-- Simular login -->
+    <div class="diag-card" style="margin-bottom:12px;">
+      <div class="diag-card-title">🔐 Simular login</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Verifica se um e-mail tem acesso ao PsiMed (busca nas duas tabelas).</p>
+      <div class="diag-email-row">
+        <input type="email" id="diag-email-met" placeholder="email@exemplo.com">
+        <button class="btn-diag" onclick="testarLoginMet()">Testar</button>
+      </div>
+      <div class="diag-result" id="diag-login-result"></div>
+    </div>
+
+    <!-- Psis sem e-mail -->
+    <div class="diag-card" style="margin-bottom:12px;">
+      <div class="diag-card-title">⚠️ Psis sem e-mail (não conseguem logar)</div>
+      <button class="btn-diag" style="background:var(--cream-dark);color:var(--met);border:1px solid var(--border);" onclick="buscarSemEmailMet()">Verificar</button>
+      <div class="diag-result" id="diag-sem-email-result" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- Encaminhamentos recentes -->
+    <div class="diag-card">
+      <div class="diag-card-title">🔄 Encaminhamentos recentes</div>
+      <button class="btn-diag" style="background:var(--cream-dark);color:var(--met);border:1px solid var(--border);" onclick="verEncRecentes()">Carregar</button>
+      <div id="diag-enc-recentes" style="margin-top:8px;"></div>
+    </div>
+  </div>
+</div><!-- /app -->
 <div id="modal-admin">
   <div class="modal-box">
     <div class="modal-title" id="modal-titulo">Gerenciar indicação</div>
@@ -719,6 +782,8 @@ function acessarMet() {
   document.getElementById('huser-nome').textContent = usuarioNome + (usuarioRegistro ? ' · ' + usuarioRegistro : '');
   document.getElementById('f-indicador').value = usuarioNome;
   document.getElementById('f-registro').value  = usuarioRegistro;
+  // Aba diagnóstico visível apenas para admin
+  if (isAdmin) document.getElementById('tab-diag-btn').style.display = 'inline-block';
   carregarCasos();
 }
 
@@ -733,11 +798,13 @@ function sair() {
 function mudarAba(aba, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('aba-casos').style.display = 'none';
-  document.getElementById('aba-indicar').style.display = 'none';
-  document.getElementById('aba-profissionais').style.display = 'none';
+  ['casos','indicar','profissionais','diagnostico'].forEach(id => {
+    const el = document.getElementById('aba-'+id);
+    if (el) el.style.display = 'none';
+  });
   document.getElementById('aba-'+aba).style.display = 'block';
   if (aba === 'profissionais') carregarProfissionais();
+  if (aba === 'diagnostico') rodarDiagMet();
 }
 
 function setFiltro(btn) {
@@ -1021,6 +1088,139 @@ async function carregarProfissionais() {
     }).join('');
   } catch(e) {
     grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar. ${e.message}</div>`;
+  }
+}
+
+// ─── DIAGNÓSTICO (admin only) ───
+function diagRow(label, val, tipo, extra='') {
+  const cls = {ok:'dv-ok',err:'dv-err',warn:'dv-warn',info:'dv-info',neutral:'dv-neutral'}[tipo]||'dv-neutral';
+  return `<div class="diag-row">
+    <span class="diag-key">${label}</span>
+    <span style="display:flex;align-items:center;gap:8px;">
+      <span class="diag-val ${cls}">${val}</span>
+      ${extra?`<span style="font-size:11px;color:var(--muted)">${extra}</span>`:''}
+    </span>
+  </div>`;
+}
+
+async function rodarDiagMet() {
+  document.getElementById('diag-tabelas').innerHTML = '<span style="font-size:12px;color:var(--muted);">Verificando...</span>';
+  document.getElementById('diag-stats-row').innerHTML = '';
+
+  const rows = [];
+
+  // psis
+  try {
+    const r = await api('GET','psis?select=id,status,premium,email&limit=500');
+    const total   = r?.length||0;
+    const aprov   = r?.filter(p=>p.status?.toLowerCase()==='aprovado').length||0;
+    const prem    = r?.filter(p=>p.premium===true).length||0;
+    const semEmail= r?.filter(p=>!p.email).length||0;
+    const premAprov = r?.filter(p=>p.premium===true&&p.status?.toLowerCase()==='aprovado').length||0;
+    rows.push(diagRow('Tabela <strong>psis</strong>','✓ ok','ok',`${total} total · ${aprov} aprovadas · ${prem} premium · ${semEmail} sem e-mail`));
+
+    // stats cards
+    document.getElementById('diag-stats-row').innerHTML = `
+      <div class="diag-card diag-stat"><div class="diag-stat-num">${total}</div><div class="diag-stat-lbl">Psis total</div></div>
+      <div class="diag-card diag-stat"><div class="diag-stat-num" style="color:var(--green)">${aprov}</div><div class="diag-stat-lbl">Aprovadas</div></div>
+      <div class="diag-card diag-stat"><div class="diag-stat-num" style="color:#C8934A">${premAprov}</div><div class="diag-stat-lbl">Premium ativas</div></div>
+      <div class="diag-card diag-stat"><div class="diag-stat-num" style="color:var(--teal)" id="diag-enc-count">…</div><div class="diag-stat-lbl">Indicações abertas</div></div>`;
+  } catch(e) {
+    rows.push(diagRow('Tabela <strong>psis</strong>','✗ erro','err',e.message));
+  }
+
+  // profissionais_saude
+  try {
+    const r = await api('GET','profissionais_saude?select=id,status,premium&limit=200');
+    const total = r?.length||0;
+    const aprov = r?.filter(p=>p.status?.toLowerCase()==='aprovado').length||0;
+    const prem  = r?.filter(p=>p.premium===true).length||0;
+    rows.push(diagRow('Tabela <strong>profissionais_saude</strong>','✓ ok','ok',`${total} total · ${aprov} aprovados · ${prem} premium`));
+  } catch(e) {
+    rows.push(diagRow('Tabela <strong>profissionais_saude</strong>','✗ erro','err','tabela não existe ou sem acesso'));
+  }
+
+  // encaminhamentos_cruzados
+  try {
+    const r = await api('GET','encaminhamentos_cruzados?select=id,status&limit=200');
+    const total = r?.length||0;
+    const disp  = r?.filter(e=>e.status==='disponivel').length||0;
+    const conc  = r?.filter(e=>e.status==='concluido').length||0;
+    rows.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>','✓ ok','ok',`${total} total · ${disp} em aberto · ${conc} concluídos`));
+    const el = document.getElementById('diag-enc-count');
+    if (el) el.textContent = disp;
+  } catch(e) {
+    rows.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>','✗ erro','err',e.message));
+  }
+
+  rows.push(`<div style="font-size:11px;color:var(--muted);padding-top:8px;">Diagnóstico: ${new Date().toLocaleTimeString('pt-BR')}</div>`);
+  document.getElementById('diag-tabelas').innerHTML = rows.join('');
+}
+
+async function testarLoginMet() {
+  const email = document.getElementById('diag-email-met').value.trim().toLowerCase();
+  const el    = document.getElementById('diag-login-result');
+  if (!email) { el.innerHTML = '<span style="font-size:12px;color:var(--red);">Informe um e-mail.</span>'; return; }
+  el.innerHTML = '<span style="font-size:12px;color:var(--muted);">Verificando...</span>';
+
+  try {
+    const [rPsi, rMed] = await Promise.all([
+      api('GET',`psis?select=nome,crp,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`),
+      api('GET',`profissionais_saude?select=nome,registro,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`)
+    ]);
+    const psi  = rPsi?.[0], med = rMed?.[0], prof = psi || med;
+    if (!prof) { el.innerHTML = diagRow('Resultado','✗ não encontrado','err','e-mail não está em nenhuma tabela'); return; }
+
+    const rede     = psi ? '🧠 Conexão Psi' : '🏥 Psi Med';
+    const statusOk = prof.status?.toLowerCase() === 'aprovado';
+    const premOk   = prof.premium === true;
+    const acesso   = statusOk && premOk;
+
+    el.innerHTML =
+      diagRow('Rede', rede, 'info') +
+      diagRow('Nome', prof.nome||'—', 'neutral') +
+      diagRow('Status', prof.status||'—', statusOk?'ok':'err', statusOk?'':'← precisa ser "aprovado"') +
+      diagRow('Premium', premOk?'sim':'não', premOk?'ok':'warn', premOk?'':'← precisa de premium') +
+      diagRow('Acesso ao PsiMed', acesso?'✓ LIBERADO':'✗ NEGADO', acesso?'ok':'err');
+  } catch(e) {
+    el.innerHTML = `<span style="font-size:12px;color:var(--red);">Erro: ${e.message}</span>`;
+  }
+}
+
+async function buscarSemEmailMet() {
+  const el = document.getElementById('diag-sem-email-result');
+  el.innerHTML = '<span style="font-size:12px;color:var(--muted);">Buscando...</span>';
+  try {
+    const [r1, r2] = await Promise.all([
+      api('GET','psis?select=nome,crp,handle,status&email=is.null&limit=200'),
+      api('GET','psis?select=nome,crp,handle,status&email=eq.&limit=200')
+    ]);
+    const lista = [...(r1||[]), ...(r2||[])];
+    if (!lista.length) { el.innerHTML = diagRow('Resultado','✓ Todas têm e-mail','ok'); return; }
+    el.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${lista.length} psi(s) sem e-mail:</div>` +
+      lista.map(p => diagRow(`${p.nome||'—'} · ${p.crp||'—'}`, p.status||'—',
+        p.status?.toLowerCase()==='aprovado'?'warn':'neutral', `@${p.handle||'—'}`)).join('');
+  } catch(e) {
+    el.innerHTML = `<span style="font-size:12px;color:var(--red);">Erro: ${e.message}</span>`;
+  }
+}
+
+async function verEncRecentes() {
+  const el = document.getElementById('diag-enc-recentes');
+  el.innerHTML = '<span style="font-size:12px;color:var(--muted);">Carregando...</span>';
+  try {
+    const r = await api('GET','encaminhamentos_cruzados?select=indicado_por,tipo_buscado,urgencia,status,created_at&order=created_at.desc&limit=10');
+    if (!r?.length) { el.innerHTML = '<span style="font-size:12px;color:var(--muted);">Nenhum encaminhamento ainda.</span>'; return; }
+    const stCls = {disponivel:'ok', concluido:'info', em_atendimento:'warn'};
+    el.innerHTML = r.map(e => {
+      const dt = new Date(e.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return diagRow(
+        `${TIPO_LABEL[e.tipo_buscado]||e.tipo_buscado} · <em style="color:var(--muted)">${e.indicado_por}</em>`,
+        e.status, stCls[e.status]||'neutral', dt
+      );
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<span style="font-size:12px;color:var(--red);">Erro: ${e.message}</span>`;
   }
 }
 
