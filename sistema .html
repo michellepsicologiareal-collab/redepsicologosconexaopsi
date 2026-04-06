@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conexão Psi — Hub da Rede</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum:#1E1040; --plum-mid:#2D1B4E; --violet:#5B3FA0;
+  --gold:#C8934A; --gold-light:#E8C98A; --gold-pale:#fef9ee;
+  --teal:#1B5E6B; --cyan:#29A8CC;
+  --green:#27ae60; --red:#c0392b;
+  --cream:#F8F5F0; --white:#FFFFFF;
+  --border:#E4DDD4; --muted:#8A8299; --ink:#0F0D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* ══ HEADER ══ */
+.hub-header {
+  background:linear-gradient(145deg,var(--plum) 0%,#261550 55%,#1a2a4a 100%);
+  border-radius:18px;
+  margin:1.4rem auto 0;
+  max-width:860px;
+  padding:2rem 2.2rem 1.8rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 8px 40px rgba(15,13,26,0.2);
+}
+.hub-header::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 70% at 90% 30%,rgba(200,147,74,0.13),transparent 60%),
+    radial-gradient(ellipse 40% 50% at 5% 85%,rgba(41,168,204,0.08),transparent 55%);
+}
+.hub-top{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin-bottom:0.25rem;}
+.hub-icon{font-size:1.35rem;}
+.hub-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:white;letter-spacing:-0.3px;}
+.hub-title em{color:var(--gold-light);font-style:italic;}
+.hub-sub{font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.3rem;position:relative;z-index:1;}
+
+/* TABS */
+.tabs{display:flex;gap:0.4rem;flex-wrap:wrap;position:relative;z-index:1;}
+.tab{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:0.38rem 0.88rem;border-radius:999px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.5);
+  font-family:'Outfit',sans-serif;font-size:0.73rem;font-weight:500;
+  cursor:pointer;transition:all 0.16s;white-space:nowrap;
+}
+.tab:hover{background:rgba(255,255,255,0.13);color:rgba(255,255,255,0.85);}
+.tab.active{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:600;}
+
+/* ══ WRAP ══ */
+.wrap{max-width:860px;margin:0 auto;padding:0 1.4rem 4rem;}
+
+/* ══ SECTIONS ══ */
+.section{display:none;}
+.section.active{display:block;animation:fi 0.2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LABEL ── */
+.label{
+  font-size:0.61rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:8px;margin:1.5rem 0 0.85rem;
+}
+.label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── LINK CARDS ── */
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.5rem;}
+@media(max-width:540px){.links-grid{grid-template-columns:1fr;}}
+
+.lcard{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:13px;padding:1rem 1.1rem;
+  display:flex;align-items:center;gap:12px;
+  text-decoration:none;color:var(--ink);
+  transition:all 0.18s;cursor:pointer;
+}
+.lcard:hover{border-color:var(--plum-mid);box-shadow:0 4px 16px rgba(45,27,78,0.1);transform:translateY(-1px);}
+.lcard.gold{border-color:rgba(200,147,74,0.4);background:var(--gold-pale);}
+.lcard.gold:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(200,147,74,0.18);}
+.lcard.teal{border-left:3px solid var(--teal);}
+.lcard.green{border-left:3px solid var(--green);}
+.lcard.wa{border-left:3px solid #25D366;}
+
+.lcard-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  background:#f4f1ec;
+}
+.lcard.gold .lcard-icon{background:rgba(200,147,74,0.12);}
+.lcard.teal .lcard-icon{background:#ddf0f5;}
+.lcard.green .lcard-icon{background:#e8f8ef;}
+.lcard.wa .lcard-icon{background:#e8fdf0;}
+
+.lcard-info{flex:1;min-width:0;}
+.lcard-title{font-size:0.85rem;font-weight:600;color:var(--plum-mid);line-height:1.3;}
+.lcard-desc{font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+.lcard-arrow{color:var(--border);font-size:0.9rem;flex-shrink:0;transition:color 0.15s;}
+.lcard:hover .lcard-arrow{color:var(--plum-mid);}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-size:0.62rem;font-weight:700;
+  letter-spacing:0.4px;padding:2px 7px;border-radius:5px;}
+.b-gold{background:rgba(200,147,74,0.15);color:var(--gold);}
+.b-plum{background:#EDE6F8;color:var(--plum-mid);}
+.b-green{background:#e8f8ef;color:var(--green);}
+.b-teal{background:#ddf0f5;color:var(--teal);}
+
+/* ── INFO CARD ── */
+.info-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:13px;padding:1.1rem 1.2rem;margin-bottom:0.75rem;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid #f4f0eb;font-size:0.8rem;flex-wrap:wrap;gap:6px;
+}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--muted);font-size:0.76rem;}
+.info-val{font-weight:600;font-size:0.78rem;}
+code{font-family:'JetBrains Mono',monospace;font-size:0.73rem;
+  background:#f0ece6;color:var(--plum-mid);padding:2px 7px;border-radius:4px;}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column;gap:0.6rem;}
+.step{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--white);border:1px solid var(--border);
+  border-radius:11px;padding:0.9rem 1rem;
+}
+.step-num{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:var(--plum-mid);color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:700;margin-top:1px;
+}
+.step-body{}
+.step-title{font-size:0.82rem;font-weight:600;color:var(--plum-mid);margin-bottom:2px;}
+.step-desc{font-size:0.76rem;color:var(--muted);line-height:1.5;}
+
+/* ── ALERT ── */
+.alert{border-left:3px solid var(--gold);background:var(--gold-pale);
+  padding:0.75rem 1rem;border-radius:0 9px 9px 0;
+  font-size:0.78rem;color:#7a4a10;margin:0.8rem 0;line-height:1.6;}
+.alert strong{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<div class="hub-header">
+  <div class="hub-top">
+    <span class="hub-icon">📋</span>
+    <div class="hub-title">Guia do <em>Sistema</em></div>
+  </div>
+  <div class="hub-sub">Conexão Psi · Central de Links · 2026</div>
+  <div class="tabs">
+    <button class="tab active" onclick="show('links',this)">🔗 Meus Links</button>
+    <button class="tab" onclick="show('perfil',this)">✏️ Meu Perfil</button>
+    <button class="tab" onclick="show('premium',this)">✨ Premium</button>
+    <button class="tab" onclick="show('rede',this)">🤝 PsiMed</button>
+    <button class="tab" onclick="show('senhas',this)">🔐 Acessos</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ LINKS ══ -->
+<div class="section active" id="s-links">
+
+  <div style="background:white;border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1.2rem;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--plum-mid);margin-bottom:0.4rem;">Seja bem-vinda à <em style="color:var(--gold);font-style:italic;">Conexão Psi</em> 💜</div>
+    <div style="font-size:0.79rem;color:var(--muted);line-height:1.7;">Seu cadastro foi <strong style="color:var(--ink);">aprovado</strong>. Use este guia para acessar tudo da rede — links, perfil, premium e dúvidas — tudo em um só lugar.</div>
+  </div>
+  <div class="label">Páginas da rede</div>
+  <div class="links-grid">
+    <a href="divulgacao.html" target="_blank" class="lcard">
+      <div class="lcard-icon">🌐</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Diretório público</div>
+        <div class="lcard-desc">Página que os pacientes veem para encontrar psicólogos</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="index.html" target="_blank" class="lcard teal">
+      <div class="lcard-icon">🧠</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Área interna da rede</div>
+        <div class="lcard-desc">Diretório completo + atualização de perfil</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="met.html" target="_blank" class="lcard teal">
+      <div class="lcard-icon">🤝</div>
+      <div class="lcard-info">
+        <div class="lcard-title">PsiMed Rede Colaborativa</div>
+        <div class="lcard-desc">Encaminhamentos cruzados <span class="badge b-gold">Premium</span></div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="planos.html" target="_blank" class="lcard gold">
+      <div class="lcard-icon">✨</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Planos e preços</div>
+        <div class="lcard-desc">Ver benefícios do plano premium</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+
+  <div class="label">Formulários e cadastros</div>
+  <div class="links-grid">
+    <a href="https://tally.so/r/b5OGYZ" target="_blank" class="lcard green">
+      <div class="lcard-icon">📋</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Cadastro na rede (Tally)</div>
+        <div class="lcard-desc">Formulário de cadastro para novos membros</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard green">
+      <div class="lcard-icon">➕</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Indicar paciente</div>
+        <div class="lcard-desc">Formulário de encaminhamento via Tally</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="perfil.html" target="_blank" class="lcard">
+      <div class="lcard-icon">✏️</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Editar meu perfil</div>
+        <div class="lcard-desc">Atualizar foto, WhatsApp, bio e especialidades</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="pacientes.html" target="_blank" class="lcard">
+      <div class="lcard-icon">🔐</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Pacientes disponíveis</div>
+        <div class="lcard-desc">Área restrita de pacientes para atendimento</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+
+  <div class="label">Comunidade</div>
+  <div class="links-grid">
+    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
+      <div class="lcard-icon">💬</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Grupo WhatsApp da rede</div>
+        <div class="lcard-desc">Encaminhamentos, parcerias e trocas entre colegas</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
+      <div class="lcard-icon">💳</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Assinar plano premium</div>
+        <div class="lcard-desc">Cupom fundadora: <code>FUNDADORA</code></div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ PERFIL ══ -->
+<div class="section" id="s-perfil">
+  <div class="label">Como atualizar seu perfil</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Acesse a área interna da rede</div>
+        <div class="step-desc">Vá em <strong>index.html</strong> e encontre seu card no diretório.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Clique em "Atualizar perfil"</div>
+        <div class="step-desc">O botão aparece no rodapé do seu card. Se estiver com borda dourada, seu perfil está incompleto.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Digite seu e-mail de cadastro</div>
+        <div class="step-desc">O mesmo e-mail que você usou no formulário do Tally. Isso confirma sua identidade.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Edite e salve</div>
+        <div class="step-desc">Você pode atualizar: foto, WhatsApp, valor da sessão, especialidades, bio e disponibilidade.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="label">O que aparece para os pacientes</div>
+  <div class="info-card">
+    <div class="info-row"><span class="info-key">📸 Foto de perfil</span><span class="info-val">Aparece no diretório público</span></div>
+    <div class="info-row"><span class="info-key">💬 WhatsApp</span><span class="info-val">Botão direto no seu card</span></div>
+    <div class="info-row"><span class="info-key">💰 Valor da sessão</span><span class="info-val">Visível no card público</span></div>
+    <div class="info-row"><span class="info-key">🎯 Especialidades</span><span class="info-val">Tags no card</span></div>
+    <div class="info-row"><span class="info-key">📝 Bio</span><span class="info-val">Texto em destaque no card</span></div>
+    <div class="info-row"><span class="info-key">🕐 Disponibilidade</span><span class="info-val">Visível no card</span></div>
+  </div>
+  <div class="alert">
+    <strong>Dica:</strong> preencha WhatsApp + valor da sessão para ter um card completo e aparecer melhor para os pacientes. Perfis incompletos aparecem com botão dourado ⚠️.
+  </div>
+
+  <div class="label">Acesso direto</div>
+  <div class="links-grid">
+    <a href="index.html" target="_blank" class="lcard teal">
+      <div class="lcard-icon">✏️</div>
+      <div class="lcard-info"><div class="lcard-title">Atualizar perfil</div><div class="lcard-desc">Área interna da rede</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="perfil.html" target="_blank" class="lcard">
+      <div class="lcard-icon">👤</div>
+      <div class="lcard-info"><div class="lcard-title">Página de perfil</div><div class="lcard-desc">Acesso direto pelo link</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ PREMIUM ══ -->
+<div class="section" id="s-premium">
+  <div class="label">O que o premium inclui</div>
+  <div class="info-card">
+    <div class="info-row"><span class="info-key">🌐 Diretório público</span><span class="info-val" style="color:var(--green)">Aparece para pacientes ✓</span></div>
+    <div class="info-row"><span class="info-key">🤝 PsiMed Rede Colaborativa</span><span class="info-val" style="color:var(--green)">Acesso liberado ✓</span></div>
+    <div class="info-row"><span class="info-key">📊 Destaque no diretório</span><span class="info-val" style="color:var(--green)">Badge verificado ✓</span></div>
+    <div class="info-row"><span class="info-key">🔄 Encaminhamentos cruzados</span><span class="info-val" style="color:var(--green)">Indicar e receber ✓</span></div>
+    <div class="info-row"><span class="info-key">👥 Rede de profissionais</span><span class="info-val" style="color:var(--green)">Contato direto ✓</span></div>
+  </div>
+
+  <div class="label">Como assinar</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Acesse o checkout</div>
+        <div class="step-desc">Clique no link abaixo. Use o cupom <code>FUNDADORA</code> para o valor de fundadora.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Conclua o pagamento no Kiwify</div>
+        <div class="step-desc">Cartão de crédito ou Pix disponíveis.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Aguarde a ativação</div>
+        <div class="step-desc">A equipe ativa seu premium em até 24h após a confirmação do pagamento.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="label">Link de assinatura</div>
+  <div class="links-grid">
+    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
+      <div class="lcard-icon">✨</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Assinar agora — Kiwify</div>
+        <div class="lcard-desc">Cupom fundadora: <code>FUNDADORA</code></div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="planos.html" target="_blank" class="lcard">
+      <div class="lcard-icon">📄</div>
+      <div class="lcard-info">
+        <div class="lcard-title">Ver planos e benefícios</div>
+        <div class="lcard-desc">Detalhes de cada plano disponível</div>
+      </div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ REDE / PSIMED ══ -->
+<div class="section" id="s-rede">
+  <div class="label">O que é a PsiMed Rede Colaborativa</div>
+  <div class="info-card">
+    <div class="info-row"><span class="info-key">Acesso</span><span class="info-val"><span class="badge b-gold">Premium + aprovada</span></span></div>
+    <div class="info-row"><span class="info-key">Login</span><span class="info-val">E-mail cadastrado na rede</span></div>
+    <div class="info-row"><span class="info-key">Quem participa</span><span class="info-val">Psicólogas + profissionais de saúde</span></div>
+    <div class="info-row"><span class="info-key">O que acontece lá</span><span class="info-val">Encaminhamentos cruzados anônimos</span></div>
+  </div>
+
+  <div class="label">Como funciona um encaminhamento</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Você indica um paciente</div>
+        <div class="step-desc">Descreve a demanda clínica sem dados pessoais identificáveis. A ética vem primeiro.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Colegas veem a indicação</div>
+        <div class="step-desc">Profissionais da rede com o perfil adequado clicam "Tenho interesse".</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">A admin conecta</div>
+        <div class="step-desc">Você recebe o contato dos interessados via WhatsApp para combinar o encaminhamento.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="label">Acessar e indicar</div>
+  <div class="links-grid">
+    <a href="met.html" target="_blank" class="lcard teal">
+      <div class="lcard-icon">🤝</div>
+      <div class="lcard-info"><div class="lcard-title">Entrar na PsiMed</div><div class="lcard-desc">Login com seu e-mail da rede</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard green">
+      <div class="lcard-icon">➕</div>
+      <div class="lcard-info"><div class="lcard-title">Indicar pelo Tally</div><div class="lcard-desc">Formulário alternativo de indicação</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
+      <div class="lcard-icon">💬</div>
+      <div class="lcard-info"><div class="lcard-title">Grupo da rede</div><div class="lcard-desc">WhatsApp — encaminhamentos e parcerias</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="planos.html" target="_blank" class="lcard gold">
+      <div class="lcard-icon">✨</div>
+      <div class="lcard-info"><div class="lcard-title">Não tem premium ainda?</div><div class="lcard-desc">Assinar para acessar a PsiMed</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+<!-- ══ SENHAS ══ -->
+<div class="section" id="s-senhas">
+  <div class="label">Acessos e senhas da plataforma</div>
+  <div class="info-card">
+    <div class="info-row">
+      <span class="info-key">🌐 Área interna (index.html)</span>
+      <span class="info-val"><span class="badge b-green">Acesso livre</span></span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">✏️ Editar perfil</span>
+      <span class="info-val">E-mail do cadastro Tally</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">🤝 PsiMed (met.html)</span>
+      <span class="info-val">E-mail cadastrado + premium</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">🔐 Área de pacientes (admin)</span>
+      <span class="info-val"><code>conexaopsi2026</code></span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">🔐 Área de pacientes (psis)</span>
+      <span class="info-val"><code>redepsi2026</code></span>
+    </div>
+  </div>
+
+  <div class="label">Acesso ao PsiMed não funciona?</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">✓</div>
+      <div class="step-body">
+        <div class="step-title">Verifique o e-mail</div>
+        <div class="step-desc">Use exatamente o mesmo e-mail que preencheu no formulário Tally. Sem espaços.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">✓</div>
+      <div class="step-body">
+        <div class="step-title">Verifique se está aprovada</div>
+        <div class="step-desc">Seu cadastro precisa estar aprovado pela admin antes de acessar.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">✓</div>
+      <div class="step-body">
+        <div class="step-title">Verifique se tem premium</div>
+        <div class="step-desc">A PsiMed é exclusiva para membros premium. Se ainda não assinou, use o link abaixo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="links-grid" style="margin-top:1rem;">
+    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
+      <div class="lcard-icon">💬</div>
+      <div class="lcard-info"><div class="lcard-title">Falar com a admin</div><div class="lcard-desc">Grupo WhatsApp da rede</div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
+      <div class="lcard-icon">✨</div>
+      <div class="lcard-info"><div class="lcard-title">Assinar premium</div><div class="lcard-desc">Cupom: <code>FUNDADORA</code></div></div>
+      <div class="lcard-arrow">↗</div>
+    </a>
+  </div>
+</div>
+
+</div><!-- wrap -->
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
