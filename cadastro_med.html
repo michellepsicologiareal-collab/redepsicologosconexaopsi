@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsiMed — Rede Colaborativa de Saúde</title>
+<meta name="description" content="Receba encaminhamentos de psicólogos. Faça parte da rede colaborativa de saúde mental.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum:#1E1040; --plum-mid:#2D1B4E;
+  --teal:#1B5E6B; --teal-mid:#245060;
+  --gold:#C8934A; --gold-light:#E8C98A;
+  --green:#27ae60; --red:#c0392b;
+  --cream:#F8F5F0; --white:#fff;
+  --border:#E4DDD4; --muted:#8A8299; --ink:#0F0D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(145deg,var(--plum) 0%,#1a3040 55%,var(--teal) 100%);
+  padding:3rem 1.5rem 4rem;
+  position:relative;overflow:hidden;
+  text-align:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 60% at 80% 30%,rgba(200,147,74,0.14),transparent 60%),
+    radial-gradient(ellipse 40% 50% at 10% 80%,rgba(27,94,107,0.2),transparent 50%);
+}
+.hero-inner{position:relative;z-index:1;max-width:620px;margin:0 auto;}
+.hero-brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;color:rgba(255,255,255,0.4);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:0.5rem;
+}
+.hero-brand em{color:var(--gold-light);font-style:italic;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(200,147,74,0.15);border:1px solid rgba(200,147,74,0.3);
+  border-radius:999px;padding:5px 14px;margin-bottom:1.5rem;
+}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-badge-txt{font-size:0.68rem;color:var(--gold-light);letter-spacing:2px;text-transform:uppercase;font-weight:600;}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,5vw,3.4rem);font-weight:700;
+  color:white;line-height:1.1;margin-bottom:1rem;
+}
+.hero h1 em{color:var(--gold-light);font-style:italic;}
+.hero-sub{font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.8;max-width:480px;margin:0 auto 2rem;}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:0.85rem 2rem;background:var(--gold);color:var(--ink);
+  border-radius:12px;font-family:'Outfit',sans-serif;font-size:0.9rem;
+  font-weight:600;text-decoration:none;cursor:pointer;border:none;
+  transition:opacity 0.2s;
+}
+.hero-cta:hover{opacity:0.88;}
+
+/* ── BENEFÍCIOS ── */
+.benefits{max-width:680px;margin:0 auto;padding:3rem 1.5rem;}
+.benefits-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.6rem;font-weight:600;color:var(--plum-mid);
+  text-align:center;margin-bottom:0.4rem;
+}
+.benefits-sub{font-size:0.82rem;color:var(--muted);text-align:center;margin-bottom:2rem;line-height:1.6;}
+.benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
+@media(max-width:480px){.benefits-grid{grid-template-columns:1fr;}}
+.benefit-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:14px;padding:1.2rem 1.3rem;
+}
+.benefit-icon{font-size:1.4rem;margin-bottom:0.5rem;}
+.benefit-title{font-size:0.85rem;font-weight:700;color:var(--plum-mid);margin-bottom:0.3rem;}
+.benefit-desc{font-size:0.77rem;color:var(--muted);line-height:1.6;}
+
+/* ── COMO FUNCIONA ── */
+.how{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3rem 1.5rem;}
+.how-inner{max-width:560px;margin:0 auto;}
+.how-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--plum-mid);text-align:center;margin-bottom:2rem;}
+.how-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:1.2rem;}
+.how-num{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:var(--teal);color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.8rem;font-weight:700;margin-top:1px;
+}
+.how-step-title{font-size:0.85rem;font-weight:600;color:var(--plum-mid);margin-bottom:2px;}
+.how-step-desc{font-size:0.78rem;color:var(--muted);line-height:1.55;}
+
+/* ── QUEM PODE ENTRAR ── */
+.tipos{max-width:680px;margin:0 auto;padding:3rem 1.5rem;}
+.tipos-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--plum-mid);text-align:center;margin-bottom:0.4rem;}
+.tipos-sub{font-size:0.82rem;color:var(--muted);text-align:center;margin-bottom:1.5rem;}
+.tipos-grid{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;}
+.tipo-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:0.5rem 1.1rem;border-radius:999px;
+  border:1.5px solid var(--border);background:var(--white);
+  font-size:0.78rem;font-weight:500;color:var(--plum-mid);
+}
+
+/* ── FORMULÁRIO ── */
+.form-section{
+  background:linear-gradient(145deg,var(--plum) 0%,#1a3040 55%,var(--teal) 100%);
+  padding:3rem 1.5rem 4rem;
+}
+.form-wrap{max-width:560px;margin:0 auto;}
+.form-header{text-align:center;margin-bottom:2rem;}
+.form-header h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.7rem;font-weight:700;color:white;margin-bottom:0.4rem;
+}
+.form-header h2 em{color:var(--gold-light);font-style:italic;}
+.form-header p{font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.6;}
+.form-card{background:white;border-radius:18px;padding:2rem 1.8rem;}
+.form-divider{
+  font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:8px;margin:1.4rem 0 1rem;
+}
+.form-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.fg{margin-bottom:1rem;}
+.fg label{display:block;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:0.88rem;
+  color:var(--ink);background:var(--cream);
+  outline:none;transition:border-color 0.2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--teal);}
+.fg textarea{min-height:80px;resize:vertical;}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
+@media(max-width:480px){.fg-grid{grid-template-columns:1fr;}}
+.fg-full{grid-column:span 2;}
+@media(max-width:480px){.fg-full{grid-column:span 1;}}
+.form-note{
+  font-size:0.75rem;color:var(--muted);line-height:1.6;
+  background:var(--cream);padding:10px 14px;border-radius:8px;
+  border-left:2px solid rgba(200,147,74,0.4);margin-bottom:1.2rem;
+}
+.btn-submit{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--teal),var(--teal-mid));
+  color:white;border:none;border-radius:11px;
+  font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:opacity 0.2s;margin-top:0.5rem;
+}
+.btn-submit:hover{opacity:0.9;}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+
+/* ── OBRIGADO ── */
+#obrigado{display:none;text-align:center;padding:3rem 1.5rem;}
+.obr-icon{font-size:3rem;margin-bottom:1rem;}
+.obr-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:white;margin-bottom:0.5rem;}
+.obr-title em{color:var(--gold-light);font-style:italic;}
+.obr-sub{font-size:0.88rem;color:rgba(255,255,255,0.6);line-height:1.7;max-width:400px;margin:0 auto;}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:2rem 1.5rem;color:var(--muted);font-size:0.75rem;border-top:1px solid var(--border);}
+footer strong{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--plum-mid);}
+footer em{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-brand">Conexão <em>Psi</em></div>
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      <span class="hero-badge-txt">Rede em crescimento</span>
+    </div>
+    <h1>Receba encaminhamentos<br>de <em>psicólogos</em></h1>
+    <p class="hero-sub">A PsiMed conecta profissionais de saúde com psicólogos da Conexão Psi para encaminhamentos qualificados e colaboração clínica.</p>
+    <button class="hero-cta" onclick="document.getElementById('form-anchor').scrollIntoView({behavior:'smooth'})">
+      Quero fazer parte →
+    </button>
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section class="benefits">
+  <div class="benefits-title">Por que entrar na rede?</div>
+  <div class="benefits-sub">Psicólogos da Conexão Psi estão ativamente buscando parceiros de saúde para encaminhar seus pacientes.</div>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">🔄</div>
+      <div class="benefit-title">Encaminhamentos qualificados</div>
+      <div class="benefit-desc">Receba indicações diretas de psicólogos que já conhecem o perfil clínico do paciente.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🤝</div>
+      <div class="benefit-title">Meets entre colegas</div>
+      <div class="benefit-desc">Converse diretamente com outros profissionais da rede antes de assumir um caso.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">💜</div>
+      <div class="benefit-title">Rede colaborativa</div>
+      <div class="benefit-desc">Faça parte de uma comunidade de saúde mental que prioriza colaboração e ética.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">🎁</div>
+      <div class="benefit-title">Gratuito na fase de testes</div>
+      <div class="benefit-desc">Acesso completo à rede sem custo durante o período de lançamento da PsiMed.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="how">
+  <div class="how-inner">
+    <div class="how-title">Como funciona</div>
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div><div class="how-step-title">Você se cadastra</div><div class="how-step-desc">Preenche o formulário abaixo com seus dados profissionais. Sem burocracia.</div></div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div><div class="how-step-title">Aprovação em até 48h</div><div class="how-step-desc">A equipe da Conexão Psi revisa seu cadastro e ativa seu perfil na rede.</div></div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div><div class="how-step-title">Acesse a PsiMed</div><div class="how-step-desc">Entre com seu e-mail em met.html e veja os encaminhamentos disponíveis para o seu perfil.</div></div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">4</div>
+      <div><div class="how-step-title">Registre interesse ou solicite meet</div><div class="how-step-desc">Sinaliza interesse em um caso ou solicita meet direto com o psicólogo que indicou.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUEM PODE ENTRAR -->
+<section class="tipos">
+  <div class="tipos-title">Quem pode participar</div>
+  <div class="tipos-sub">Profissionais de saúde com registro ativo no conselho da categoria.</div>
+  <div class="tipos-grid">
+    <div class="tipo-pill">🏥 Psiquiatra</div>
+    <div class="tipo-pill">🥗 Nutricionista</div>
+    <div class="tipo-pill">🧬 Neurologista</div>
+    <div class="tipo-pill">💪 Fisioterapeuta</div>
+    <div class="tipo-pill">🩺 Clínica Geral</div>
+    <div class="tipo-pill">💊 Outros especialistas</div>
+  </div>
+</section>
+
+<!-- FORMULÁRIO -->
+<section class="form-section" id="form-anchor">
+  <div class="form-wrap">
+    <div class="form-header">
+      <h2>Faça parte da <em>PsiMed</em></h2>
+      <p>Preencha os dados abaixo. Após aprovação você receberá o acesso pelo e-mail cadastrado.</p>
+    </div>
+
+    <div class="form-card" id="form-card">
+      <div class="form-divider">Dados profissionais</div>
+      <div class="fg-grid">
+        <div class="fg fg-full">
+          <label>Nome completo *</label>
+          <input type="text" id="f-nome" placeholder="Dr(a). Nome Sobrenome">
+        </div>
+        <div class="fg">
+          <label>Tipo de profissional *</label>
+          <select id="f-tipo">
+            <option value="">Selecione...</option>
+            <option value="Psiquiatra">Psiquiatra</option>
+            <option value="Nutricionista">Nutricionista</option>
+            <option value="Neurologista">Neurologista</option>
+            <option value="Fisioterapeuta">Fisioterapeuta</option>
+            <option value="Clínica Geral">Clínica Geral</option>
+            <option value="Outro">Outro especialista</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Registro (CRM / CRN / CREFITO...) *</label>
+          <input type="text" id="f-registro" placeholder="Ex: CRM 12345/SP">
+        </div>
+        <div class="fg fg-full">
+          <label>Especialidade</label>
+          <input type="text" id="f-especialidade" placeholder="Ex: Psiquiatria infantil, Neurologia clínica...">
+        </div>
+      </div>
+
+      <div class="form-divider">Contato e atendimento</div>
+      <div class="fg-grid">
+        <div class="fg">
+          <label>E-mail profissional *</label>
+          <input type="email" id="f-email" placeholder="seu@email.com">
+        </div>
+        <div class="fg">
+          <label>WhatsApp *</label>
+          <input type="tel" id="f-whatsapp" placeholder="11 99999-9999">
+        </div>
+        <div class="fg">
+          <label>Formato de atendimento</label>
+          <select id="f-formato">
+            <option value="Online">Online</option>
+            <option value="Presencial">Presencial</option>
+            <option value="Ambos">Online + Presencial</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Cidade / Estado</label>
+          <input type="text" id="f-cidade" placeholder="Ex: São Paulo – SP">
+        </div>
+        <div class="fg fg-full">
+          <label>Bio profissional</label>
+          <textarea id="f-bio" placeholder="Breve apresentação: experiência, foco clínico, público que atende..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-note">
+        ✅ Acesso gratuito durante a fase de testes da PsiMed. Após o cadastro, a equipe da Conexão Psi revisará seus dados e ativará seu perfil em até 48h.
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="enviarCadastro()">
+        Enviar cadastro →
+      </button>
+    </div>
+
+    <!-- OBRIGADO -->
+    <div id="obrigado">
+      <div class="obr-icon">🎉</div>
+      <div class="obr-title">Cadastro <em>recebido!</em></div>
+      <div class="obr-sub">Obrigada! Seu cadastro foi enviado com sucesso. A equipe da Conexão Psi vai revisar e você receberá o acesso em até 48h pelo e-mail cadastrado.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>Conexão <em>Psi</em></strong> · PsiMed Rede Colaborativa · 2026<br>
+  <span style="margin-top:4px;display:block;">
+    <a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/" style="color:var(--muted);text-decoration:none;">← Voltar para o diretório</a>
+  </span>
+</footer>
+
+<script>
+const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const H   = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+const ADMIN_WA = '5511947388423';
+
+function get(id){ return document.getElementById(id)?.value?.trim(); }
+
+async function enviarCadastro() {
+  const nome       = get('f-nome');
+  const tipo       = get('f-tipo');
+  const registro   = get('f-registro');
+  const email      = get('f-email');
+  const whatsapp   = get('f-whatsapp');
+
+  // Validações
+  if (!nome)      { alert('Informe seu nome completo.'); return; }
+  if (!tipo)      { alert('Selecione o tipo de profissional.'); return; }
+  if (!registro)  { alert('Informe seu registro profissional.'); return; }
+  if (!email)     { alert('Informe seu e-mail profissional.'); return; }
+  if (!whatsapp)  { alert('Informe seu WhatsApp.'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  try {
+    // Verifica se e-mail já existe
+    const check = await fetch(
+      `${SB}/rest/v1/profissionais_saude?select=id&email=ilike.${encodeURIComponent(email.toLowerCase())}&limit=1`,
+      {headers:H}
+    );
+    const exists = await check.json();
+    if (exists?.length) {
+      alert('Este e-mail já está cadastrado. Se tiver dúvidas, fale com a admin pelo WhatsApp.');
+      btn.disabled = false; btn.textContent = 'Enviar cadastro →';
+      return;
+    }
+
+    // Insere na tabela
+    const wa = whatsapp.replace(/\D/g,'');
+    const payload = {
+      nome,
+      tipo,
+      registro,
+      email:       email.toLowerCase(),
+      whatsapp:    wa.startsWith('55') ? wa : '55' + wa,
+      especialidade: get('f-especialidade') || null,
+      formato:     get('f-formato') || 'Online',
+      cidade:      get('f-cidade') || null,
+      bio:         get('f-bio') || null,
+      status:      'pendente',
+      premium:     true   // gratuito fase de testes = premium ativo imediatamente
+    };
+
+    const r = await fetch(`${SB}/rest/v1/profissionais_saude`, {
+      method:'POST', headers:H, body: JSON.stringify(payload)
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error(err);
+    }
+
+    // Notifica admin via WhatsApp
+    const waMsg = encodeURIComponent(
+      `🏥 *Novo cadastro PsiMed — Prof. de Saúde*\n\n` +
+      `*Nome:* ${nome}\n` +
+      `*Tipo:* ${tipo}\n` +
+      `*Registro:* ${registro}\n` +
+      `*E-mail:* ${email}\n` +
+      `*WhatsApp:* ${wa}\n` +
+      `*Cidade:* ${get('f-cidade') || '—'}\n\n` +
+      `Acesse admin.html para aprovar o cadastro.`
+    );
+    window.open(`https://wa.me/${ADMIN_WA}?text=${waMsg}`, '_blank');
+
+    // Mostra obrigado
+    document.getElementById('form-card').style.display = 'none';
+    document.getElementById('obrigado').style.display = 'block';
+
+  } catch(e) {
+    alert('Erro ao enviar: ' + e.message + '\n\nTente novamente ou entre em contato pelo WhatsApp.');
+    btn.disabled = false; btn.textContent = 'Enviar cadastro →';
+  }
+}
+</script>
+</body>
+</html>

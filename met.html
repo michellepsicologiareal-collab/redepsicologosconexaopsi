@@ -404,6 +404,51 @@ header {
 @keyframes slideIn { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
 /* MODAL ADMIN */
+#modal-meet {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.5); z-index:300;
+  align-items:center; justify-content:center; padding:20px;
+}
+#modal-meet.open { display:flex; }
+.meet-box {
+  background:white; border-radius:18px; padding:28px;
+  width:100%; max-width:460px; max-height:90vh; overflow-y:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,0.25);
+}
+.meet-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--met); margin-bottom:4px; }
+.meet-sub { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
+.meet-target {
+  display:flex; align-items:center; gap:10px;
+  background:var(--cream); border-radius:10px; padding:12px 14px; margin-bottom:16px;
+}
+.meet-target-av { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
+.meet-target-nome { font-size:13px; font-weight:600; color:var(--text); }
+.meet-target-reg  { font-size:11px; color:var(--muted); }
+.meet-field { margin-bottom:14px; }
+.meet-field label { display:block; font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.meet-field select, .meet-field textarea {
+  width:100%; padding:10px 13px; border:1.5px solid var(--border); border-radius:9px;
+  font-family:'Outfit',sans-serif; font-size:13px; color:var(--text); background:var(--cream); outline:none; transition:border-color 0.2s;
+}
+.meet-field select:focus, .meet-field textarea:focus { border-color:var(--met); }
+.meet-field textarea { min-height:80px; resize:vertical; }
+.meet-actions { display:flex; gap:10px; margin-top:20px; }
+.btn-meet-send { flex:1; padding:12px; background:linear-gradient(135deg,var(--met),var(--teal)); color:white; border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
+.btn-meet-send:hover { opacity:0.9; }
+.btn-meet-cancel { padding:12px 18px; background:var(--cream-dark); color:var(--muted); border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:13px; cursor:pointer; }
+.btn-meet { width:100%; padding:9px; border-radius:8px; background:linear-gradient(135deg,var(--met),var(--teal)); color:white; border:none; font-family:'Outfit',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:0.2s; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-meet:hover { opacity:0.88; }
+.meet-req-card { background:white; border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; }
+.meet-req-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; }
+.meet-req-de { font-size:13px; font-weight:600; color:var(--text); }
+.meet-req-data { font-size:11px; color:var(--muted); }
+.meet-req-msg { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+.meet-req-tipo { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:6px; background:#EEEDFE; color:#3C3489; margin-bottom:8px; }
+.meet-req-actions { display:flex; gap:8px; }
+.btn-aceitar { padding:8px 16px; background:var(--green); color:white; border:none; border-radius:8px; font-family:'Outfit',sans-serif; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-recusar { padding:8px 14px; background:#fdecea; color:var(--red); border:none; border-radius:8px; font-family:'Outfit',sans-serif; font-size:12px; cursor:pointer; }
+
+/* MODAL ADMIN */
 #modal-admin {
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.5); z-index:200;
@@ -483,6 +528,7 @@ header {
     <button class="tab active" onclick="mudarAba('casos',this)">🔄 Indicações recebidas <span class="badge" id="badge-casos">0</span></button>
     <button class="tab" onclick="mudarAba('indicar',this)">➕ Indicar paciente</button>
     <button class="tab" onclick="mudarAba('profissionais',this)">👥 Profissionais da rede</button>
+    <button class="tab" onclick="mudarAba('meets',this)">🤝 Meets <span class="badge" id="badge-meets" style="background:var(--teal);">0</span></button>
     <button class="tab" id="tab-diag-btn" onclick="mudarAba('diagnostico',this)" style="display:none;">🩺 Diagnóstico</button>
   </div>
 
@@ -665,7 +711,53 @@ header {
       <div id="diag-enc-recentes" style="margin-top:8px;"></div>
     </div>
   </div>
+
+  <!-- ─── ABA: MEETS ─── -->
+  <div id="aba-meets" class="content" style="display:none;">
+    <div class="section-header">
+      <div class="section-title">Solicitações de meet</div>
+      <button class="btn-refresh" onclick="carregarMeets()">🔄 Atualizar</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">
+      Solicitações de meet para encaminhamento de paciente recebidas de colegas da rede.
+    </p>
+    <div id="meets-grid">
+      <div class="empty"><div class="empty-icon">🤝</div>Carregando...</div>
+    </div>
+  </div>
+
 </div><!-- /app -->
+
+<!-- MODAL: SOLICITAR MEET -->
+<div id="modal-meet">
+  <div class="meet-box">
+    <div class="meet-title">🤝 Solicitar meet</div>
+    <div class="meet-sub">Solicitação de encaminhamento de paciente. Não inclua dados pessoais identificáveis.</div>
+    <div class="meet-target" id="meet-target-info"></div>
+    <div class="meet-field">
+      <label>Tipo de solicitação *</label>
+      <select id="meet-tipo">
+        <option value="encaminhamento_paciente">Encaminhamento de paciente</option>
+        <option value="co_terapia">Co-terapia / acompanhamento conjunto</option>
+        <option value="supervisao">Supervisão clínica</option>
+        <option value="parceria">Parceria profissional</option>
+      </select>
+    </div>
+    <div class="meet-field">
+      <label>Contexto clínico (sem dados pessoais) *</label>
+      <textarea id="meet-msg" placeholder="Ex: Paciente adulto com ansiedade, já em processo terapêutico, precisa de avaliação psiquiátrica para suporte medicamentoso..."></textarea>
+    </div>
+    <div class="meet-field">
+      <label>Sua disponibilidade para o meet</label>
+      <textarea id="meet-disponibilidade" style="min-height:55px;" placeholder="Ex: Disponível seg-sex após 18h pelo WhatsApp."></textarea>
+    </div>
+    <div class="meet-actions">
+      <button class="btn-meet-send" onclick="enviarMeet()">📲 Enviar solicitação</button>
+      <button class="btn-meet-cancel" onclick="fecharModalMeet()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-admin">
   <div class="modal-box">
     <div class="modal-title" id="modal-titulo">Gerenciar indicação</div>
@@ -801,13 +893,14 @@ function sair() {
 function mudarAba(aba, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  ['casos','indicar','profissionais','diagnostico'].forEach(id => {
+  ['casos','indicar','profissionais','diagnostico','meets'].forEach(id => {
     const el = document.getElementById('aba-'+id);
     if (el) el.style.display = 'none';
   });
   document.getElementById('aba-'+aba).style.display = 'block';
   if (aba === 'profissionais') carregarProfissionais();
   if (aba === 'diagnostico') rodarDiagMet();
+  if (aba === 'meets') carregarMeets();
 }
 
 function setFiltro(btn) {
@@ -1086,7 +1179,10 @@ async function carregarProfissionais() {
         <span class="prof-rede ${p._rede==='psi'?'rede-psi':'rede-med'}">${p._rede==='psi'?'🧠 Conexão Psi':'🏥 Psi Med'}</span>
         ${p._esp?`<div class="prof-chips"><span class="prof-chip">${p._esp}</span></div>`:''}
         ${p.cidade?`<div class="prof-cidade">📍 ${p.cidade}</div>`:''}
-        ${wa?`<a href="https://wa.me/${wa}?text=${waMsg}" target="_blank" class="btn-whats-prof">📲 Contato via WhatsApp</a>`:''}
+        ${p._reg !== usuarioRegistro ? `
+        <button class="btn-meet" onclick='abrirModalMeet(${JSON.stringify({nome:p._nome,reg:p._reg,wa:wa,tipo:p._tipo,rede:p._rede,cor:cor,ini:ini})})'>
+          🤝 Solicitar meet
+        </button>` : `<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0;">Este é você</div>`}
       </div>`;
     }).join('');
   } catch(e) {
@@ -1226,6 +1322,175 @@ async function verEncRecentes() {
     el.innerHTML = `<span style="font-size:12px;color:var(--red);">Erro: ${e.message}</span>`;
   }
 }
+
+// ─── MEETS ───
+let meetAlvo = null;
+const MEET_TIPO_LABEL = {
+  encaminhamento_paciente: '🔄 Encaminhamento de paciente',
+  co_terapia: '👥 Co-terapia',
+  supervisao: '🎓 Supervisão clínica',
+  parceria: '🤝 Parceria profissional'
+};
+
+function abrirModalMeet(prof) {
+  meetAlvo = prof;
+  const ini = prof.ini || (prof.nome||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('meet-target-info').innerHTML = `
+    <div class="meet-target-av" style="background:${prof.cor||'#2D1B4E'}">${ini}</div>
+    <div>
+      <div class="meet-target-nome">${prof.nome||'—'}</div>
+      <div class="meet-target-reg">${prof.tipo||prof.reg||''} · ${prof.reg||''}</div>
+    </div>`;
+  document.getElementById('meet-msg').value = '';
+  document.getElementById('meet-disponibilidade').value = '';
+  document.getElementById('meet-tipo').value = 'encaminhamento_paciente';
+  document.getElementById('modal-meet').classList.add('open');
+}
+
+function fecharModalMeet() {
+  document.getElementById('modal-meet').classList.remove('open');
+  meetAlvo = null;
+}
+
+async function enviarMeet() {
+  const tipo  = document.getElementById('meet-tipo').value;
+  const msg   = document.getElementById('meet-msg').value.trim();
+  const disp  = document.getElementById('meet-disponibilidade').value.trim();
+  if (!msg) { toast('Descreva o contexto clínico.', 'err'); return; }
+
+  const btn = document.querySelector('.btn-meet-send');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  try {
+    // Salva no banco
+    await api('POST', 'meet_requests', {
+      solicitante_nome:     usuarioNome,
+      solicitante_registro: usuarioRegistro,
+      solicitante_wa:       usuarioWA,
+      destinatario_nome:    meetAlvo.nome,
+      destinatario_registro:meetAlvo.reg,
+      tipo,
+      mensagem:  msg,
+      disponibilidade: disp,
+      status: 'pendente'
+    });
+
+    // Abre WhatsApp do destinatário com mensagem estruturada
+    const tipoLabel = MEET_TIPO_LABEL[tipo] || tipo;
+    const waMsg = encodeURIComponent(
+      `🤝 *Solicitação de Meet — PsiMed Rede Colaborativa*\n\n` +
+      `Olá ${meetAlvo.nome?.split(' ')[0]}! Recebi seu perfil na rede e gostaria de conversar.\n\n` +
+      `*Tipo:* ${tipoLabel}\n` +
+      `*Contexto:* ${msg}\n` +
+      `${disp ? `*Minha disponibilidade:* ${disp}\n` : ''}` +
+      `*Quem sou:* ${usuarioNome} (${usuarioRegistro})\n` +
+      `${usuarioWA ? `*Meu WhatsApp:* ${usuarioWA}` : ''}`
+    );
+
+    const wa = (meetAlvo.wa||'').replace(/\D/g,'');
+    if (wa) {
+      window.open(`https://wa.me/55${wa}?text=${waMsg}`, '_blank');
+    } else {
+      // Se não tem WA, notifica admin
+      const adminMsg = encodeURIComponent(
+        `🤝 *Solicitação de Meet — PsiMed*\n\n${usuarioNome} (${usuarioRegistro}) solicitou meet com ${meetAlvo.nome} (${meetAlvo.reg}).\n*Tipo:* ${tipoLabel}\n*Contexto:* ${msg}`
+      );
+      window.open(`https://wa.me/${ADMIN_WA}?text=${adminMsg}`, '_blank');
+      toast('Profissional sem WA cadastrado. Admin notificada.', 'ok');
+    }
+
+    fecharModalMeet();
+    toast('✅ Solicitação enviada!', 'ok');
+
+  } catch(e) {
+    // Se tabela não existe ainda, ainda abre o WA
+    const tipoLabel = MEET_TIPO_LABEL[tipo] || tipo;
+    const waMsg = encodeURIComponent(
+      `🤝 *Solicitação de Meet — PsiMed Rede Colaborativa*\n\n` +
+      `Olá ${meetAlvo.nome?.split(' ')[0]}! Recebi seu perfil na rede e gostaria de conversar.\n\n` +
+      `*Tipo:* ${tipoLabel}\n*Contexto:* ${msg}\n` +
+      `*Quem sou:* ${usuarioNome} (${usuarioRegistro})`
+    );
+    const wa = (meetAlvo.wa||'').replace(/\D/g,'');
+    if (wa) window.open(`https://wa.me/55${wa}?text=${waMsg}`, '_blank');
+    fecharModalMeet();
+    toast('✅ Mensagem enviada pelo WhatsApp!', 'ok');
+  } finally {
+    btn.disabled = false; btn.textContent = '📲 Enviar solicitação';
+  }
+}
+
+async function carregarMeets() {
+  const grid = document.getElementById('meets-grid');
+  grid.innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
+  try {
+    const r = await api('GET',
+      `meet_requests?select=*&destinatario_registro=eq.${encodeURIComponent(usuarioRegistro)}&order=created_at.desc&limit=50`
+    );
+    const pendentes = (r||[]).filter(m => m.status === 'pendente').length;
+    const badge = document.getElementById('badge-meets');
+    if (badge) badge.textContent = pendentes || '';
+
+    if (!r?.length) {
+      grid.innerHTML = '<div class="empty"><div class="empty-icon">🤝</div>Nenhuma solicitação de meet ainda.</div>';
+      return;
+    }
+
+    grid.innerHTML = r.map(m => {
+      const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo;
+      const waMsg = encodeURIComponent(`Olá ${m.solicitante_nome?.split(' ')[0]}! Vi sua solicitação de meet na PsiMed e aceito conversar. Quando posso te chamar?`);
+      const wa = (m.solicitante_wa||'').replace(/\D/g,'');
+      return `<div class="meet-req-card">
+        <div class="meet-req-top">
+          <div class="meet-req-de">De: <strong>${m.solicitante_nome||'—'}</strong> · ${m.solicitante_registro||'—'}</div>
+          <div class="meet-req-data">${dt}</div>
+        </div>
+        <div class="meet-req-tipo">${tipoLabel}</div>
+        <div class="meet-req-msg">${m.mensagem||'—'}</div>
+        ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
+        <div class="meet-req-actions">
+          ${m.status==='pendente' ? `
+            ${wa ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar">✅ Aceitar pelo WhatsApp</a>` : `<button class="btn-aceitar" onclick="aceitarMeet('${m.id}')">✅ Aceitar</button>`}
+            <button class="btn-recusar" onclick="recusarMeet('${m.id}')">❌ Recusar</button>
+          ` : `<span class="meet-status-${m.status==='aceito'?'aceitou':'recusou'}">${m.status==='aceito'?'✅ Aceito':'❌ Recusado'}</span>`}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    // Tabela ainda não existe
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔧</div>
+      A tabela de meets precisa ser criada no banco.<br>
+      <span style="font-size:12px;margin-top:8px;display:block;">
+        Execute no SQL Editor:<br>
+        <code style="font-family:monospace;font-size:11px;background:#f4f2ef;padding:2px 6px;border-radius:4px;">
+          CREATE TABLE meet_requests (...)
+        </code>
+      </span>
+    </div>`;
+  }
+}
+
+async function aceitarMeet(id) {
+  try {
+    await api('PATCH', `meet_requests?id=eq.${id}`, { status:'aceito' });
+    carregarMeets();
+    toast('✅ Meet aceito!', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+async function recusarMeet(id) {
+  if (!confirm('Recusar esta solicitação?')) return;
+  try {
+    await api('PATCH', `meet_requests?id=eq.${id}`, { status:'recusado' });
+    carregarMeets();
+    toast('Solicitação recusada.', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+document.getElementById('modal-meet').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-meet')) fecharModalMeet();
+});
 
 function toast(msg, tipo) {
   const t = document.createElement('div');
