@@ -99,6 +99,22 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
 .lc.psimed .lc-t{color:var(--teal);}
 .lc.psimed .lc-arr{color:rgba(27,94,107,0.3);}
 .lc.psimed:hover .lc-arr{color:var(--teal);}
+.lc.publico{
+  border-color:rgba(91,63,160,0.3);
+  background:linear-gradient(135deg,#f0ecfc 0%,#e6dff8 100%);
+  border-left:3px solid var(--violet);
+}
+.lc.publico:hover{border-color:var(--violet);box-shadow:0 4px 16px rgba(91,63,160,0.15);}
+.lc.publico .lc-icon{background:rgba(91,63,160,0.1);}
+.lc.publico .lc-t{color:var(--violet);}
+.lc.interno{
+  border-color:rgba(27,94,107,0.25);
+  background:linear-gradient(135deg,#f0fafb 0%,#e3f4f7 100%);
+  border-left:3px solid var(--teal);
+}
+.lc.interno:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(27,94,107,0.12);}
+.lc.interno .lc-icon{background:rgba(27,94,107,0.1);}
+.lc.interno .lc-t{color:var(--teal);}
 .lc-t{font-size:0.82rem;font-weight:600;color:var(--plum-mid);}
 .lc-d{font-size:0.71rem;color:var(--muted);margin-top:2px;}
 .lc-arr{color:var(--border);font-size:0.85rem;transition:color 0.15s;}
@@ -191,14 +207,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
 <div class="section active" id="s-inicio">
   <div class="lbl">Acesso rápido</div>
   <div class="lgrid">
-    <a href="https://tinyurl.com/ConexaoPsiRede" target="_blank" class="lc">
+    <a href="https://tinyurl.com/ConexaoPsiRede" target="_blank" class="lc publico">
       <div class="lc-icon">🌐</div>
-      <div class="lc-info"><div class="lc-t">Diretório público</div><div class="lc-d">Para pacientes encontrarem psis</div></div>
+      <div class="lc-info">
+        <div class="lc-t">Diretório público</div>
+        <div class="lc-d">Para <strong>pacientes</strong> encontrarem psicólogos</div>
+      </div>
       <div class="lc-arr">↗</div>
     </a>
-    <a href="index.html" target="_blank" class="lc teal">
+    <a href="index.html" target="_blank" class="lc interno">
       <div class="lc-icon">🧠</div>
-      <div class="lc-info"><div class="lc-t">Área interna da rede</div><div class="lc-d">Todas as psis aprovadas</div></div>
+      <div class="lc-info">
+        <div class="lc-t">Área interna da rede</div>
+        <div class="lc-d">Para <strong>psis</strong> — editar perfil e ver a rede</div>
+      </div>
       <div class="lc-arr">↗</div>
     </a>
     <a href="https://tally.so/r/b5OGYZ" target="_blank" class="lc green">
