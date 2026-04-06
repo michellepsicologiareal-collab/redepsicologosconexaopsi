@@ -191,7 +191,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
     <div class="hdr-sub">Conexão Psi · Links e Etapas · 2026</div>
     <div class="tabs">
       <button class="tab active"       onclick="show('inicio',this)">🔗 Início</button>
-      <button class="tab"              onclick="show('diretorio',this)">🌐 Diretório público</button>
+      <button class="tab"              onclick="show('diretorio',this)">⭐ Diretório Premium</button>
       <button class="tab"              onclick="show('cadastro',this)">📋 Cadastro de psi</button>
       <button class="tab"              onclick="show('perfil',this)">✏️ Editar perfil</button>
       <button class="tab"              onclick="show('pacientes',this)">🔐 Área de pacientes</button>
@@ -208,10 +208,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
   <div class="lbl">Acesso rápido</div>
   <div class="lgrid">
     <a href="https://tinyurl.com/ConexaoPsiRede" target="_blank" class="lc publico">
-      <div class="lc-icon">🌐</div>
+      <div class="lc-icon">⭐</div>
       <div class="lc-info">
-        <div class="lc-t">Diretório público</div>
-        <div class="lc-d">Para <strong>pacientes</strong> encontrarem psicólogos</div>
+        <div class="lc-t">Diretório Premium</div>
+        <div class="lc-d">Só psis premium — visível para <strong>pacientes</strong></div>
       </div>
       <div class="lc-arr">↗</div>
     </a>
@@ -272,8 +272,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
 <!-- ══ DIRETÓRIO PÚBLICO ══ -->
 <div class="section" id="s-diretorio">
   <div class="det-card">
-    <div class="det-title">🌐 Diretório público</div>
-    <div class="det-sub">Pacientes encontram psicólogos — sem senha</div>
+    <div class="det-title">⭐ Diretório Premium</div>
+    <div class="det-sub">Só psis premium aparecem aqui — pacientes encontram e entram em contato</div>
     <div class="chips">
       <a class="chip link" href="https://tinyurl.com/ConexaoPsiRede" target="_blank">
         <span class="chip-lbl">Link curto</span> tinyurl.com/ConexaoPsiRede ↗
@@ -286,7 +286,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
     <div class="lbl" style="margin-top:0;">Como funciona para o paciente</div>
     <div class="flow">
       <div class="fb">Paciente abre o site</div><div class="fa">→</div>
-      <div class="fb">Vê psis Premium ⭐ e Gratuitas</div><div class="fa">→</div>
+      <div class="fb gold">Vê apenas psis Premium ⭐</div><div class="fa">→</div>
       <div class="fb">Filtra por abordagem ou cidade</div><div class="fa">→</div>
       <div class="fb gold">Clica no WhatsApp</div>
     </div>
@@ -294,10 +294,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);mi
   </div>
 
   <div class="det-card">
-    <div class="lbl" style="margin-top:0;">Quem aparece no diretório</div>
+    <div class="lbl" style="margin-top:0;">Quem aparece neste diretório</div>
     <div class="flow" style="flex-direction:column;align-items:flex-start;gap:8px;">
-      <div style="display:flex;align-items:center;gap:8px;"><div class="fb gold">⭐ Premium</div><span style="font-size:0.76rem;color:var(--muted);">Card completo — foto, bio, WhatsApp, valor, especialidades</span></div>
-      <div style="display:flex;align-items:center;gap:8px;"><div class="fb">Gratuitas</div><span style="font-size:0.76rem;color:var(--muted);">Card básico — nome, CRP, abordagem, formato</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><div class="fb gold">⭐ Premium</div><span style="font-size:0.76rem;color:var(--muted);">Card completo — foto, bio, WhatsApp, valor, especialidades, badge verificado</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><div class="fb" style="opacity:0.45;text-decoration:line-through;">Gratuitas</div><span style="font-size:0.76rem;color:var(--muted);opacity:0.55;">Não aparecem neste diretório</span></div>
     </div>
   </div>
 </div>
