@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentação Técnica — Conexão Psi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum:#2D1B4E; --violet:#5B3FA0; --gold:#C8934A; --gold-light:#E8C98A;
+  --teal:#1B5E6B; --cyan:#29A8CC; --green:#27ae60; --red:#c0392b;
+  --orange:#e67e22; --cream:#FAF7F2; --card:#FFFFFF;
+  --border:#E8E2D8; --muted:#7A7490; --ink:#0F0D1A;
+  --dark:#1a1a2e; --code-bg:#0d1117;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* ── HEADER ── */
+.doc-header{
+  background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 60%,var(--teal) 100%);
+  padding:2.5rem 2rem 1.8rem; position:relative; overflow:hidden;
+}
+.doc-header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 50% 80% at 80% 50%,rgba(200,147,74,0.15),transparent 60%),
+             radial-gradient(ellipse 40% 60% at 10% 80%,rgba(41,168,204,0.1),transparent 50%);
+}
+.doc-header-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;}
+.doc-logo{display:flex;align-items:center;gap:10px;margin-bottom:0.5rem;}
+.doc-logo-icon{font-size:1.4rem;}
+.doc-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:white;}
+.doc-title em{color:var(--gold-light);font-style:italic;}
+.doc-subtitle{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:1.5rem;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0.5rem;flex-wrap:wrap;position:relative;z-index:1;}
+.tab{
+  padding:0.45rem 1rem;border-radius:999px;
+  border:1.5px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);
+  font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:500;
+  cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
+}
+.tab:hover{background:rgba(255,255,255,0.12);color:white;}
+.tab.active{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:600;}
+
+/* ── CONTENT ── */
+.content{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;
+  color:var(--plum);margin-bottom:0.4rem;
+}
+.sec-sub{font-size:0.82rem;color:var(--muted);margin-bottom:2rem;line-height:1.6;}
+
+/* ── CARDS GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+.card{background:white;border:1px solid var(--border);border-radius:14px;padding:1.3rem;}
+.card-title{font-size:0.82rem;font-weight:700;letter-spacing:0.5px;color:var(--plum);margin-bottom:0.5rem;display:flex;align-items:center;gap:7px;}
+.card-body{font-size:0.8rem;color:var(--muted);line-height:1.7;}
+.card-body strong{color:var(--ink);}
+
+/* ── STAT CARDS ── */
+.stat-card{background:white;border:1px solid var(--border);border-radius:14px;padding:1.2rem;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;line-height:1;color:var(--plum);}
+.stat-lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-top:4px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;
+  letter-spacing:0.5px;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.b-plum{background:#EDE6F8;color:var(--plum);}
+.b-teal{background:#e0f4f8;color:var(--teal);}
+.b-gold{background:#fef9ee;color:var(--gold);}
+.b-green{background:#eafaf1;color:var(--green);}
+.b-red{background:#fdecea;color:var(--red);}
+.b-orange{background:#fef3e8;color:var(--orange);}
+.b-dark{background:var(--plum);color:white;}
+
+/* ── TABLE ── */
+.doc-table{width:100%;border-collapse:collapse;font-size:0.79rem;margin-bottom:1.5rem;}
+.doc-table th{background:var(--plum);color:white;padding:9px 14px;text-align:left;font-weight:600;font-size:0.72rem;letter-spacing:0.5px;}
+.doc-table th:first-child{border-radius:8px 0 0 0;}
+.doc-table th:last-child{border-radius:0 8px 0 0;}
+.doc-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--ink);vertical-align:top;}
+.doc-table tr:hover td{background:#faf8f5;}
+.ok{color:var(--green);font-weight:700;}
+.no{color:var(--red);font-weight:700;}
+.ef{color:var(--teal);font-weight:600;font-size:0.72rem;}
+.warn{color:var(--orange);font-weight:600;}
+
+/* ── CODE ── */
+code{font-family:'JetBrains Mono',monospace;font-size:0.76rem;
+  background:#f0ede8;color:var(--plum);padding:1px 6px;border-radius:4px;}
+pre{font-family:'JetBrains Mono',monospace;font-size:0.74rem;
+  background:var(--code-bg);color:#c9d1d9;padding:1.2rem 1.4rem;
+  border-radius:10px;margin:0.8rem 0;overflow-x:auto;line-height:1.8;border:1px solid #30363d;}
+pre .kw{color:#ff79c6;}
+pre .str{color:#f1fa8c;}
+pre .cm{color:#6272a4;font-style:italic;}
+pre .fn{color:#50fa7b;}
+pre .num{color:#bd93f9;}
+pre .var{color:#8be9fd;}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;gap:0;margin:1rem 0;flex-wrap:wrap;}
+.flow-box{
+  background:white;border:1.5px solid var(--border);border-radius:10px;
+  padding:0.6rem 1rem;font-size:0.76rem;font-weight:500;color:var(--plum);
+  white-space:nowrap;
+}
+.flow-box.dark{background:var(--plum);color:white;border-color:var(--plum);}
+.flow-box.teal{background:var(--teal);color:white;border-color:var(--teal);}
+.flow-box.gold{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+.flow-box.green{background:var(--green);color:white;border-color:var(--green);}
+.flow-box.red{background:var(--red);color:white;border-color:var(--red);}
+.flow-arrow{color:var(--muted);font-size:1rem;padding:0 0.5rem;flex-shrink:0;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+.section-label{
+  font-size:0.65rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── ALERT ── */
+.alert{border-left:3px solid var(--orange);background:#fef9ee;
+  padding:0.8rem 1rem;border-radius:0 8px 8px 0;
+  font-size:0.79rem;color:#7a4a10;margin:0.8rem 0;line-height:1.6;}
+.alert.green{border-color:var(--green);background:#eafaf1;color:#1a5c30;}
+.alert.red{border-color:var(--red);background:#fdecea;color:#7a1a1a;}
+.alert strong{font-weight:700;}
+
+/* ── FILE TREE ── */
+.file-tree{background:var(--code-bg);border-radius:10px;padding:1.2rem;font-family:'JetBrains Mono',monospace;font-size:0.76rem;line-height:2;border:1px solid #30363d;}
+.ft-dir{color:#79c0ff;}
+.ft-html{color:#f1fa8c;}
+.ft-ts{color:#50fa7b;}
+.ft-sql{color:#ff79c6;}
+.ft-cm{color:#6272a4;font-style:italic;}
+
+/* ── URL CHIP ── */
+.url-chip{display:inline-flex;align-items:center;gap:6px;
+  background:#f0ede8;border-radius:8px;padding:4px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--plum);}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div class="doc-logo">
+      <span class="doc-logo-icon">📋</span>
+      <div>
+        <div class="doc-title">Documentação <em>Técnica</em></div>
+        <div class="doc-subtitle">Conexão Psi · Sistema Completo · V1.0 · 2026</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="show('visao')">🗺️ Visão Geral</button>
+      <button class="tab" onclick="show('stack')">⚙️ Stack & Arquitetura</button>
+      <button class="tab" onclick="show('banco')">🗄️ Banco de Dados</button>
+      <button class="tab" onclick="show('paginas')">📄 Páginas</button>
+      <button class="tab" onclick="show('auth')">🔐 Autenticação</button>
+      <button class="tab" onclick="show('fluxos')">🔄 Fluxos</button>
+      <button class="tab" onclick="show('seguranca')">🛡️ Segurança</button>
+      <button class="tab" onclick="show('manutencao')">🔧 Manutenção</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════ -->
+<!-- VISÃO GERAL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section active" id="sec-visao">
+  <div class="sec-title">Visão Geral do Sistema</div>
+  <div class="sec-sub">Conexão Psi é uma plataforma de rede colaborativa para psicólogos, com diretório público, área de membros e rede de encaminhamentos cruzados (PsiMed).</div>
+
+  <div class="grid-4">
+    <div class="stat-card"><div class="stat-num" style="color:var(--plum)">4</div><div class="stat-lbl">Páginas públicas</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--gold)">3</div><div class="stat-lbl">Tabelas Supabase</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--teal)">1</div><div class="stat-lbl">Edge Function</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">7</div><div class="stat-lbl">RLS Policies</div></div>
+  </div>
+
+  <div class="section-label">Dois produtos integrados</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🧠 Conexão Psi</div>
+      <div class="card-body">
+        Diretório de psicólogos verificados. Pacientes encontram profissionais por abordagem, formato e cidade. Psicólogos têm perfil com WhatsApp direto.<br><br>
+        <span class="badge b-plum">index.html</span> <span class="badge b-plum">divulgacao.html</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏥 PsiMed Rede Colaborativa</div>
+      <div class="card-body">
+        Área premium exclusiva para psicólogos e profissionais de saúde. Encaminhamentos cruzados anônimos entre colegas da rede.<br><br>
+        <span class="badge b-teal">met.html</span> <span class="badge b-gold">premium only</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Personas</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">👤 Paciente</div>
+      <div class="card-body">Acessa <strong>divulgacao.html</strong>. Filtra por abordagem, formato, cidade. Contato direto via WhatsApp do psicólogo.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧠 Psicóloga / Prof. Saúde</div>
+      <div class="card-body">Cadastro via Tally. Aparece no <strong>index.html</strong> (área interna). Com premium: acessa <strong>met.html</strong> para encaminhamentos.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">👑 Admin</div>
+      <div class="card-body">Acessa <strong>admin.html</strong> com senha. Aprova cadastros, ativa premium, edita perfis. Dois níveis: Master e Sócio.</div>
+    </div>
+  </div>
+
+  <div class="section-label">URLs do sistema</div>
+  <table class="doc-table">
+    <tr><th>Página</th><th>URL</th><th>Acesso</th></tr>
+    <tr><td><strong>Diretório público</strong></td><td><code>divulgacao.html</code></td><td><span class="badge b-green">Público</span></td></tr>
+    <tr><td><strong>Área interna (psis)</strong></td><td><code>index.html</code></td><td><span class="badge b-green">Público (senha soft)</span></td></tr>
+    <tr><td><strong>PsiMed Rede</strong></td><td><code>met.html</code></td><td><span class="badge b-gold">Premium + Aprovado</span></td></tr>
+    <tr><td><strong>Painel admin</strong></td><td><code>admin.html</code></td><td><span class="badge b-red">Senha admin</span></td></tr>
+    <tr><td><strong>Planos</strong></td><td><code>planos.html</code></td><td><span class="badge b-green">Público</span></td></tr>
+    <tr><td><strong>Editar perfil</strong></td><td><code>perfil.html</code></td><td><span class="badge b-green">E-mail verificado</span></td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- STACK & ARQUITETURA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-stack">
+  <div class="sec-title">Stack & Arquitetura</div>
+  <div class="sec-sub">100% serverless. Sem backend próprio, sem Node.js local. Todo o processamento é client-side ou via Supabase.</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">🌐 Hosting</div>
+      <div class="card-body"><strong>GitHub Pages</strong><br>Repositório: michellepsicologiareal-collab / redepsicologosconexaopsi<br>Deploy: push na branch main → publicação automática</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🗄️ Banco + API</div>
+      <div class="card-body"><strong>Supabase</strong><br>PostgreSQL gerenciado. API REST automática (PostgREST). Row Level Security para controle de acesso.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ Edge Functions</div>
+      <div class="card-body"><strong>Supabase Deno</strong><br><code>admin-proxy</code> — proxy seguro para operações de escrita do admin usando service_role.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Formulários</div>
+      <div class="card-body"><strong>Tally.so</strong><br>Cadastro de psis: <code>tally.so/r/b5OGYZ</code><br>Cadastro de profs. saúde: link separado<br>Webhook → INSERT direto no Supabase</div>
+    </div>
+    <div class="card">
+      <div class="card-title">💳 Pagamentos</div>
+      <div class="card-body"><strong>Kiwify</strong><br>Checkout: <code>pay.kiwify.com.br/O5SVu87</code><br>Cupom fundadora: <code>FUNDADORA</code><br>Ativação premium: manual via admin</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📱 Notificações</div>
+      <div class="card-body"><strong>WhatsApp Business</strong><br>Notificações de interesse em encaminhamentos<br>Admin WA: <code>5511947388423</code></div>
+    </div>
+  </div>
+
+  <div class="section-label">Estrutura de arquivos do repositório</div>
+  <div class="file-tree">
+<span class="ft-dir">redepsicologosconexaopsi/</span><br>
+├── <span class="ft-html">index.html</span>         <span class="ft-cm">← área interna (psis logadas)</span><br>
+├── <span class="ft-html">divulgacao.html</span>    <span class="ft-cm">← diretório público (pacientes)</span><br>
+├── <span class="ft-html">met.html</span>           <span class="ft-cm">← PsiMed rede colaborativa (premium)</span><br>
+├── <span class="ft-html">admin.html</span>         <span class="ft-cm">← painel administrativo</span><br>
+├── <span class="ft-html">planos.html</span>        <span class="ft-cm">← página de planos/preços</span><br>
+├── <span class="ft-html">perfil.html</span>        <span class="ft-cm">← edição de perfil via e-mail</span><br>
+├── <span class="ft-html">pacientes.html</span>     <span class="ft-cm">← área de pacientes disponíveis</span><br>
+└── <span class="ft-html">sistema.html</span>       <span class="ft-cm">← dashboard sistema</span>
+  </div>
+
+  <div class="section-label">Arquitetura de chamadas</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1rem;">
+    <div style="font-size:0.76rem;font-weight:600;color:var(--muted);margin-bottom:0.8rem;">LEITURA (SELECT) — todos os arquivos</div>
+    <div class="flow">
+      <div class="flow-box dark">Browser</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">GET /rest/v1/psis</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">Supabase REST (anon)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">RLS SELECT ✓</div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:0.76rem;font-weight:600;color:var(--muted);margin-bottom:0.8rem;">ESCRITA ADMIN (UPDATE/DELETE)</div>
+    <div class="flow">
+      <div class="flow-box dark">admin.html</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box gold">POST admin-proxy</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">Edge Function</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">valida senha</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">service_role ✓</div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:0.76rem;font-weight:600;color:var(--muted);margin-bottom:0.8rem;">ESCRITA PÚBLICA (INSERT encaminhamentos)</div>
+    <div class="flow">
+      <div class="flow-box dark">met.html</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">POST /rest/v1/enc...</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">Supabase REST (anon)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">RLS INSERT ✓</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- BANCO DE DADOS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-banco">
+  <div class="sec-title">Banco de Dados</div>
+  <div class="sec-sub">PostgreSQL gerenciado pelo Supabase. Projeto: <code>tjtrdfbckgdgvcegdsbz</code>. Três tabelas principais com RLS ativo.</div>
+
+  <div class="section-label">Tabela: psis</div>
+  <table class="doc-table">
+    <tr><th>Campo</th><th>Tipo</th><th>Descrição</th><th>Fonte</th></tr>
+    <tr><td><code>id</code></td><td>uuid</td><td>PK gerada automaticamente</td><td>Supabase</td></tr>
+    <tr><td><code>nome</code></td><td>text</td><td>Nome completo</td><td>Tally</td></tr>
+    <tr><td><code>crp</code></td><td>text</td><td>Registro profissional</td><td>Tally</td></tr>
+    <tr><td><code>email</code></td><td>text</td><td>E-mail (usado para login no met.html)</td><td>Tally</td></tr>
+    <tr><td><code>handle</code></td><td>text</td><td>Instagram sem @</td><td>Tally</td></tr>
+    <tr><td><code>whatsapp</code></td><td>text</td><td>Número sem formatação</td><td>Tally / perfil</td></tr>
+    <tr><td><code>abordagem</code></td><td>text</td><td>TCC, Psicanálise, etc.</td><td>Tally</td></tr>
+    <tr><td><code>formato</code></td><td>text</td><td>Online / Presencial / Ambos</td><td>Tally</td></tr>
+    <tr><td><code>cidade</code></td><td>text</td><td>Cidade de atendimento</td><td>Tally</td></tr>
+    <tr><td><code>especialidades</code></td><td>text</td><td>CSV: "Ansiedade, TDAH, Luto"</td><td>Tally / perfil</td></tr>
+    <tr><td><code>publico</code></td><td>text</td><td>Adultos, Crianças, etc.</td><td>Tally</td></tr>
+    <tr><td><code>valor_sessao</code></td><td>text</td><td>Texto livre: "R$ 150"</td><td>perfil</td></tr>
+    <tr><td><code>bio</code></td><td>text</td><td>Texto livre</td><td>perfil</td></tr>
+    <tr><td><code>foto_url</code></td><td>text</td><td>URL pública (Supabase Storage)</td><td>perfil / admin</td></tr>
+    <tr><td><code>disponibilidade</code></td><td>text</td><td>Ex: "Seg-Sex manhã"</td><td>perfil</td></tr>
+    <tr><td><code>status</code></td><td>text</td><td><code>pendente</code> / <code>aprovado</code> / <code>reprovado</code></td><td>admin</td></tr>
+    <tr><td><code>premium</code></td><td>boolean</td><td>Acesso ao met.html</td><td>admin</td></tr>
+    <tr><td><code>created_at</code></td><td>timestamptz</td><td>Data de cadastro</td><td>Supabase</td></tr>
+  </table>
+
+  <div class="section-label">Tabela: profissionais_saude</div>
+  <table class="doc-table">
+    <tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr>
+    <tr><td><code>id</code></td><td>uuid</td><td>PK</td></tr>
+    <tr><td><code>nome</code></td><td>text</td><td>Nome completo</td></tr>
+    <tr><td><code>registro</code></td><td>text</td><td>CRM / CRN / CREFITO etc.</td></tr>
+    <tr><td><code>email</code></td><td>text</td><td>Login no met.html</td></tr>
+    <tr><td><code>tipo</code></td><td>text</td><td>Psiquiatra / Nutricionista / Neurologista / Fisioterapeuta / Clínica Geral</td></tr>
+    <tr><td><code>especialidade</code></td><td>text</td><td>Livre</td></tr>
+    <tr><td><code>whatsapp</code></td><td>text</td><td>Número sem formatação</td></tr>
+    <tr><td><code>formato</code></td><td>text</td><td>Online / Presencial / Ambos</td></tr>
+    <tr><td><code>cidade</code></td><td>text</td><td>—</td></tr>
+    <tr><td><code>bio</code></td><td>text</td><td>—</td></tr>
+    <tr><td><code>foto_url</code></td><td>text</td><td>—</td></tr>
+    <tr><td><code>status</code></td><td>text</td><td><code>pendente</code> / <code>aprovado</code> / <code>reprovado</code></td></tr>
+    <tr><td><code>premium</code></td><td>boolean</td><td>Acesso ao met.html</td></tr>
+    <tr><td><code>created_at</code></td><td>timestamptz</td><td>—</td></tr>
+  </table>
+
+  <div class="section-label">Tabela: encaminhamentos_cruzados</div>
+  <table class="doc-table">
+    <tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr>
+    <tr><td><code>id</code></td><td>uuid</td><td>PK</td></tr>
+    <tr><td><code>indicado_por</code></td><td>text</td><td>Nome do profissional que indicou</td></tr>
+    <tr><td><code>crp_ou_registro</code></td><td>text</td><td>Registro do indicador</td></tr>
+    <tr><td><code>tipo_indicador</code></td><td>text</td><td>psi / medico</td></tr>
+    <tr><td><code>contato_indicador</code></td><td>text</td><td>WhatsApp com 55</td></tr>
+    <tr><td><code>tipo_buscado</code></td><td>text</td><td>psi / psiquiatra / nutricionista / neurologista / fisioterapeuta / clinica geral</td></tr>
+    <tr><td><code>demanda</code></td><td>text</td><td>Descrição clínica anonimizada</td></tr>
+    <tr><td><code>publico</code></td><td>text</td><td>Adulto / Criança / etc.</td></tr>
+    <tr><td><code>formato</code></td><td>text</td><td>Online / Presencial / Ambos</td></tr>
+    <tr><td><code>cidade</code></td><td>text</td><td>—</td></tr>
+    <tr><td><code>valor_maximo</code></td><td>text</td><td>Faixa de valor aceita</td></tr>
+    <tr><td><code>urgencia</code></td><td>text</td><td>alta / media / baixa</td></tr>
+    <tr><td><code>observacoes</code></td><td>text</td><td>Info clínica adicional</td></tr>
+    <tr><td><code>interessados</code></td><td>text[]</td><td>Array de registros (CRP/CRM) dos interessados</td></tr>
+    <tr><td><code>status</code></td><td>text</td><td>disponivel / em_atendimento / concluido</td></tr>
+    <tr><td><code>created_at</code></td><td>timestamptz</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PÁGINAS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-paginas">
+  <div class="sec-title">Páginas do Sistema</div>
+  <div class="sec-sub">Cada arquivo HTML é independente — sem framework, sem build. Lógica JS inline, estilo CSS inline.</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📄 index.html — Área interna</div>
+      <div class="card-body">
+        <span class="badge b-green" style="margin-bottom:8px;display:inline-flex;">Membros aprovados</span><br>
+        Diretório completo de todas as psis aprovadas (gratuitas + premium). Filtros por abordagem, formato, cidade. Botão "Atualizar perfil" com verificação por e-mail. Upload de foto via clever-handler. Stats de rede no hero.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌐 divulgacao.html — Diretório público</div>
+      <div class="card-body">
+        <span class="badge b-green" style="margin-bottom:8px;display:inline-flex;">Pacientes</span><br>
+        Mostra apenas psis com <code>premium=true</code> e <code>status=aprovado</code>. Filtros Online/Presencial incluem formato "Ambos". Tags de abordagem. Botão WhatsApp direto. CTA de cadastro para psicólogas.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🤝 met.html — PsiMed Rede</div>
+      <div class="card-body">
+        <span class="badge b-gold" style="margin-bottom:8px;display:inline-flex;">Premium + Aprovado</span><br>
+        Login por e-mail (lookup nas duas tabelas). 3 abas: Indicações recebidas · Indicar paciente · Profissionais da rede. Registrar interesse notifica admin via WhatsApp.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">👑 admin.html — Painel admin</div>
+      <div class="card-body">
+        <span class="badge b-red" style="margin-bottom:8px;display:inline-flex;">Senha admin</span><br>
+        Tabs: Pendentes · Aprovados · Premium · Prof. Saúde · Encaminhamentos · Todos · Sistema · Diagnóstico. Cards unificados com badge 🧠/🏥. Upload de foto nos modais. Escritas via Edge Function.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Dependências externas</div>
+  <table class="doc-table">
+    <tr><th>Recurso</th><th>URL</th><th>Usado em</th></tr>
+    <tr><td>Google Fonts (Cormorant + Outfit)</td><td><code>fonts.googleapis.com</code></td><td>Todos</td></tr>
+    <tr><td>Supabase REST API</td><td><code>tjtrdfbckgdgvcegdsbz.supabase.co/rest/v1</code></td><td>Todos</td></tr>
+    <tr><td>Supabase Edge Functions</td><td><code>.../functions/v1/admin-proxy</code></td><td>admin.html</td></tr>
+    <tr><td>Supabase Edge Functions</td><td><code>.../functions/v1/clever-handler</code></td><td>index.html, admin.html</td></tr>
+    <tr><td>Tally.so (cadastro psi)</td><td><code>tally.so/r/b5OGYZ</code></td><td>divulgacao, index</td></tr>
+    <tr><td>Kiwify (pagamento)</td><td><code>pay.kiwify.com.br/O5SVu87</code></td><td>planos.html</td></tr>
+    <tr><td>WhatsApp API</td><td><code>wa.me/</code></td><td>Todos</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- AUTENTICAÇÃO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-auth">
+  <div class="sec-title">Autenticação</div>
+  <div class="sec-sub">Sem Supabase Auth. Cada área tem seu próprio mecanismo de acesso.</div>
+
+  <table class="doc-table">
+    <tr><th>Área</th><th>Mecanismo</th><th>Onde verifica</th><th>Nível</th></tr>
+    <tr>
+      <td><strong>met.html</strong></td>
+      <td>E-mail lookup</td>
+      <td>Tabelas <code>psis</code> e <code>profissionais_saude</code></td>
+      <td><span class="badge b-gold">status=aprovado AND premium=true</span></td>
+    </tr>
+    <tr>
+      <td><strong>admin.html</strong></td>
+      <td>Senha em objeto JS</td>
+      <td>Client-side (NIVEIS object)</td>
+      <td><span class="badge b-red">Master</span> <span class="badge b-plum">Sócio</span></td>
+    </tr>
+    <tr>
+      <td><strong>index.html</strong></td>
+      <td>E-mail da psi (editar perfil)</td>
+      <td>Campo <code>email</code> na tabela <code>psis</code></td>
+      <td><span class="badge b-green">Qualquer aprovada</span></td>
+    </tr>
+    <tr>
+      <td><strong>admin-proxy</strong></td>
+      <td>Senha via HTTPS + secrets</td>
+      <td>Edge Function (servidor)</td>
+      <td><span class="badge b-red">Server-side</span></td>
+    </tr>
+  </table>
+
+  <div class="section-label">Senhas do sistema</div>
+  <table class="doc-table">
+    <tr><th>Acesso</th><th>Senha</th><th>Permissões</th></tr>
+    <tr><td>Admin Master</td><td><code>MasterPsi2026!</code></td><td>Tudo: aprovar, premium, editar, excluir, ver senhas, diagnóstico</td></tr>
+    <tr><td>Admin Sócio</td><td><code>SocioPsi2026!</code></td><td>Aprovar, premium, editar — sem excluir e sem ver senhas</td></tr>
+    <tr><td>Pacientes admin</td><td><code>conexaopsi2026</code></td><td>Área de pacientes</td></tr>
+    <tr><td>Pacientes psis</td><td><code>redepsi2026</code></td><td>Área de pacientes (psis)</td></tr>
+    <tr><td>met.html</td><td>E-mail cadastrado</td><td>Acesso se aprovado + premium</td></tr>
+  </table>
+
+  <div class="alert"><strong>⚠️ Segurança:</strong> as senhas admin ficam expostas no HTML (GitHub público). A proteção real é o RLS + Edge Function. Troque as senhas periodicamente e atualize também nos Secrets da Edge Function.</div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FLUXOS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-fluxos">
+  <div class="sec-title">Fluxos Operacionais</div>
+  <div class="sec-sub">Jornadas completas dos principais processos do sistema.</div>
+
+  <div class="section-label">Fluxo 1 — Cadastro e aprovação de psicóloga</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;">
+    <div class="flow" style="flex-wrap:wrap;gap:0.3rem;">
+      <div class="flow-box">Psi preenche Tally</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">INSERT em psis<br><small style="color:var(--muted)">status=pendente</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box dark">Admin vê Pendentes</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">Clica Aprovar</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">admin-proxy PATCH<br><small>status=aprovado</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Psi aparece<br>em index.html</div>
+    </div>
+  </div>
+
+  <div class="section-label">Fluxo 2 — Ativação premium</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;">
+    <div class="flow" style="flex-wrap:wrap;gap:0.3rem;">
+      <div class="flow-box">Psi compra no Kiwify</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box dark">Admin confirma pagamento</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box gold">Clica ✨ Premium</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">admin-proxy PATCH<br><small>premium=true</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">Aparece em divulgacao.html + met.html</div>
+    </div>
+  </div>
+
+  <div class="section-label">Fluxo 3 — Login no met.html</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;">
+    <div class="flow" style="flex-wrap:wrap;gap:0.3rem;">
+      <div class="flow-box">Digita e-mail</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Lookup ilike em psis<br>+ profissionais_saude</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">status=aprovado?</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">premium=true?</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">Acesso liberado</div>
+    </div>
+    <div style="margin-top:0.8rem;font-size:0.76rem;color:var(--muted);">
+      Se e-mail não encontrado → <span class="badge b-red">E-mail não cadastrado</span> &nbsp;
+      Se não aprovado → <span class="badge b-orange">Cadastro pendente</span> &nbsp;
+      Se não premium → <span class="badge b-gold">Upgrade necessário</span>
+    </div>
+  </div>
+
+  <div class="section-label">Fluxo 4 — Encaminhamento cruzado</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;">
+    <div class="flow" style="flex-wrap:wrap;gap:0.3rem;">
+      <div class="flow-box">Psi preenche indicação</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">INSERT encaminhamentos<br><small>status=disponivel</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">WA notifica admin</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box dark">Outro profissional<br>clica "Tenho interesse"</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">PATCH interessados[]</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">Admin libera contato</div>
+    </div>
+  </div>
+
+  <div class="section-label">Fluxo 5 — Upload de foto (admin)</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.4rem;">
+    <div class="flow" style="flex-wrap:wrap;gap:0.3rem;">
+      <div class="flow-box">Admin seleciona arquivo</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">FileReader → base64</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box teal">POST clever-handler<br><small>{id, email, foto, filename}</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Upload Storage</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box green">Retorna URL pública</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">PATCH foto_url via admin-proxy</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEGURANÇA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-seguranca">
+  <div class="sec-title">Segurança</div>
+  <div class="sec-sub">Modelo de segurança baseado em RLS + Edge Function. A anon key é pública por design — a proteção real está nas policies do banco.</div>
+
+  <div class="section-label">Matriz de permissões (estado final)</div>
+  <table class="doc-table">
+    <tr><th>Agente</th><th>SELECT</th><th>INSERT</th><th>UPDATE</th><th>DELETE</th></tr>
+    <tr>
+      <td>Qualquer visitante (anon key)</td>
+      <td class="ok">✅ tudo</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>Tally (webhook, anon key)</td>
+      <td class="ok">✅</td><td class="ok">✅ psis/meds</td><td class="no">❌</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>met.html (anon key)</td>
+      <td class="ok">✅</td><td class="ok">✅ enc.</td><td class="ok">✅ enc.</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>admin.html — Sócio (via Edge Fn)</td>
+      <td class="ok">✅</td><td class="ef">Edge Fn</td><td class="ef">Edge Fn</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>admin.html — Master (via Edge Fn)</td>
+      <td class="ok">✅</td><td class="ef">Edge Fn</td><td class="ef">Edge Fn</td><td class="ef">Edge Fn</td>
+    </tr>
+  </table>
+
+  <div class="section-label">RLS policies ativas (7 total)</div>
+  <table class="doc-table">
+    <tr><th>Tabela</th><th>Policy</th><th>Operação</th></tr>
+    <tr><td>psis</td><td><code>select_psis</code></td><td>SELECT</td></tr>
+    <tr><td>psis</td><td><code>insert_psis</code></td><td>INSERT</td></tr>
+    <tr><td>profissionais_saude</td><td><code>select_profissionais_saude</code></td><td>SELECT</td></tr>
+    <tr><td>profissionais_saude</td><td><code>insert_profissionais_saude</code></td><td>INSERT</td></tr>
+    <tr><td>encaminhamentos_cruzados</td><td><code>select_encaminhamentos</code></td><td>SELECT</td></tr>
+    <tr><td>encaminhamentos_cruzados</td><td><code>insert_encaminhamentos</code></td><td>INSERT</td></tr>
+    <tr><td>encaminhamentos_cruzados</td><td><code>update_encaminhamentos</code></td><td>UPDATE</td></tr>
+  </table>
+
+  <div class="section-label">Edge Function — admin-proxy</div>
+  <table class="doc-table">
+    <tr><th>Validação</th><th>Resposta se falhar</th></tr>
+    <tr><td>Senha não bate com nenhum secret</td><td><code>401 Não autorizado</code></td></tr>
+    <tr><td>Tabela não está na whitelist</td><td><code>400 Tabela não permitida</code></td></tr>
+    <tr><td>Sócio tentando deletar</td><td><code>403 Apenas Master pode excluir</code></td></tr>
+    <tr><td>update/delete sem id</td><td><code>400 id obrigatório</code></td></tr>
+    <tr><td>insert/update sem payload</td><td><code>400 payload obrigatório</code></td></tr>
+  </table>
+
+  <div class="alert red"><strong>Risco residual:</strong> qualquer pessoa pode fazer INSERT em <code>psis</code> com a anon key. Isso é intencional (Tally precisa). O impacto é baixo pois todos os cadastros chegam como <code>status=pendente</code> e precisam de aprovação manual.</div>
+  <div class="alert green"><strong>Proteção ativa:</strong> UPDATE e DELETE em <code>psis</code> e <code>profissionais_saude</code> só funcionam via <code>service_role</code>, que nunca sai do servidor Supabase.</div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MANUTENÇÃO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section" id="sec-manutencao">
+  <div class="sec-title">Manutenção</div>
+  <div class="sec-sub">Operações rotineiras, SQLs úteis e procedimentos de recuperação.</div>
+
+  <div class="section-label">SQLs de rotina</div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title">📊 Resumo por status</div>
+    <pre><span class="kw">SELECT</span> status, <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> <span class="var">psis</span> <span class="kw">GROUP BY</span> status <span class="kw">ORDER BY</span> status;</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title">✨ Psis premium aprovadas</div>
+    <pre><span class="kw">SELECT</span> nome, crp, email, cidade <span class="kw">FROM</span> <span class="var">psis</span>
+<span class="kw">WHERE</span> premium = <span class="num">true</span> <span class="kw">AND</span> status = <span class="str">'aprovado'</span>
+<span class="kw">ORDER BY</span> nome;</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title">⚠️ Psis sem e-mail (não conseguem logar no met.html)</div>
+    <pre><span class="kw">SELECT</span> nome, crp, handle <span class="kw">FROM</span> <span class="var">psis</span>
+<span class="kw">WHERE</span> email <span class="kw">IS NULL OR</span> email = <span class="str">''</span>;</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title">🔄 Normalizar status (maiúscula → minúscula)</div>
+    <pre><span class="kw">UPDATE</span> <span class="var">psis</span> <span class="kw">SET</span> status = <span class="fn">LOWER</span>(status)
+<span class="kw">WHERE</span> status != <span class="fn">LOWER</span>(status);
+
+<span class="kw">UPDATE</span> <span class="var">profissionais_saude</span> <span class="kw">SET</span> status = <span class="fn">LOWER</span>(status)
+<span class="kw">WHERE</span> status != <span class="fn">LOWER</span>(status);</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title">🧹 Limpar encaminhamentos concluídos (>30 dias)</div>
+    <pre><span class="kw">DELETE FROM</span> <span class="var">encaminhamentos_cruzados</span>
+<span class="kw">WHERE</span> status = <span class="str">'concluido'</span>
+  <span class="kw">AND</span> created_at &lt; <span class="fn">NOW</span>() - <span class="kw">INTERVAL</span> <span class="str">'30 days'</span>;</pre>
+  </div>
+
+  <div class="section-label">Procedimento — troca de senha admin</div>
+  <table class="doc-table">
+    <tr><th>Passo</th><th>Onde</th><th>O que mudar</th></tr>
+    <tr><td>1</td><td>admin.html — objeto <code>NIVEIS</code></td><td>Chave do objeto e valor <code>SENHAS_VISIVEIS</code></td></tr>
+    <tr><td>2</td><td>Supabase → Settings → Edge Functions → Secrets</td><td><code>ADMIN_MASTER_PASSWORD</code> e/ou <code>ADMIN_SOCIO_PASSWORD</code></td></tr>
+    <tr><td>3</td><td>GitHub</td><td>Subir admin.html atualizado</td></tr>
+  </table>
+
+  <div class="section-label">Diagnóstico rápido — checklist quando algo quebra</div>
+  <table class="doc-table">
+    <tr><th>Sintoma</th><th>Causa provável</th><th>Solução</th></tr>
+    <tr><td>Profissionais não aparecem no met.html</td><td>status com maiúscula no banco</td><td>Rodar SQL de normalização</td></tr>
+    <tr><td>Admin não consegue aprovar</td><td>Edge Function não deployada ou secret errado</td><td>Verificar admin-proxy + secrets</td></tr>
+    <tr><td>Tally não cadastra</td><td>RLS bloqueou INSERT</td><td>Verificar policy <code>insert_psis</code></td></tr>
+    <tr><td>met.html não aceita login válido</td><td>e-mail com case diferente</td><td>Query usa ilike — verificar se status está aprovado</td></tr>
+    <tr><td>Foto não aparece após upload</td><td>Tally Storage URL privada ou clever-handler falhou</td><td>Verificar bucket público no Storage</td></tr>
+    <tr><td>Diretório público vazio</td><td>Nenhuma psi com premium=true e status=aprovado</td><td>Ativar premium via admin</td></tr>
+  </table>
+</div>
+
+</div><!-- content -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
