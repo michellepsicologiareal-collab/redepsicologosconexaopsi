@@ -115,7 +115,14 @@ header{background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 100%);padding:0 
 .btn-salvar{flex:1;padding:12px;background:var(--plum);color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
 .btn-fechar{padding:12px 20px;background:#f0ede8;color:var(--muted);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;}
 
-/* ── ENCAMINHAMENTOS ── */
+/* ── UPLOAD FOTO ADMIN ── */
+.foto-admin-wrap{display:flex;align-items:center;gap:12px;padding:10px;background:var(--cream);border:1.5px dashed var(--border);border-radius:10px;}
+.foto-admin-preview{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none;flex-shrink:0;}
+.foto-admin-ini{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:white;flex-shrink:0;background:var(--plum);}
+.foto-admin-controls{flex:1;}
+.foto-admin-controls input[type=file]{font-size:12px;width:100%;color:var(--muted);}
+.foto-admin-status{font-size:11px;margin-top:4px;min-height:14px;}
+.foto-url-toggle{font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;text-decoration:underline;}
 .enc-card{background:white;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;}
 .enc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
 .enc-tipo{font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;}
@@ -214,7 +221,6 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
   <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
   <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico')" style="display:none;">🩺 Diagnóstico</button>
-  <button class="nav-tab" onclick="showTab('documentacao')">📚 Documentação</button>
 </div>
 
 <!-- ── BUSCA GLOBAL ── -->
@@ -374,7 +380,20 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
       <div class="form-group"><label>Premium</label>
         <select id="e-premium"><option value="false">Não</option><option value="true">Sim ✨</option></select>
       </div>
-      <div class="form-group"><label>Foto URL</label><input type="url" id="e-foto"></div>
+      <div class="form-group full">
+        <label>Foto de perfil</label>
+        <div class="foto-admin-wrap">
+          <img id="e-foto-preview" class="foto-admin-preview" src="" alt="preview">
+          <div id="e-foto-ini" class="foto-admin-ini">?</div>
+          <div class="foto-admin-controls">
+            <input type="file" id="e-foto-file" accept="image/jpeg,image/png,image/webp" onchange="previewFotoAdmin('e',this)">
+            <input type="hidden" id="e-foto">
+            <div id="e-foto-status" class="foto-admin-status"></div>
+            <span class="foto-url-toggle" onclick="toggleFotoUrl('e')">↕ Colar URL manualmente</span>
+            <input type="url" id="e-foto-url" placeholder="https://..." style="display:none;width:100%;margin-top:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+          </div>
+        </div>
+      </div>
       <div class="form-group full"><label>Bio</label><textarea id="e-bio"></textarea></div>
     </div>
     <div class="modal-actions">
@@ -407,10 +426,21 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
       <div class="form-group"><label>Premium</label>
         <select id="m-premium"><option value="false">Não</option><option value="true">Sim ✨</option></select>
       </div>
+      <div class="form-group full">
+        <label>Foto de perfil</label>
+        <div class="foto-admin-wrap">
+          <img id="m-foto-preview" class="foto-admin-preview" src="" alt="preview">
+          <div id="m-foto-ini" class="foto-admin-ini">?</div>
+          <div class="foto-admin-controls">
+            <input type="file" id="m-foto-file" accept="image/jpeg,image/png,image/webp" onchange="previewFotoAdmin('m',this)">
+            <input type="hidden" id="m-foto">
+            <div id="m-foto-status" class="foto-admin-status"></div>
+            <span class="foto-url-toggle" onclick="toggleFotoUrl('m')">↕ Colar URL manualmente</span>
+            <input type="url" id="m-foto-url" placeholder="https://..." style="display:none;width:100%;margin-top:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+          </div>
+        </div>
+      </div>
       <div class="form-group full"><label>Bio</label><textarea id="m-bio"></textarea></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-salvar" onclick="salvarMed()">💾 Salvar</button>
       <button class="btn-fechar" onclick="fecharModal('modal-med')">Cancelar</button>
     </div>
   </div>
@@ -467,459 +497,6 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
     <div id="diag-sem-email" style="margin-top:12px;"></div>
   </div>
 </div>
-
-<!-- ══════════════════════════════════════════
-     ABA: DOCUMENTAÇÃO TÉCNICA
-     ══════════════════════════════════════════ -->
-<style>
-/* ── DOCUMENTAÇÃO ── */
-.doc-hero{background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 100%);border-radius:16px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;}
-.doc-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(200,147,74,0.1);filter:blur(40px);}
-.doc-hero-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:white;margin-bottom:4px;position:relative;}
-.doc-hero-title em{color:var(--gold-light);font-style:italic;}
-.doc-hero-sub{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;position:relative;}
-.doc-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:relative;}
-.doc-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;}
-.doc-chip:hover,.doc-chip.active{background:rgba(200,147,74,0.2);border-color:var(--gold);color:var(--gold-light);}
-
-.doc-grid{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start;}
-.doc-nav{background:white;border:1px solid var(--border);border-radius:14px;padding:8px;position:sticky;top:72px;}
-.doc-nav-item{display:block;width:100%;text-align:left;padding:9px 14px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-radius:8px;transition:all 0.15s;}
-.doc-nav-item:hover{background:#f4f2ef;color:var(--plum);}
-.doc-nav-item.active{background:var(--plum);color:white;}
-.doc-nav-sep{height:1px;background:var(--border);margin:6px 8px;}
-
-.doc-content{display:flex;flex-direction:column;gap:14px;}
-.doc-panel{display:none;}
-.doc-panel.active{display:flex;flex-direction:column;gap:14px;}
-
-.doc-card{background:white;border:1px solid var(--border);border-radius:14px;padding:22px;}
-.doc-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--plum);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-.doc-section-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin:16px 0 10px;display:flex;align-items:center;gap:8px;}
-.doc-section-title::after{content:'';flex:1;height:1px;background:rgba(27,94,107,0.12);}
-.doc-p{font-size:13px;color:#555;line-height:1.8;margin-bottom:10px;}
-.doc-note{font-size:12px;color:#7a4e0e;background:#FEF9EE;border:1px solid rgba(200,147,74,0.25);border-left:3px solid var(--gold);border-radius:8px;padding:10px 14px;margin:10px 0;line-height:1.7;}
-.doc-note.danger{color:#7a1a1a;background:#fdecea;border-left-color:var(--red);border-color:rgba(192,57,43,0.2);}
-.doc-note.info{color:#0c3a4a;background:#e6f1fb;border-left-color:var(--teal);border-color:rgba(27,94,107,0.2);}
-.doc-ul{margin:6px 0 10px 18px;display:flex;flex-direction:column;gap:5px;}
-.doc-ul li{font-size:13px;color:#555;line-height:1.6;}
-.doc-ol{margin:6px 0 10px 20px;display:flex;flex-direction:column;gap:6px;}
-.doc-ol li{font-size:13px;color:#555;line-height:1.6;}
-.doc-code{background:#1a1a2e;border-radius:10px;padding:14px 16px;margin:10px 0;font-family:monospace;font-size:12px;color:#a8d8ea;line-height:1.8;white-space:pre-wrap;position:relative;}
-.doc-code .kw{color:#ff9ff3;}
-.doc-code .str{color:#ffd93d;}
-.doc-copy-btn{position:absolute;top:10px;right:10px;padding:4px 10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border:none;border-radius:6px;font-size:10px;cursor:pointer;font-family:'Outfit',sans-serif;}
-.doc-copy-btn:hover{background:rgba(255,255,255,0.2);color:white;}
-
-/* TABLE */
-.doc-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;}
-.doc-table th{background:var(--plum);color:white;padding:9px 12px;text-align:left;font-weight:600;font-size:11px;letter-spacing:0.5px;}
-.doc-table th:first-child{border-radius:8px 0 0 0;}
-.doc-table th:last-child{border-radius:0 8px 0 0;}
-.doc-table td{padding:8px 12px;border-bottom:1px solid #f4f2ef;color:#444;vertical-align:top;line-height:1.5;}
-.doc-table tr:last-child td{border-bottom:none;}
-.doc-table tr:hover td{background:#faf9f8;}
-
-/* STATUS PILLS */
-.spill{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;}
-.spill-ok{background:#eafaf1;color:var(--green);}
-.spill-warn{background:#fef3e8;color:var(--orange);}
-.spill-danger{background:#fdecea;color:var(--red);}
-.spill-info{background:#e6f1fb;color:var(--teal);}
-
-/* FLOW STEPS */
-.doc-flow{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
-.doc-flow-step{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:#f9f8f6;border-radius:9px;border:1px solid var(--border);}
-.doc-flow-num{width:24px;height:24px;border-radius:50%;background:var(--plum);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
-.doc-flow-text{font-size:13px;color:#444;line-height:1.6;}
-.doc-flow-text strong{color:var(--plum);}
-
-@media(max-width:768px){.doc-grid{grid-template-columns:1fr;}.doc-nav{position:static;display:flex;flex-wrap:wrap;gap:4px;padding:6px;}.doc-nav-item{padding:6px 12px;flex-shrink:0;}}
-</style>
-
-<div class="section" id="tab-documentacao">
-  <!-- HERO -->
-  <div class="doc-hero">
-    <div class="doc-hero-title">📚 Documentação <em>Técnica</em></div>
-    <div class="doc-hero-sub">Conexão Psi · Sistema Completo · v1.0 · 2026</div>
-    <div class="doc-chips">
-      <span class="doc-chip active" onclick="docNav('visao',this)">🗺️ Visão Geral</span>
-      <span class="doc-chip" onclick="docNav('stack',this)">⚙️ Stack & Arquitetura</span>
-      <span class="doc-chip" onclick="docNav('banco',this)">🗄️ Banco de Dados</span>
-      <span class="doc-chip" onclick="docNav('paginas',this)">📄 Páginas</span>
-      <span class="doc-chip" onclick="docNav('auth',this)">🔐 Autenticação</span>
-      <span class="doc-chip" onclick="docNav('fluxos',this)">🔄 Fluxos</span>
-      <span class="doc-chip" onclick="docNav('seguranca',this)">🛡️ Segurança</span>
-      <span class="doc-chip" onclick="docNav('manutencao',this)">🔧 Manutenção</span>
-    </div>
-  </div>
-
-  <div class="doc-grid">
-    <!-- MENU LATERAL -->
-    <div class="doc-nav" id="doc-sidenav">
-      <button class="doc-nav-item active" onclick="docNav('visao',this)">🗺️ Visão Geral</button>
-      <button class="doc-nav-item" onclick="docNav('stack',this)">⚙️ Stack & Arquitetura</button>
-      <button class="doc-nav-item" onclick="docNav('banco',this)">🗄️ Banco de Dados</button>
-      <div class="doc-nav-sep"></div>
-      <button class="doc-nav-item" onclick="docNav('paginas',this)">📄 Todas as Páginas</button>
-      <button class="doc-nav-item" onclick="docNav('auth',this)">🔐 Autenticação</button>
-      <button class="doc-nav-item" onclick="docNav('fluxos',this)">🔄 Fluxos Operacionais</button>
-      <div class="doc-nav-sep"></div>
-      <button class="doc-nav-item" onclick="docNav('seguranca',this)">🛡️ Segurança</button>
-      <button class="doc-nav-item" onclick="docNav('manutencao',this)">🔧 Manutenção</button>
-    </div>
-
-    <!-- CONTEÚDO -->
-    <div class="doc-content">
-
-      <!-- ════ VISÃO GERAL ════ -->
-      <div class="doc-panel active" id="doc-visao">
-        <div class="doc-card">
-          <div class="doc-card-title">🗺️ Visão Geral do Sistema</div>
-          <p class="doc-p">A <strong>Conexão Psi</strong> é uma plataforma web colaborativa para gerenciar uma rede de psicólogos. Permite cadastro, aprovação, gestão de perfis, encaminhamento de pacientes e captação pública via diretório premium.</p>
-          <div class="doc-section-title">Objetivos</div>
-          <ul class="doc-ul">
-            <li>Diretório colaborativo com perfis gratuitos e premium</li>
-            <li>Encaminhamento de pacientes entre membros da rede</li>
-            <li>Visibilidade pública para captação orgânica de clientes</li>
-            <li>Monetização via assinatura Premium (R$27,90/mês, 1ª cobrança R$20)</li>
-            <li>Rastreamento de origem de visitantes via UTM</li>
-          </ul>
-          <div class="doc-section-title">Tipos de Usuário</div>
-          <table class="doc-table">
-            <tr><th>Usuário</th><th>Acesso</th><th>Função Principal</th></tr>
-            <tr><td>Psicóloga (membro)</td><td>Email cadastrado</td><td>Perfil, encaminhamentos, área pessoal</td></tr>
-            <tr><td>Administrador</td><td>conexaopsi2026</td><td>Gestão completa do sistema</td></tr>
-            <tr><td>Master</td><td>Senha especial</td><td>Tudo + exclusão permanente</td></tr>
-            <tr><td>Sócio</td><td>Senha de sócio</td><td>Visualização e funções restritas</td></tr>
-            <tr><td>Paciente / Público</td><td>Sem login</td><td>Apenas a página pública (divulgacao.html)</td></tr>
-          </table>
-          <div class="doc-section-title">Estrutura de Arquivos</div>
-          <table class="doc-table">
-            <tr><th>Arquivo</th><th>Descrição</th><th>Acesso</th></tr>
-            <tr><td><code>index.html</code></td><td>Diretório interno — área dos membros</td><td><span class="spill spill-warn">Senha</span></td></tr>
-            <tr><td><code>divulgacao.html</code></td><td>Vitrine pública de captação de pacientes</td><td><span class="spill spill-ok">Público</span></td></tr>
-            <tr><td><code>admin.html</code></td><td>Painel administrativo completo</td><td><span class="spill spill-danger">Admin</span></td></tr>
-            <tr><td><code>pacientes.html</code></td><td>Gestão de encaminhamentos entre psis</td><td><span class="spill spill-warn">Senha</span></td></tr>
-            <tr><td><code>perfil.html</code></td><td>Área pessoal de cada psicóloga</td><td><span class="spill spill-info">Email</span></td></tr>
-            <tr><td><code>planos.html</code></td><td>Apresentação dos planos Gratuito e Premium</td><td><span class="spill spill-ok">Público</span></td></tr>
-            <tr><td><code>sistema.html</code></td><td>Guia de links e fluxo do sistema</td><td><span class="spill spill-ok">Público</span></td></tr>
-            <tr><td><code>obrigado.html</code></td><td>Pós-conversão Premium</td><td><span class="spill spill-ok">Público</span></td></tr>
-            <tr><td><code>met.html</code></td><td>Rede multidisciplinar PsiMed</td><td><span class="spill spill-info">Email</span></td></tr>
-            <tr><td><code>teste_psimed.html</code></td><td>Diagnóstico técnico do sistema</td><td><span class="spill spill-ok">Técnico</span></td></tr>
-            <tr><td><code>visitas_divulgacao.sql</code></td><td>Script SQL para tabela de UTM</td><td><span class="spill spill-info">Backend</span></td></tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- ════ STACK ════ -->
-      <div class="doc-panel" id="doc-stack">
-        <div class="doc-card">
-          <div class="doc-card-title">⚙️ Stack & Arquitetura</div>
-          <table class="doc-table">
-            <tr><th>Camada</th><th>Tecnologia</th><th>Detalhes</th></tr>
-            <tr><td>Frontend</td><td>HTML5 + CSS3 + Vanilla JS</td><td>Sem framework — direto no browser</td></tr>
-            <tr><td>Backend / BaaS</td><td>Supabase (PostgreSQL + REST)</td><td>tjtrdfbckgdgvcegdsbz.supabase.co</td></tr>
-            <tr><td>Hospedagem</td><td>GitHub Pages</td><td>michellepsicologiareal-collab/redepsicologosconexaopsi</td></tr>
-            <tr><td>Fontes</td><td>Google Fonts</td><td>Cormorant Garamond + Outfit (CDN)</td></tr>
-            <tr><td>Formulário</td><td>Tally.so (externo)</td><td>https://tally.so/r/b5OGYZ</td></tr>
-            <tr><td>Pagamento</td><td>WhatsApp (manual)</td><td>Sem gateway automático integrado</td></tr>
-          </table>
-          <div class="doc-section-title">Comunicação com o Backend</div>
-          <p class="doc-p">Toda comunicação usa a API REST do Supabase diretamente no navegador via <code>fetch()</code>. Não há servidor intermediário.</p>
-          <div class="doc-code"><button class="doc-copy-btn" onclick="copiarCodigo(this)">Copiar</button><span class="kw">const</span> SB  = <span class="str">'https://tjtrdfbckgdgvcegdsbz.supabase.co'</span>;
-<span class="kw">const</span> KEY = <span class="str">'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'</span>;
-<span class="kw">const</span> H   = { <span class="str">'apikey'</span>: KEY, <span class="str">'Authorization'</span>: <span class="str">'Bearer '</span> + KEY };
-
-<span class="kw">async function</span> api(method, path, body) {
-  <span class="kw">const</span> r = <span class="kw">await</span> fetch(SB + <span class="str">'/rest/v1/'</span> + path, { method, headers: H,
-    body: body ? JSON.stringify(body) : undefined });
-  <span class="kw">return</span> r.json();
-}</div>
-          <div class="doc-note danger">⚠️ A chave anon KEY está exposta no HTML (lado cliente). Qualquer pessoa pode inspecioná-la. O RLS do Supabase é a principal camada de proteção — mantenha-o corretamente configurado.</div>
-          <div class="doc-section-title">URL publicada</div>
-          <p class="doc-p"><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/" target="_blank" style="color:var(--violet);">https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/</a></p>
-        </div>
-      </div>
-
-      <!-- ════ BANCO DE DADOS ════ -->
-      <div class="doc-panel" id="doc-banco">
-        <div class="doc-card">
-          <div class="doc-card-title">🗄️ Tabela: <code>psis</code></div>
-          <p class="doc-p">Tabela principal. Armazena todos os psicólogos da rede.</p>
-          <table class="doc-table">
-            <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
-            <tr><td>id</td><td>UUID / Serial</td><td>Chave primária</td></tr>
-            <tr><td>nome</td><td>TEXT</td><td>Nome completo</td></tr>
-            <tr><td>crp</td><td>TEXT</td><td>Número de registro CRP</td></tr>
-            <tr><td>email</td><td>TEXT</td><td>Email de acesso ao perfil.html</td></tr>
-            <tr><td>handle</td><td>TEXT</td><td>Instagram (sem @)</td></tr>
-            <tr><td>cidade / estado</td><td>TEXT</td><td>Localização</td></tr>
-            <tr><td>abordagem</td><td>TEXT</td><td>TCC, Psicanálise, Humanista…</td></tr>
-            <tr><td>formato</td><td>TEXT</td><td>Online, Presencial ou Ambos</td></tr>
-            <tr><td>status</td><td>TEXT</td><td><code>pendente</code> | <code>aprovado</code> | <code>reprovado</code></td></tr>
-            <tr><td>premium</td><td>BOOLEAN</td><td>true = aparece em destaque no diretório público</td></tr>
-            <tr><td>whatsapp</td><td>TEXT</td><td>Número de agendamento (só dígitos)</td></tr>
-            <tr><td>valor</td><td>TEXT</td><td>Valor da sessão (texto livre)</td></tr>
-            <tr><td>disponibilidade</td><td>TEXT</td><td>Horários disponíveis</td></tr>
-            <tr><td>bio</td><td>TEXT</td><td>Mini bio (visível apenas premium)</td></tr>
-            <tr><td>especialidades</td><td>TEXT / JSON</td><td>Array de especialidades (até 5)</td></tr>
-            <tr><td>foto_url</td><td>TEXT</td><td>URL da foto de perfil</td></tr>
-            <tr><td>created_at</td><td>TIMESTAMP</td><td>Data de cadastro</td></tr>
-          </table>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">🗄️ Tabela: <code>pacientes</code></div>
-          <p class="doc-p">Pacientes encaminhados na rede.</p>
-          <table class="doc-table">
-            <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
-            <tr><td>id</td><td>UUID</td><td>Chave primária</td></tr>
-            <tr><td>demanda</td><td>TEXT</td><td>Descrição do caso</td></tr>
-            <tr><td>status</td><td>TEXT</td><td>disponivel | interessados | em_atendimento | concluido | declinou</td></tr>
-            <tr><td>urgencia</td><td>TEXT</td><td>alta | media | baixa</td></tr>
-            <tr><td>tipo</td><td>TEXT</td><td>psi | psiq | nutri | neuro | fisio</td></tr>
-            <tr><td>interessados</td><td>TEXT[]</td><td>Array de psis que manifestaram interesse</td></tr>
-            <tr><td>psi_responsavel</td><td>TEXT</td><td>Psicóloga responsável pelo atendimento</td></tr>
-            <tr><td>whatsapp_paciente</td><td>TEXT</td><td>Contato do paciente</td></tr>
-            <tr><td>created_at</td><td>TIMESTAMP</td><td>Data de entrada</td></tr>
-          </table>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">🗄️ Demais Tabelas</div>
-          <div class="doc-section-title">profissionais_saude</div>
-          <p class="doc-p">Médicos e outros profissionais para o módulo PsiMed (met.html). Colunas: id, nome, especialidade, crm_crp_etc, email, status, created_at.</p>
-          <div class="doc-section-title">encaminhamentos_cruzados</div>
-          <p class="doc-p">Indicações entre psicólogos e outros profissionais no PsiMed. Colunas: id, tipo_profissional, urgencia, demanda, status, quem_indicou, whatsapp_paciente, created_at.</p>
-          <div class="doc-section-title">visitas_divulgacao</div>
-          <p class="doc-p">Rastreamento UTM de visitantes da página pública. Criada pelo arquivo <code>visitas_divulgacao.sql</code>.</p>
-          <div class="doc-code"><button class="doc-copy-btn" onclick="copiarCodigo(this)">Copiar</button><span class="kw">-- Origens dos últimos 30 dias</span>
-<span class="kw">SELECT</span> source, <span class="kw">COUNT</span>(*) <span class="kw">as</span> visitas
-<span class="kw">FROM</span> visitas_divulgacao
-<span class="kw">WHERE</span> created_at > NOW() - INTERVAL <span class="str">'30 days'</span>
-<span class="kw">GROUP BY</span> source <span class="kw">ORDER BY</span> visitas <span class="kw">DESC</span>;</div>
-          <div class="doc-note info">💡 Para criar a tabela <code>visitas_divulgacao</code>: Supabase → SQL Editor → cole o conteúdo do arquivo <code>visitas_divulgacao.sql</code> → Run.</div>
-        </div>
-      </div>
-
-      <!-- ════ PÁGINAS ════ -->
-      <div class="doc-panel" id="doc-paginas">
-        <div class="doc-card">
-          <div class="doc-card-title">📄 index.html — Diretório Interno</div>
-          <p class="doc-p">Página principal da rede. Exibe o diretório de psicólogos com busca, filtros e edição de perfil inline.</p>
-          <ul class="doc-ul">
-            <li>Estatísticas dinâmicas (total de profissionais e premium)</li>
-            <li>Busca por nome, especialidade, cidade</li>
-            <li>Filtros por abordagem, formato e estado</li>
-            <li>Cards diferenciados para membros premium</li>
-            <li>Modal de edição de perfil inline por email</li>
-            <li>Seção de convite com mensagem copiável para WhatsApp</li>
-          </ul>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">📄 divulgacao.html — Página Pública</div>
-          <p class="doc-p">Vitrine pública para pacientes encontrarem psicólogos. Exibe apenas profissionais com <code>status = aprovado</code> e <code>premium = true</code>.</p>
-          <ul class="doc-ul">
-            <li>Busca e filtros por abordagem e formato</li>
-            <li>Cards com bio, especialidades, valor e botão WhatsApp</li>
-            <li>Rastreamento automático de visitas por UTM</li>
-            <li>CTA para novos psicólogos se cadastrarem</li>
-          </ul>
-          <div class="doc-section-title">Links UTM prontos</div>
-          <div class="doc-code"><button class="doc-copy-btn" onclick="copiarCodigo(this)">Copiar</button>Instagram Bio:
-divulgacao.html?utm_source=instagram&utm_medium=bio&utm_campaign=rede
-
-Instagram Stories:
-divulgacao.html?utm_source=instagram&utm_medium=stories&utm_campaign=rede
-
-WhatsApp Grupo:
-divulgacao.html?utm_source=whatsapp&utm_medium=grupo&utm_campaign=rede</div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">📄 pacientes.html — Encaminhamentos</div>
-          <p class="doc-p">Gestão do fluxo de pacientes entre membros da rede. Acesso via senha.</p>
-          <table class="doc-table">
-            <tr><th>Status</th><th>Significado</th><th>Ação Disponível</th></tr>
-            <tr><td><span class="spill spill-ok">disponivel</span></td><td>Aguardando interesse</td><td>Psi clica "Tenho interesse"</td></tr>
-            <tr><td><span class="spill spill-warn">interessados</span></td><td>Psis interessadas (máx 3)</td><td>Admin libera para atendimento</td></tr>
-            <tr><td><span class="spill spill-info">em_atendimento</span></td><td>Atendimento em curso</td><td>Psi finaliza ou declina</td></tr>
-            <tr><td><span class="spill" style="background:#F0EDF8;color:#5B3FA0;">concluido</span></td><td>Caso encerrado</td><td>Arquivo</td></tr>
-            <tr><td><span class="spill" style="background:#f0eff4;color:#6B6480;">declinou</span></td><td>Psi não pôde atender</td><td>Admin reativa</td></tr>
-          </table>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">📄 perfil.html — Área da Psicóloga</div>
-          <p class="doc-p">Portal pessoal onde cada psicóloga edita seu perfil usando <strong>apenas o email</strong> cadastrado (sem senha).</p>
-          <div class="doc-section-title">Campos Editáveis</div>
-          <ul class="doc-ul">
-            <li>WhatsApp de atendimento · Valor da sessão · Disponibilidade</li>
-            <li>Público atendido · Mini bio (só premium) · Especialidades (até 5)</li>
-          </ul>
-          <div class="doc-section-title">Campos Somente Leitura</div>
-          <ul class="doc-ul">
-            <li>Nome · CRP · Email · Instagram · Abordagem · Formato</li>
-          </ul>
-          <div class="doc-note">Para alterar dados cadastrais, contato via WhatsApp da administração: <strong>5511947388423</strong></div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">📄 met.html — Módulo PsiMed</div>
-          <p class="doc-p">Rede multidisciplinar que conecta psicólogos com médicos e outros profissionais para encaminhamentos cruzados.</p>
-          <table class="doc-table">
-            <tr><th>Especialidade</th><th>Código</th></tr>
-            <tr><td>Psicólogo</td><td>psi</td></tr>
-            <tr><td>Psiquiatra</td><td>psiq</td></tr>
-            <tr><td>Nutricionista</td><td>nutri</td></tr>
-            <tr><td>Neurologista</td><td>neuro</td></tr>
-            <tr><td>Fisioterapeuta</td><td>fisio</td></tr>
-            <tr><td>Clínica Geral</td><td>clinica</td></tr>
-          </table>
-          <div class="doc-note danger">⚠️ A tabela <code>encaminhamentos_cruzados</code> precisa ser criada manualmente no Supabase antes do primeiro uso do met.html. Use o teste_psimed.html para verificar.</div>
-        </div>
-      </div>
-
-      <!-- ════ AUTENTICAÇÃO ════ -->
-      <div class="doc-panel" id="doc-auth">
-        <div class="doc-card">
-          <div class="doc-card-title">🔐 Métodos de Autenticação por Página</div>
-          <table class="doc-table">
-            <tr><th>Página</th><th>Método</th><th>Credencial</th><th>Risco</th></tr>
-            <tr><td>admin.html</td><td>Senha hardcoded</td><td>conexaopsi2026 (admin)</td><td><span class="spill spill-danger">Alto</span></td></tr>
-            <tr><td>pacientes.html</td><td>Senha hardcoded</td><td>redepsi2026 (psi)</td><td><span class="spill spill-danger">Alto</span></td></tr>
-            <tr><td>perfil.html</td><td>Email no banco</td><td>Email da tabela psis</td><td><span class="spill spill-warn">Médio</span></td></tr>
-            <tr><td>met.html</td><td>Email no banco</td><td>Email em psis ou prof_saude</td><td><span class="spill spill-warn">Médio</span></td></tr>
-            <tr><td>index.html</td><td>Email no banco</td><td>Email da tabela psis</td><td><span class="spill spill-warn">Médio</span></td></tr>
-            <tr><td>divulgacao.html</td><td>Nenhum</td><td>—</td><td><span class="spill spill-ok">Público</span></td></tr>
-          </table>
-          <div class="doc-note danger">⚠️ As senhas <code>conexaopsi2026</code> e <code>redepsi2026</code> estão visíveis no código-fonte HTML. Qualquer pessoa pode obtê-las inspecionando a página. Para aumentar a segurança futuramente, migrar para Supabase Auth com tokens JWT.</div>
-          <div class="doc-section-title">Níveis de Admin</div>
-          <table class="doc-table">
-            <tr><th>Nível</th><th>Permissões Extras</th></tr>
-            <tr><td><strong>Master</strong></td><td>Todas as funções + botão Excluir registros (master-only)</td></tr>
-            <tr><td><strong>Admin</strong></td><td>Aprovar/reprovar psis, ativar premium, editar, visualizar tudo</td></tr>
-            <tr><td><strong>Sócio</strong></td><td>Visualização + funções limitadas</td></tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- ════ FLUXOS ════ -->
-      <div class="doc-panel" id="doc-fluxos">
-        <div class="doc-card">
-          <div class="doc-card-title">🔄 Cadastro de Nova Psicóloga</div>
-          <div class="doc-flow">
-            <div class="doc-flow-step"><div class="doc-flow-num">1</div><div class="doc-flow-text">Psicóloga preenche formulário em <strong>tally.so/r/b5OGYZ</strong></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">2</div><div class="doc-flow-text">Tally envia dados para tabela <strong>psis</strong> com <code>status = pendente</code></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">3</div><div class="doc-flow-text">Admin acessa <strong>admin.html → aba Pendentes</strong>, verifica CRP no site do CFP</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">4</div><div class="doc-flow-text">Admin clica <strong>Aprovar</strong> → <code>status = aprovado</code></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">5</div><div class="doc-flow-text">Psicóloga é notificada pelo WhatsApp e acessa <strong>perfil.html</strong> para completar perfil</div></div>
-          </div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">🔄 Ativação de Perfil Premium</div>
-          <div class="doc-flow">
-            <div class="doc-flow-step"><div class="doc-flow-num">1</div><div class="doc-flow-text">Psicóloga acessa <strong>planos.html</strong> → clica "Assinar Premium"</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">2</div><div class="doc-flow-text">WhatsApp da administração abre com mensagem pré-formatada</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">3</div><div class="doc-flow-text">Admin recebe pagamento (PIX ou método combinado)</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">4</div><div class="doc-flow-text">Admin acessa <strong>admin.html</strong> → localiza a psi → clica <strong>Ativar Premium</strong> → <code>premium = true</code></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">5</div><div class="doc-flow-text">Perfil passa a aparecer em <strong>destaque</strong> em <strong>divulgacao.html</strong></div></div>
-          </div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-card-title">🔄 Encaminhamento de Paciente</div>
-          <div class="doc-flow">
-            <div class="doc-flow-step"><div class="doc-flow-num">1</div><div class="doc-flow-text">Paciente é cadastrado no sistema com <code>status = disponivel</code></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">2</div><div class="doc-flow-text">Aparece na aba <strong>Disponíveis</strong> do pacientes.html</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">3</div><div class="doc-flow-text">Psicóloga clica <strong>"Tenho interesse"</strong> — nome entra no array <code>interessados</code> (máx 3)</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">4</div><div class="doc-flow-text">Admin libera para atendimento → <code>status = em_atendimento</code></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">5</div><div class="doc-flow-text">Psicóloga responsável contata paciente pelo WhatsApp</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">6</div><div class="doc-flow-text">Ao finalizar → clica <strong>"Concluir"</strong> → <code>status = concluido</code></div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════ SEGURANÇA ════ -->
-      <div class="doc-panel" id="doc-seguranca">
-        <div class="doc-card">
-          <div class="doc-card-title">🛡️ Vulnerabilidades & Recomendações</div>
-          <table class="doc-table">
-            <tr><th>Item</th><th>Risco</th><th>Recomendação</th></tr>
-            <tr><td>Senhas hardcoded no HTML</td><td><span class="spill spill-danger">Alto</span></td><td>Migrar para Supabase Auth com tokens JWT</td></tr>
-            <tr><td>Chave anon exposta</td><td><span class="spill spill-warn">Médio</span></td><td>Manter RLS corretamente configurado em todas as tabelas</td></tr>
-            <tr><td>RLS desabilitado em visitas_divulgacao</td><td><span class="spill spill-ok">Baixo</span></td><td>Aceitável — tabela só registra visitas públicas</td></tr>
-            <tr><td>Sem validação server-side</td><td><span class="spill spill-warn">Médio</span></td><td>Adicionar validações via Supabase Edge Functions</td></tr>
-            <tr><td>Sem rate limiting</td><td><span class="spill spill-warn">Médio</span></td><td>Configurar rate limiting no Supabase ou no Tally</td></tr>
-            <tr><td>Pagamento manual (WhatsApp)</td><td><span class="spill spill-danger">Alto (operacional)</span></td><td>Integrar gateway real (Stripe, Mercado Pago) futuramente</td></tr>
-          </table>
-          <div class="doc-section-title">Boas Práticas Implementadas</div>
-          <ul class="doc-ul">
-            <li>Uso da chave <code>anon</code> (não a <code>service_role</code>) no frontend</li>
-            <li>Dados de pacientes com identificação mínima (sem prontuário clínico)</li>
-            <li>Verificação de CRP manual antes da aprovação</li>
-            <li>Campos <code>premium</code> e <code>status</code> só alteráveis pelo admin</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ════ MANUTENÇÃO ════ -->
-      <div class="doc-panel" id="doc-manutencao">
-        <div class="doc-card">
-          <div class="doc-card-title">🔧 Tarefas Rotineiras</div>
-          <table class="doc-table">
-            <tr><th>Tarefa</th><th>Frequência</th><th>Como Fazer</th></tr>
-            <tr><td>Aprovar novas psicólogas</td><td>Conforme chegam</td><td>admin.html → aba Pendentes → Aprovar</td></tr>
-            <tr><td>Ativar perfis premium</td><td>Após pagamento</td><td>admin.html → localizar psi → botão Premium</td></tr>
-            <tr><td>Revisar encaminhamentos</td><td>Semanal</td><td>pacientes.html → verificar casos parados</td></tr>
-            <tr><td>Analisar visitas UTM</td><td>Mensal</td><td>Supabase SQL Editor → queries da seção Analytics</td></tr>
-            <tr><td>Verificar sistema</td><td>Conforme necessário</td><td>teste_psimed.html → Rodar diagnóstico</td></tr>
-          </table>
-          <div class="doc-section-title">Como Atualizar o Site</div>
-          <div class="doc-flow">
-            <div class="doc-flow-step"><div class="doc-flow-num">1</div><div class="doc-flow-text">Acesse o repositório no <strong>GitHub</strong></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">2</div><div class="doc-flow-text">Edite o arquivo HTML desejado (botão "Edit" ✏️)</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">3</div><div class="doc-flow-text">Faça commit com mensagem descritiva: <em>"Commit changes"</em></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">4</div><div class="doc-flow-text">GitHub Pages atualiza automaticamente em alguns minutos</div></div>
-          </div>
-          <div class="doc-section-title">Criar tabela encaminhamentos_cruzados (PsiMed)</div>
-          <div class="doc-flow">
-            <div class="doc-flow-step"><div class="doc-flow-num">1</div><div class="doc-flow-text">Acesse <strong>supabase.com/dashboard</strong> → seu projeto</div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">2</div><div class="doc-flow-text">Vá em <strong>SQL Editor</strong></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">3</div><div class="doc-flow-text">Cole o SQL de criação da tabela e clique <strong>Run</strong></div></div>
-            <div class="doc-flow-step"><div class="doc-flow-num">4</div><div class="doc-flow-text">Confirme no <strong>teste_psimed.html</strong> rodando o diagnóstico completo</div></div>
-          </div>
-          <div class="doc-note info">💡 Links úteis: <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--teal);">Supabase Dashboard</a> · <a href="https://github.com/michellepsicologiareal-collab/redepsicologosconexaopsi" target="_blank" style="color:var(--teal);">GitHub Repositório</a> · <a href="https://tally.so/r/b5OGYZ" target="_blank" style="color:var(--teal);">Formulário Tally</a></div>
-        </div>
-      </div>
-
-    </div><!-- /doc-content -->
-  </div><!-- /doc-grid -->
-</div><!-- /tab-documentacao -->
-
-<script>
-function docNav(panel, el) {
-  // Atualiza painéis
-  document.querySelectorAll('.doc-panel').forEach(p => p.classList.remove('active'));
-  const target = document.getElementById('doc-' + panel);
-  if (target) target.classList.add('active');
-  // Atualiza nav lateral
-  document.querySelectorAll('.doc-nav-item').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.doc-chip').forEach(b => b.classList.remove('active'));
-  // Marca o elemento clicado
-  if (el) el.classList.add('active');
-  // Sincroniza nav lateral e chips
-  document.querySelectorAll('.doc-nav-item, .doc-chip').forEach(b => {
-    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + panel + "'")) {
-      b.classList.add('active');
-    }
-  });
-}
-
-function copiarCodigo(btn) {
-  const block = btn.closest('.doc-code');
-  const text = block.innerText.replace('Copiar\n', '').trim();
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copiado!';
-    setTimeout(() => btn.textContent = 'Copiar', 2000);
-  });
-}
-</script>
 
 <footer>Conexão Psi · Painel Admin · <span id="footer-nivel"></span></footer>
 
@@ -1320,10 +897,45 @@ function abrirEditPsi(id) {
   document.getElementById('e-foto').value=p.foto_url||'';
   document.getElementById('e-status').value=p.status||'pendente';
   document.getElementById('e-premium').value=p.premium?'true':'false';
+  // Foto: preview ou iniciais
+  resetFotoAdmin('e', p.foto_url, p.nome);
+  document.getElementById('e-foto-file').value='';
+  document.getElementById('e-foto-status').textContent='';
   document.getElementById('modal-psi').classList.add('open');
 }
 async function salvarPsi() {
   if(!editPsiId) return;
+  const btn = document.querySelector('#modal-psi .btn-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  // Resolve foto: file upload > URL manual > hidden atual
+  let fotoUrl = document.getElementById('e-foto').value.trim();
+  const urlManual = document.getElementById('e-foto-url').value.trim();
+  if (urlManual) fotoUrl = urlManual;
+
+  const fotoFile = document.getElementById('e-foto-file').files[0];
+  if (fotoFile) {
+    try {
+      btn.textContent = 'Enviando foto...';
+      document.getElementById('e-foto-status').textContent = '⏳ Enviando...';
+      const email = document.getElementById('e-email').value.trim();
+      const base64 = await fileToBase64(fotoFile);
+      const r = await fetch(`${SB}/functions/v1/clever-handler`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: editPsiId, email, foto: base64, filename: fotoFile.name })
+      });
+      const res = await r.json();
+      if (!r.ok) throw new Error(res.error || 'Erro no upload');
+      fotoUrl = res.url;
+      document.getElementById('e-foto-status').textContent = '✅ Upload feito';
+    } catch(e) {
+      toast('Erro no upload da foto: '+e.message,'err');
+      btn.disabled=false; btn.textContent='💾 Salvar';
+      return;
+    }
+  }
+
   const updates = {
     nome:document.getElementById('e-nome').value.trim(),
     crp:document.getElementById('e-crp').value.trim(),
@@ -1337,7 +949,7 @@ async function salvarPsi() {
     valor_sessao:document.getElementById('e-valor').value.trim(),
     especialidades:document.getElementById('e-especialidades').value.trim(),
     bio:document.getElementById('e-bio').value.trim(),
-    foto_url:document.getElementById('e-foto').value.trim(),
+    foto_url: fotoUrl,
     status:document.getElementById('e-status').value,
     premium:document.getElementById('e-premium').value==='true'
   };
@@ -1346,6 +958,7 @@ async function salvarPsi() {
     const p = todosPsis.find(x=>x.id===editPsiId); if(p) Object.assign(p,updates);
     fecharModal('modal-psi'); atualizarStatsPsi(); renderPsis(); toast('✅ Salvo!');
   } catch(e) { toast('Erro: '+e.message,'err'); }
+  finally { btn.disabled=false; btn.textContent='💾 Salvar'; }
 }
 
 // ═══════════════════════════════════════════════
@@ -1425,10 +1038,42 @@ function abrirEditMed(id) {
   document.getElementById('m-status').value=p.status||'pendente';
   document.getElementById('m-premium').value=p.premium?'true':'false';
   document.getElementById('m-bio').value=p.bio||'';
+  document.getElementById('m-foto').value=p.foto_url||'';
+  resetFotoAdmin('m', p.foto_url, p.nome);
+  document.getElementById('m-foto-file').value='';
+  document.getElementById('m-foto-status').textContent='';
   document.getElementById('modal-med').classList.add('open');
 }
 async function salvarMed() {
   if(!editMedId) return;
+  const btn = document.querySelector('#modal-med .btn-salvar');
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  let fotoUrl = document.getElementById('m-foto').value.trim();
+  const urlManual = document.getElementById('m-foto-url').value.trim();
+  if (urlManual) fotoUrl = urlManual;
+
+  const fotoFile = document.getElementById('m-foto-file').files[0];
+  if (fotoFile) {
+    try {
+      btn.textContent='Enviando foto...';
+      document.getElementById('m-foto-status').textContent='⏳ Enviando...';
+      const email = document.getElementById('m-email').value.trim();
+      const base64 = await fileToBase64(fotoFile);
+      const r = await fetch(`${SB}/functions/v1/clever-handler`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: editMedId, email, foto: base64, filename: fotoFile.name })
+      });
+      const res = await r.json();
+      if (!r.ok) throw new Error(res.error || 'Erro no upload');
+      fotoUrl = res.url;
+      document.getElementById('m-foto-status').textContent='✅ Upload feito';
+    } catch(e) {
+      toast('Erro no upload da foto: '+e.message,'err');
+      btn.disabled=false; btn.textContent='💾 Salvar'; return;
+    }
+  }
+
   const updates={
     nome:document.getElementById('m-nome').value.trim(),
     registro:document.getElementById('m-registro').value.trim(),
@@ -1440,13 +1085,15 @@ async function salvarMed() {
     cidade:document.getElementById('m-cidade').value.trim(),
     status:document.getElementById('m-status').value,
     premium:document.getElementById('m-premium').value==='true',
-    bio:document.getElementById('m-bio').value.trim()
+    bio:document.getElementById('m-bio').value.trim(),
+    foto_url: fotoUrl
   };
   try {
     await api('PATCH',`profissionais_saude?id=eq.${editMedId}`,updates);
     const p=todosMeds.find(x=>x.id===editMedId);if(p)Object.assign(p,updates);
     fecharModal('modal-med'); atualizarStatsMed(); renderMeds(); toast('✅ Salvo!');
   } catch(e){toast('Erro: '+e.message,'err');}
+  finally { btn.disabled=false; btn.textContent='💾 Salvar'; }
 }
 
 // ═══════════════════════════════════════════════
@@ -1684,6 +1331,66 @@ async function buscarSemEmail() {
       diagRow(`${p.nome||'—'} · ${p.crp||'—'}`, p.status||'—', p.status?.toLowerCase()==='aprovado'?'warn':'info', `@${p.handle||'—'}`)
     ).join('');
   } catch(e) { el.innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+// ═══════════════════════════════════════════════
+// FOTO — helpers upload / preview
+// ═══════════════════════════════════════════════
+function resetFotoAdmin(prefix, fotoUrl, nome) {
+  const preview = document.getElementById(prefix+'-foto-preview');
+  const ini     = document.getElementById(prefix+'-foto-ini');
+  const iniText = (nome||'?').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+  ini.textContent = iniText;
+  if (fotoUrl) {
+    preview.src = fotoUrl;
+    preview.style.display = 'block';
+    ini.style.display = 'none';
+    preview.onerror = () => { preview.style.display='none'; ini.style.display='flex'; };
+  } else {
+    preview.style.display = 'none';
+    ini.style.display = 'flex';
+  }
+  // Reset URL manual field
+  const urlField = document.getElementById(prefix+'-foto-url');
+  if (urlField) { urlField.value=''; urlField.style.display='none'; }
+}
+
+function previewFotoAdmin(prefix, input) {
+  const file = input.files[0];
+  const status = document.getElementById(prefix+'-foto-status');
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    status.textContent = '⚠️ Máximo 3MB. Escolha outra.';
+    status.style.color = 'var(--red)';
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById(prefix+'-foto-preview');
+    const ini     = document.getElementById(prefix+'-foto-ini');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    ini.style.display = 'none';
+    status.textContent = '📷 Pronta para upload';
+    status.style.color = 'var(--green)';
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleFotoUrl(prefix) {
+  const field = document.getElementById(prefix+'-foto-url');
+  field.style.display = field.style.display === 'none' ? 'block' : 'none';
+  if (field.style.display === 'block') field.focus();
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result);
+    r.onerror = () => rej(new Error('Erro ao ler arquivo'));
+    r.readAsDataURL(file);
+  });
 }
 
 function toast(msg, tipo='ok') {

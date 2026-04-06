@@ -967,9 +967,10 @@ async function carregarProfissionais() {
   const grid = document.getElementById('prof-grid');
   grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div>Carregando...</div>';
   try {
+    // Usa eq (exato) em vez de ilike para status — mais confiável
     const [psis, meds] = await Promise.all([
-      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&limit=100'),
-      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&limit=100')
+      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=100'),
+      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=100')
     ]);
 
     const profis = [
@@ -978,7 +979,18 @@ async function carregarProfissionais() {
     ].sort((a,b) => (a._nome||'').localeCompare(b._nome||''));
 
     if (!profis.length) {
-      grid.innerHTML = '<div class="empty"><div class="empty-icon">✨</div>Em breve profissionais premium aparecem aqui.</div>';
+      // Verificar se existem psis mas sem premium/aprovado (para diagnóstico)
+      const [totalPsis] = await Promise.all([
+        api('GET', 'psis?select=status,premium&limit=200')
+      ]);
+      const naoAprovados = (totalPsis||[]).filter(p => (p.status||'').toLowerCase() !== 'aprovado').length;
+      const naoPremi     = (totalPsis||[]).filter(p => p.status?.toLowerCase() === 'aprovado' && !p.premium).length;
+
+      let msg = 'Nenhum profissional premium aprovado na rede ainda.';
+      if (naoAprovados > 0) msg += ` (${naoAprovados} cadastros pendentes de aprovação)`;
+      if (naoPremi > 0)    msg += ` · ${naoPremi} aprovados ainda sem premium`;
+
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">✨</div>${msg}</div>`;
       return;
     }
 
