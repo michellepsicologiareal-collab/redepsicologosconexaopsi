@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conexão Psi — Deploy Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum:#2D1B4E; --gold:#C8934A; --teal:#1B5E6B;
+  --green:#27ae60; --red:#c0392b; --orange:#e67e22;
+  --cream:#FAF7F2; --border:#E8E2D8; --muted:#7A7490;
+  --ink:#0F0D1A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--ink); max-width:800px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+
+header { background:var(--plum); border-radius:16px; padding:1.8rem 2rem; margin-bottom:2rem; }
+header h1 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:white; font-weight:600; }
+header h1 em { color:var(--gold); font-style:italic; }
+header p { color:rgba(255,255,255,0.5); font-size:0.82rem; margin-top:0.4rem; }
+
+.phase { margin-bottom:2rem; }
+.phase-title {
+  display:flex; align-items:center; gap:10px;
+  font-size:0.7rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:1rem;
+  padding-bottom:0.6rem; border-bottom:1px solid var(--border);
+}
+.phase-num {
+  width:22px; height:22px; border-radius:50%;
+  background:var(--plum); color:white;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.65rem; font-weight:700; flex-shrink:0;
+}
+
+.step {
+  background:white; border:1px solid var(--border); border-radius:12px;
+  padding:1.2rem 1.4rem; margin-bottom:0.8rem;
+  display:flex; gap:14px; align-items:flex-start;
+}
+.step-check {
+  width:22px; height:22px; border-radius:6px; border:2px solid var(--border);
+  flex-shrink:0; margin-top:1px; cursor:pointer; transition:all 0.15s;
+  display:flex; align-items:center; justify-content:center; font-size:12px;
+}
+.step-check:hover { border-color:var(--green); background:#eafaf1; }
+.step-check.done { background:var(--green); border-color:var(--green); color:white; }
+.step-body { flex:1; }
+.step-title { font-size:0.9rem; font-weight:600; color:var(--plum); margin-bottom:0.3rem; }
+.step-desc { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+.step-tag {
+  display:inline-block; font-size:0.65rem; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; padding:2px 8px; border-radius:5px; margin-bottom:0.5rem;
+}
+.tag-sql { background:#e8f4f6; color:var(--teal); }
+.tag-supabase { background:#eafaf1; color:var(--green); }
+.tag-github { background:#f0ede8; color:var(--plum); }
+.tag-test { background:#fef9ee; color:var(--gold); }
+
+code {
+  font-family:'JetBrains Mono',monospace; font-size:0.78rem;
+  background:#f4f2ef; color:var(--plum); padding:1px 6px; border-radius:4px;
+}
+pre {
+  font-family:'JetBrains Mono',monospace; font-size:0.75rem;
+  background:#1a1a2e; color:#a8d8ea; padding:1rem 1.2rem;
+  border-radius:8px; margin-top:0.6rem; overflow-x:auto; line-height:1.7;
+}
+pre .kw { color:#ff9ff3; }
+pre .str { color:#ffd93d; }
+pre .cm { color:rgba(255,255,255,0.3); font-style:italic; }
+
+.alert {
+  border-left:3px solid var(--orange); background:#fef9ee;
+  padding:0.8rem 1rem; border-radius:0 8px 8px 0;
+  font-size:0.8rem; color:#7a4a10; margin-top:0.7rem; line-height:1.6;
+}
+.alert strong { color:var(--orange); }
+
+.matrix {
+  width:100%; border-collapse:collapse; font-size:0.78rem; margin-top:0.8rem;
+}
+.matrix th {
+  background:var(--plum); color:white; padding:8px 12px;
+  text-align:left; font-weight:600; font-size:0.7rem; letter-spacing:0.5px;
+}
+.matrix td { padding:8px 12px; border-bottom:1px solid var(--border); }
+.matrix tr:last-child td { border-bottom:none; }
+.ok { color:var(--green); font-weight:700; }
+.no { color:var(--red); font-weight:700; }
+.ef { color:var(--teal); font-weight:600; font-size:0.72rem; }
+
+.status-bar {
+  position:sticky; bottom:0; background:white; border-top:1px solid var(--border);
+  padding:0.8rem 1.2rem; display:flex; align-items:center; justify-content:space-between;
+  margin-top:2rem; border-radius:12px; box-shadow:0 -4px 20px rgba(0,0,0,0.06);
+}
+.status-bar span { font-size:0.82rem; color:var(--muted); }
+.status-bar strong { color:var(--plum); }
+.progress-bar {
+  height:4px; background:var(--border); border-radius:2px; flex:1; margin:0 1rem;
+}
+.progress-fill { height:100%; background:var(--green); border-radius:2px; transition:width 0.3s; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Conexão <em>Psi</em> · Deploy Guide</h1>
+  <p>Checklist completo — execute na ordem. Marque cada passo ao concluir.</p>
+</header>
+
+<!-- FASE 1 -->
+<div class="phase">
+  <div class="phase-title"><span class="phase-num">1</span> Supabase — SQL Editor</div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-sql">SQL</span>
+      <div class="step-title">Rodar sql_final_consolidado.sql</div>
+      <div class="step-desc">
+        Abre o SQL Editor → cole o arquivo completo → Run.<br>
+        Faz três coisas: normaliza status (Aprovado → aprovado), corrige RLS policies, verifica resultado.
+      </div>
+      <div class="alert"><strong>Verifique:</strong> o resultado do SELECT no final deve mostrar exatamente as 7 policies listadas na tabela abaixo.</div>
+      <table class="matrix" style="margin-top:0.8rem;">
+        <tr><th>Tabela</th><th>Policy</th><th>Operação</th></tr>
+        <tr><td>psis</td><td>leitura_publica_psis</td><td class="ok">SELECT ✅</td></tr>
+        <tr><td>psis</td><td>insert_publico_psis</td><td class="ok">INSERT ✅</td></tr>
+        <tr><td>profissionais_saude</td><td>leitura_publica_med</td><td class="ok">SELECT ✅</td></tr>
+        <tr><td>profissionais_saude</td><td>insert_publico_med</td><td class="ok">INSERT ✅</td></tr>
+        <tr><td>encaminhamentos_cruzados</td><td>leitura_publica_enc</td><td class="ok">SELECT ✅</td></tr>
+        <tr><td>encaminhamentos_cruzados</td><td>insert_enc</td><td class="ok">INSERT ✅</td></tr>
+        <tr><td>encaminhamentos_cruzados</td><td>update_enc</td><td class="ok">UPDATE ✅</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-sql">SQL</span>
+      <div class="step-title">Verificar status das psis premium</div>
+      <div class="step-desc">Confirma que a normalização funcionou e que existem psis premium aprovadas para aparecer no diretório.</div>
+      <pre><span class="kw">SELECT</span> nome, crp, status, premium
+<span class="kw">FROM</span> psis
+<span class="kw">WHERE</span> premium = <span class="str">true</span>
+<span class="kw">ORDER BY</span> nome;
+<span class="cm">-- Se retornar vazio: ainda não há psis premium.
+-- Se retornar com status = 'Aprovado': o UPDATE de normalização não rodou.</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- FASE 2 -->
+<div class="phase">
+  <div class="phase-title"><span class="phase-num">2</span> Supabase — Edge Functions</div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-supabase">Edge Function</span>
+      <div class="step-title">Criar Edge Function: admin-proxy</div>
+      <div class="step-desc">
+        Dashboard → Edge Functions → + New Function → nome: <code>admin-proxy</code><br>
+        Cole o conteúdo de <code>admin-proxy_index.ts</code> → Deploy.
+      </div>
+      <div class="alert">
+        <strong>URL resultante:</strong> <code>https://tjtrdfbckgdgvcegdsbz.supabase.co/functions/v1/admin-proxy</code><br>
+        Confirme que a URL bate com o <code>PROXY_URL</code> no admin.html.
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-supabase">Secrets</span>
+      <div class="step-title">Adicionar secrets da Edge Function</div>
+      <div class="step-desc">
+        Dashboard → Settings → Edge Functions → Add Secret. Adicione dois:
+      </div>
+      <pre><span class="kw">ADMIN_MASTER_PASSWORD</span>  =  MasterPsi2026!
+<span class="kw">ADMIN_SOCIO_PASSWORD</span>   =  SocioPsi2026!
+<span class="cm"># SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são injetadas automaticamente</span></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-test">Teste</span>
+      <div class="step-title">Testar admin-proxy (opcional mas recomendado)</div>
+      <div class="step-desc">Cole no terminal ou use o Supabase Logs para verificar:</div>
+      <pre><span class="kw">curl</span> -X POST \
+  https://tjtrdfbckgdgvcegdsbz.supabase.co/functions/v1/admin-proxy \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"apikey: SUA_ANON_KEY"</span> \
+  -d <span class="str">'{"action":"update","table":"psis","id":"ID_INEXISTENTE","payload":{"bio":"teste"},"adminPassword":"MasterPsi2026!"}'</span>
+<span class="cm"># Esperado: {"ok":true,"data":[]} (array vazio pois ID não existe)</span>
+<span class="cm"># Se retornar {"error":"Não autorizado"}: secret não foi salvo corretamente</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- FASE 3 -->
+<div class="phase">
+  <div class="phase-title"><span class="phase-num">3</span> GitHub Pages — Deploy dos arquivos</div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-github">GitHub</span>
+      <div class="step-title">Subir admin.html</div>
+      <div class="step-desc">
+        Substitui o arquivo no repositório. Traz:<br>
+        · Upload de foto nos modais de edição (psi e med)<br>
+        · Tabs unificadas Pendentes/Aprovados/Premium com badge Conexão Psi / Psi Med<br>
+        · Todas as escritas roteadas pela Edge Function admin-proxy
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-github">GitHub</span>
+      <div class="step-title">Subir met.html</div>
+      <div class="step-desc">
+        · Login por e-mail apenas (sem campos nome/senha/registro)<br>
+        · Profissionais usa <code>status=eq.aprovado</code> (corrigido)<br>
+        · Diagnóstico de vazio: mostra contagem de pendentes/sem-premium
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-github">GitHub</span>
+      <div class="step-title">Subir divulgacao.html</div>
+      <div class="step-desc">
+        · Filtro Online/Presencial agora inclui psis com formato "Ambos"<br>
+        · Status query corrigida para <code>eq.aprovado</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FASE 4 -->
+<div class="phase">
+  <div class="phase-title"><span class="phase-num">4</span> Validação final</div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-test">Teste</span>
+      <div class="step-title">Testar admin.html — aprovar, premium, editar com foto</div>
+      <div class="step-desc">
+        1. Login → Pendentes: deve aparecer card com badge 🧠 ou 🏥<br>
+        2. Aprovar uma psi → conferir que muda para Aprovados<br>
+        3. Ativar Premium → conferir aba Premium<br>
+        4. Editar → selecionar foto → salvar → foto deve aparecer no card
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-test">Teste</span>
+      <div class="step-title">Testar met.html — Profissionais da rede</div>
+      <div class="step-desc">
+        1. Login com e-mail de uma psi premium aprovada<br>
+        2. Aba "Profissionais da rede" → deve listar as psis premium<br>
+        3. Se vazio: clicar F12 → Console → copiar o erro e verificar
+      </div>
+      <div class="alert">
+        <strong>Se aparecer "X aprovados sem premium":</strong> acesse admin.html → encontre a psi → clique ✨ Premium → volte ao met.html e atualize.
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-test">Teste</span>
+      <div class="step-title">Testar divulgacao.html — filtros Online/Presencial/Ambos</div>
+      <div class="step-desc">
+        Clicar em "Online" deve mostrar psis com formato Online E psis com formato Ambos.<br>
+        Antes só mostrava Online exato.
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-check" onclick="toggle(this)"></div>
+    <div class="step-body">
+      <span class="step-tag tag-test">Diagnóstico Admin</span>
+      <div class="step-title">Rodar Diagnóstico no admin.html (aba 🩺)</div>
+      <div class="step-desc">
+        Após tudo deployado: Admin → aba Diagnóstico → "Rodar diagnóstico".<br>
+        Todas as 3 tabelas devem aparecer com ✓ existe.<br>
+        Simular login com e-mail de psi premium → deve mostrar "LIBERADO".
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Matriz de permissões final -->
+<div style="background:white;border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:2rem;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--plum);font-weight:600;margin-bottom:1rem;">Matriz de permissões — estado final</div>
+  <table class="matrix">
+    <tr><th>Agente</th><th>SELECT</th><th>INSERT</th><th>UPDATE</th><th>DELETE</th></tr>
+    <tr>
+      <td>Qualquer visitante (anon)</td>
+      <td class="ok">✅</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>Tally (cadastro psi/med)</td>
+      <td class="ok">✅</td><td class="ok">✅</td><td class="no">❌</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>met.html — indicações</td>
+      <td class="ok">✅</td><td class="ok">✅ enc.</td><td class="ok">✅ enc.</td><td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>admin.html (Sócio)</td>
+      <td class="ok">✅</td>
+      <td class="ef">Edge Fn</td>
+      <td class="ef">Edge Fn</td>
+      <td class="no">❌</td>
+    </tr>
+    <tr>
+      <td>admin.html (Master)</td>
+      <td class="ok">✅</td>
+      <td class="ef">Edge Fn</td>
+      <td class="ef">Edge Fn</td>
+      <td class="ef">Edge Fn</td>
+    </tr>
+  </table>
+</div>
+
+<div class="status-bar">
+  <span>Progresso: <strong id="done-count">0</strong> / <strong id="total-count">0</strong> passos</span>
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <span id="status-msg">Pronto para começar</span>
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  updateProgress();
+}
+function updateProgress() {
+  const all  = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  document.getElementById('done-count').textContent = done;
+  document.getElementById('total-count').textContent = all;
+  document.getElementById('progress').style.width = (done/all*100) + '%';
+  const msgs = ['Pronto para começar','Boa sorte! 💪','Avançando...','Na metade 🎯','Quase lá!','Concluído! 🎉'];
+  const idx = Math.min(Math.floor(done/all*5), 5);
+  document.getElementById('status-msg').textContent = msgs[idx];
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('total-count').textContent = document.querySelectorAll('.step-check').length;
+});
+</script>
+</body>
+</html>

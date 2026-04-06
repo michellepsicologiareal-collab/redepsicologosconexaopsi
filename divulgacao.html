@@ -179,7 +179,7 @@ function detectSource() {
 // ═══════ LOAD DATA ═══════
 async function carregar() {
   try {
-    const r = await fetch(`${SB}/rest/v1/psis?select=*&premium=eq.true&status=ilike.aprovado&order=nome.asc`, {headers: H});
+    const r = await fetch(`${SB}/rest/v1/psis?select=*&premium=eq.true&status=eq.aprovado&order=nome.asc`, {headers: H});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     todos = await r.json();
     if (!Array.isArray(todos)) todos = [];
