@@ -697,7 +697,7 @@ const TIPO_CLASS = {
   fisioterapeuta:'tipo-fisio', 'clinica geral':'tipo-clinica'
 };
 
-let usuarioNome = '', usuarioRegistro = '', isAdmin = false;
+let usuarioNome = '', usuarioRegistro = '', usuarioWA = '', isAdmin = false;
 let casos = [], filtroAtual = 'todos';
 let casoSelecionado = null;
 
@@ -721,53 +721,53 @@ async function entrar() {
   btn.textContent = 'Verificando...'; btn.disabled = true;
   err.textContent = '';
 
-  // Verificar se é admin
-  if (email === 'michellepsicologiareal@gmail.com' || email === 'admin') {
-    isAdmin = true;
-    usuarioNome = 'Admin';
-    usuarioRegistro = 'Admin';
-    acessarMet();
-    btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
-    return;
-  }
-
   try {
-    // Verificar nas duas tabelas — psis e profissionais_saude
+    // Busca nas duas tabelas simultaneamente
     const [resPsis, resMed] = await Promise.all([
-      fetch(`${SB}/rest/v1/psis?select=nome,crp,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H}),
-      fetch(`${SB}/rest/v1/profissionais_saude?select=nome,registro,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H})
+      fetch(`${SB}/rest/v1/psis?select=nome,crp,email,status,premium,whatsapp&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H}),
+      fetch(`${SB}/rest/v1/profissionais_saude?select=nome,registro,email,status,premium,whatsapp&email=ilike.${encodeURIComponent(email)}&limit=1`, {headers:H})
     ]);
 
     const psis = await resPsis.json();
     const meds = await resMed.json();
 
-    const psi = psis?.[0];
-    const med = meds?.[0];
+    const psi  = psis?.[0];
+    const med  = meds?.[0];
     const prof = psi || med;
 
+    // 1. E-mail não existe em nenhuma tabela
     if (!prof) {
       err.textContent = 'E-mail não encontrado na rede. Verifique ou faça seu cadastro.';
       btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
       return;
     }
 
-    if (prof.status !== 'aprovado') {
-      err.textContent = 'Seu cadastro ainda está pendente de aprovação.';
+    // 2. Cadastro pendente ou reprovado (case-insensitive)
+    const statusNorm = (prof.status || '').toLowerCase();
+    if (statusNorm !== 'aprovado') {
+      err.textContent = statusNorm === 'reprovado'
+        ? 'Seu cadastro não foi aprovado. Entre em contato com a administração.'
+        : 'Seu cadastro ainda está pendente de aprovação. Aguarde ou entre em contato.';
       btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
       return;
     }
 
+    // 3. Aprovado mas sem premium
     if (!prof.premium) {
-      err.textContent = 'O Met é exclusivo para membros premium. Faça o upgrade no diretório.';
+      err.textContent = 'A PsiMed é exclusiva para membros premium. Acesse planos.html para assinar.';
       btn.textContent = 'Entrar na PsiMed'; btn.disabled = false;
       return;
     }
 
+    // ✅ Acesso liberado
     usuarioNome     = prof.nome || '';
     usuarioRegistro = prof.crp || prof.registro || '';
-    isAdmin         = false;
+    usuarioWA       = prof.whatsapp || '';
+    // Admin: apenas e-mail cadastrado no banco com acesso admin real
+    isAdmin = (email === 'michellepsicologiareal@gmail.com');
 
     acessarMet();
+
   } catch(e) {
     err.textContent = 'Erro de conexão. Tente novamente.';
     console.error(e);
@@ -780,8 +780,11 @@ function acessarMet() {
   document.getElementById('login').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('huser-nome').textContent = usuarioNome + (usuarioRegistro ? ' · ' + usuarioRegistro : '');
+  // Preenche formulário de indicação com dados do usuário logado
   document.getElementById('f-indicador').value = usuarioNome;
   document.getElementById('f-registro').value  = usuarioRegistro;
+  const contatoEl = document.getElementById('f-contato');
+  if (contatoEl && usuarioWA) contatoEl.value = usuarioWA;
   // Aba diagnóstico visível apenas para admin
   if (isAdmin) document.getElementById('tab-diag-btn').style.display = 'inline-block';
   carregarCasos();
@@ -792,7 +795,7 @@ function sair() {
   document.getElementById('login').style.display = 'flex';
   document.getElementById('email-login').value = '';
   document.getElementById('lerr').textContent = '';
-  usuarioNome = ''; usuarioRegistro = ''; isAdmin = false;
+  usuarioNome = ''; usuarioRegistro = ''; usuarioWA = ''; isAdmin = false;
 }
 
 function mudarAba(aba, btn) {
