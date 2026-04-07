@@ -1192,7 +1192,7 @@ async function carregarProfsParaAdmin(caso) {
     let profis = [];
 
     if (tipoBuscado === 'psi') {
-      const r = await api('GET', 'psis?select=nome,crp,whatsapp,abordagem,cidade,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=80');
+      const r = await api('GET', 'psis?select=nome,crp,whatsapp,abordagem,cidade,foto_url&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=80');
       profis = (r||[]).map(p => ({nome:p.nome, reg:p.crp, wa:p.whatsapp, esp:p.abordagem, cidade:p.cidade, foto:p.foto_url, tipo:'Psicólogo(a)', cor:'#2D1B4E', rede:'psi'}));
     } else {
       // Para outros tipos, busca em profissionais_saude filtrando pelo tipo
@@ -1418,8 +1418,8 @@ async function carregarProfissionais() {
   try {
     // Usa eq (exato) em vez de ilike para status — mais confiável
     const [psis, meds] = await Promise.all([
-      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&order=nome.asc&limit=100'),
-      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&order=nome.asc&limit=100')
+      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=100'),
+      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=100')
     ]);
 
     const profis = [
@@ -1446,8 +1446,8 @@ async function carregarProfissionais() {
     grid.innerHTML = profis.map((p,i) => {
       const ini = (p._nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
       const cor = CORES[i % CORES.length];
-      const av  = p.foto_url
-        ? `<img src="${p.foto_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+      const av  = (p.foto_url && typeof p.foto_url === 'string' && p.foto_url.startsWith('http'))
+        ? `<img src="${p.foto_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">`
         : `<div class="prof-avatar" style="background:${cor}">${ini}</div>`;
       const h   = (p.handle||'').replace('@','');
       const wa  = (p.whatsapp||'').replace(/\D/g,'');
