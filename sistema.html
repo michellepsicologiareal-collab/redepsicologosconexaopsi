@@ -152,21 +152,32 @@ code{font-family:'JetBrains Mono',monospace;font-size:0.73rem;
 <body>
 
 <div class="hub-header">
-  <div style="position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:0.25rem;">
+    <div style="position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:0.25rem;">
     <div class="hub-top" style="margin-bottom:0;">
       <span class="hub-icon">📋</span>
       <div class="hub-title">Guia do <em>Sistema</em></div>
     </div>
-    <!-- CAIXA ADMIN -->
-    <a href="admin.html" target="_blank" style="
-      display:inline-flex;align-items:center;gap:7px;
-      background:rgba(200,147,74,0.15);border:1.5px solid rgba(200,147,74,0.35);
-      border-radius:10px;padding:7px 14px;text-decoration:none;
-      font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:600;
-      color:var(--gold-light);transition:all 0.15s;white-space:nowrap;flex-shrink:0;
-    " onmouseover="this.style.background='rgba(200,147,74,0.25)'" onmouseout="this.style.background='rgba(200,147,74,0.15)'">
-      <span style="font-size:0.85rem;">👑</span> Painel Admin
-    </a>
+    <!-- BOTÕES HEADER -->
+    <div style="display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap;">
+      <a href="divulgacao.html" target="_blank" style="
+        display:inline-flex;align-items:center;gap:6px;
+        background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);
+        border-radius:10px;padding:7px 14px;text-decoration:none;
+        font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:500;
+        color:rgba(255,255,255,0.65);transition:all 0.15s;white-space:nowrap;
+      " onmouseover="this.style.background='rgba(255,255,255,0.15)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.65)'">
+        <span style="font-size:0.85rem;">🌐</span> Página pública
+      </a>
+      <a href="admin.html" target="_blank" style="
+        display:inline-flex;align-items:center;gap:7px;
+        background:rgba(200,147,74,0.15);border:1.5px solid rgba(200,147,74,0.35);
+        border-radius:10px;padding:7px 14px;text-decoration:none;
+        font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:600;
+        color:var(--gold-light);transition:all 0.15s;white-space:nowrap;
+      " onmouseover="this.style.background='rgba(200,147,74,0.25)'" onmouseout="this.style.background='rgba(200,147,74,0.15)'">
+        <span style="font-size:0.85rem;">👑</span> Painel Admin
+      </a>
+    </div>
   </div>
   <div class="hub-sub">Conexão Psi · Central de Links · 2026</div>
   <div class="tabs">
@@ -175,6 +186,7 @@ code{font-family:'JetBrains Mono',monospace;font-size:0.73rem;
     <button class="tab" onclick="show('premium',this)">✨ Premium</button>
     <button class="tab" onclick="show('rede',this)">🤝 PsiMed</button>
     <button class="tab" onclick="show('senhas',this)">🔐 Acessos</button>
+    <button class="tab" onclick="show('fluxos',this)">🗺️ Como funciona</button>
   </div>
 </div>
 
@@ -530,14 +542,111 @@ code{font-family:'JetBrains Mono',monospace;font-size:0.73rem;
 
 </div><!-- wrap -->
 
+<!-- SECTION: FLUXOS -->
+<div class="section" id="s-fluxos" style="display:none;">
+<div class="wrap" style="padding-top:1.5rem;">
+
+<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.2rem;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--plum-mid);margin-bottom:0.3rem;">Como funciona a rede</div>
+  <div style="font-size:0.8rem;color:var(--muted);line-height:1.65;">Selecione um fluxo para ver o passo a passo de cada processo do sistema.</div>
+</div>
+
+<div id="ftabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;"></div>
+
+<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;">
+  <div id="ftitle" style="font-size:0.88rem;font-weight:600;color:var(--plum-mid);margin-bottom:0.3rem;"></div>
+  <div id="fdesc" style="font-size:0.78rem;color:var(--muted);line-height:1.65;margin-bottom:1.1rem;"></div>
+  <svg id="fsvg" width="100%" style="overflow:visible;display:block;"></svg>
+</div>
+
+</div>
+</div>
+
 <script>
 function show(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('s-' + id).classList.add('active');
+  const el = document.getElementById('s-' + id);
+  if (el) { el.classList.add('active'); el.style.display='block'; }
   btn.classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
+  if (id === 'fluxos') { setTimeout(()=>{ if(!window._fInit){ initFluxos(); window._fInit=true; } drawFluxo(window._fCur||0); }, 50); }
 }
+
+const FLUXOS = [
+  {label:'Cadastro psi', c:'#1B5E6B',
+   title:'1 — Cadastro e aprovação de psicóloga',
+   desc:'A psi preenche o formulário Tally → entra como pendente no banco → admin revisa no painel e aprova → aparece no diretório da rede.',
+   steps:[{t:'Tally b5OGYZ',s:'formulário público'},{t:'status: pendente',s:'INSERT em psis'},{t:'Admin aprova',s:'admin.html'},{t:'Aparece na rede',s:'index.html'}]},
+  {label:'Cadastro médico', c:'#2971B8',
+   title:'2 — Cadastro de profissional de saúde',
+   desc:'Admin envia o link cadastro_med.html via WhatsApp → prof. preenche o formulário nativo → INSERT em profissionais_saude com premium=true → admin aprova → acessa met.html.',
+   steps:[{t:'cadastro_med.html',s:'link via WhatsApp'},{t:'INSERT prof_saude',s:'premium=true'},{t:'Admin aprova',s:'admin.html'},{t:'Acessa met.html',s:'login por e-mail'}]},
+  {label:'Login PsiMed', c:'#5B3FA0',
+   title:'3 — Login no met.html',
+   desc:'Profissional digita o e-mail → sistema busca nas duas tabelas → verifica status=aprovado e premium=true → acesso liberado com nome e dados pré-preenchidos.',
+   steps:[{t:'Digita e-mail',s:'tela de login'},{t:'Busca no banco',s:'psis + prof_saude'},{t:'Aprovado + premium?',s:'verificação'},{t:'Acesso liberado',s:'app completo'}]},
+  {label:'Encaminhamento', c:'#C8934A',
+   title:'4 — Encaminhamento cruzado de paciente',
+   desc:'Profissional indica um paciente com perfil clínico anonimizado → outros registram interesse → admin libera contato entre as partes.',
+   steps:[{t:'Indica paciente',s:'met.html ou Tally'},{t:'Caso publicado',s:'enc_cruzados'},{t:'Registra interesse',s:'outro profissional'},{t:'Admin libera',s:'contato via WA'}]},
+  {label:'Solicitar meet', c:'#27ae60',
+   title:'5 — Solicitar meet entre profissionais',
+   desc:'Na aba Profissionais da rede, clica em Solicitar meet → preenche tipo e contexto clínico → INSERT em meet_requests → abre WhatsApp da receptora com mensagem estruturada.',
+   steps:[{t:'Profissionais da rede',s:'aba met.html'},{t:'Preenche modal',s:'tipo + contexto'},{t:'INSERT meet_requests',s:'status: pendente'},{t:'Abre WA receptora',s:'mensagem pronta'}]},
+  {label:'Receber meet', c:'#E8652A',
+   title:'6 — Receber e responder solicitação de meet',
+   desc:'Psi receptora vê as solicitações na aba Meets com badge contador → aceita (abre WA do solicitante) ou recusa → status atualizado no banco.',
+   steps:[{t:'Aba Meets',s:'badge contador'},{t:'Lê solicitação',s:'tipo + contexto'},{t:'Aceitar / recusar',s:'decisão'},{t:'Status atualizado',s:'banco de dados'}]},
+];
+
+window._fCur = 0;
+
+function initFluxos() {
+  const tabs = document.getElementById('ftabs');
+  tabs.innerHTML = FLUXOS.map((f,i) =>
+    `<button onclick="drawFluxo(${i})" id="ftab${i}" style="
+      padding:5px 13px;border-radius:999px;border:1.5px solid ${f.c};
+      background:transparent;color:${f.c};font-family:'Outfit',sans-serif;
+      font-size:0.72rem;font-weight:600;cursor:pointer;transition:all .15s;
+    ">${f.label}</button>`
+  ).join('');
+}
+
+function drawFluxo(i) {
+  window._fCur = i;
+  const f = FLUXOS[i];
+  document.querySelectorAll('#ftabs button').forEach((b,j) => {
+    b.style.background = j===i ? FLUXOS[j].c : 'transparent';
+    b.style.color = j===i ? '#fff' : FLUXOS[j].c;
+  });
+  document.getElementById('ftitle').textContent = f.title;
+  document.getElementById('fdesc').textContent = f.desc;
+  const svg = document.getElementById('fsvg');
+  const n = f.steps.length;
+  const bw = 128, bh = 52, pad = 8;
+  const W = 560;
+  const gap = Math.floor((W - pad*2 - n*bw) / (n-1));
+  const H = bh + 20;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  let out = `<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+  f.steps.forEach((step, j) => {
+    const x = pad + j*(bw+gap), y = 8;
+    const cx = x+bw/2;
+    const last = j===n-1;
+    const fill = last ? f.c+'25' : '#faf8f5';
+    const sw = last ? 2 : 1;
+    out += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="${fill}" stroke="${f.c}" stroke-width="${sw}"/>`;
+    out += `<text x="${cx}" y="${y+17}" text-anchor="middle" dominant-baseline="central" font-family="Outfit,sans-serif" font-size="11.5" font-weight="600" fill="${f.c}">${step.t}</text>`;
+    out += `<text x="${cx}" y="${y+35}" text-anchor="middle" dominant-baseline="central" font-family="Outfit,sans-serif" font-size="10.5" fill="#8A8299">${step.s}</text>`;
+    if (j < n-1) {
+      const ax1=x+bw+2, ax2=x+bw+gap-2, ay=y+bh/2;
+      out += `<line x1="${ax1}" y1="${ay}" x2="${ax2}" y2="${ay}" stroke="${f.c}" stroke-width="1.5" marker-end="url(#ar2)"/>`;
+    }
+  });
+  svg.innerHTML = out;
+}
+
 </script>
 </body>
 </html>
