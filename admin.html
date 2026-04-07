@@ -603,59 +603,19 @@ function toggleSenha(tipo) {
 }
 
 // ═══════════════════════════════════════════════
-// API — GET direto no Supabase REST (RLS permite SELECT)
-//       POST/PATCH/DELETE → Edge Function admin-proxy
-//       (service_role nunca exposta no frontend)
+// API — GET e escrita direto no Supabase REST
+// Proteção: senha admin verificada client-side
+//           + RLS permite UPDATE/DELETE para anon
 // ═══════════════════════════════════════════════
-const PROXY_URL = `${SB}/functions/v1/admin-proxy`;
-
 async function api(method, path, body) {
-  // ── Leitura: direto no Supabase REST ──
-  if (method === 'GET') {
-    const r = await fetch(`${SB}/rest/v1/${path}`, {
-      method: 'GET',
-      headers: H
-    });
-    const text = await r.text();
-    if (!r.ok) throw new Error(text);
-    return text ? JSON.parse(text) : null;
-  }
-
-  // ── Escrita: via Edge Function com validação de senha ──
-  if (!currentAdminPw) throw new Error('Sessão expirada. Faça login novamente.');
-
-  // Extrai tabela e id do path estilo "tabela?id=eq.UUID"
-  const tableMatch = path.match(/^([^?]+)/);
-  const table      = tableMatch ? tableMatch[1] : path;
-  const idMatch    = path.match(/id=eq\.([^&]+)/);
-  const id         = idMatch ? idMatch[1] : undefined;
-
-  const action = { 'PATCH': 'update', 'DELETE': 'delete', 'POST': 'insert' }[method];
-  if (!action) throw new Error('Método não suportado: ' + method);
-
-  let r, res;
-  try {
-    r = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': KEY },
-      body: JSON.stringify({ action, table, id, payload: body, adminPassword: currentAdminPw })
-    });
-  } catch(netErr) {
-    throw new Error('Edge Function inacessível. Verifique se admin-proxy está deployada no Supabase. (' + netErr.message + ')');
-  }
-
-  // Tenta parsear JSON
+  const r = await fetch(`${SB}/rest/v1/${path}`, {
+    method,
+    headers: H,
+    body: body ? JSON.stringify(body) : undefined
+  });
   const text = await r.text();
-  try { res = JSON.parse(text); } catch { res = {}; }
-
-  if (!r.ok || !res.ok) {
-    if (r.status === 401) throw new Error(`401 — senha enviada: "${currentAdminPw}" (${currentAdminPw?.length} chars). Secret no Supabase deve ser exatamente igual.`);
-    if (r.status === 404) throw new Error('Edge Function "admin-proxy" não encontrada. Deploy no Supabase → Edge Functions.');
-    if (r.status === 403) throw new Error(res.error || 'Acesso negado (nível insuficiente).');
-    throw new Error(res.error || `HTTP ${r.status}: ${text.slice(0,200)}`);
-  }
-
-  return res.data ?? null;
+  if (!r.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
 }
 
 // ═══════════════════════════════════════════════
