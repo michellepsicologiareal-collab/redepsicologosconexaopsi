@@ -167,6 +167,7 @@ footer a{color:var(--muted);text-decoration:none;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 @media(max-width:700px){.hero-stats{gap:1.5rem;}.fg-grid{grid-template-columns:1fr;}}
 </style>
+<script src="termos.js"></script>
 </head>
 <body>
 
@@ -462,6 +463,13 @@ function verificarEmail() {
   document.getElementById('modal-email').classList.remove('open');
   editandoId = pendingEditId;
   emailVerificado = emailDigitado; // guardar para enviar com o update
+
+  // ── Verificar aceite de termos ──
+  TermosAceite.verificar({
+    email: emailVerificado,
+    tabela: 'psis',
+    onAceito: () => {} // página já aberta, apenas registra o aceite
+  });
   pendingEditId = null;
   document.getElementById('modal-psi-nome').textContent = `✏️ ${p.nome||'—'} · ${p.crp||'—'}`;
   document.getElementById('p-whatsapp').value      = p.whatsapp||'';

@@ -491,6 +491,7 @@ header {
   .content { padding:20px 16px; }
 }
 </style>
+<script src="termos.js"></script>
 </head>
 <body>
 
@@ -790,6 +791,7 @@ const TIPO_CLASS = {
 };
 
 let usuarioNome = '', usuarioRegistro = '', usuarioWA = '', isAdmin = false;
+let emailLogado = '', tabelaLogada = 'psis';
 let casos = [], filtroAtual = 'todos';
 let casoSelecionado = null;
 
@@ -858,7 +860,16 @@ async function entrar() {
     // Admin: apenas e-mail cadastrado no banco com acesso admin real
     isAdmin = (email === 'michellepsicologiareal@gmail.com');
 
-    acessarMet();
+    // ── Guardar email e tabela para os termos ──
+    emailLogado  = email;
+    tabelaLogada = psi ? 'psis' : 'profissionais_saude';
+
+    // ── Verificar aceite de termos ──
+    await TermosAceite.verificar({
+      email: emailLogado,
+      tabela: tabelaLogada,
+      onAceito: () => acessarMet()
+    });
 
   } catch(e) {
     err.textContent = 'Erro de conexão. Tente novamente.';
