@@ -490,6 +490,76 @@ header {
   .form-full { grid-column:span 1; }
   .content { padding:20px 16px; }
 }
+
+/* ─── PROF CARDS NO MODAL ADMIN ─── */
+.modal-box { box-shadow:0 24px 60px rgba(0,0,0,0.25); }
+.admin-profs-titulo {
+  font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--gold); margin:18px 0 10px;
+  display:flex; align-items:center; gap:8px;
+}
+.admin-profs-titulo::after { content:''; flex:1; height:1px; background:rgba(200,147,74,0.25); }
+.admin-profs-grid { display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; padding-right:2px; }
+.admin-profs-grid::-webkit-scrollbar { width:4px; }
+.admin-profs-grid::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+.admin-prof-card {
+  display:flex; align-items:center; gap:10px;
+  border:1.5px solid var(--border); border-radius:11px;
+  padding:10px 12px; background:var(--cream);
+  cursor:pointer; transition:all 0.15s;
+  position:relative;
+}
+.admin-prof-card:hover { border-color:var(--met); background:white; box-shadow:0 2px 10px rgba(27,94,107,0.1); }
+.admin-prof-card.selecionado {
+  border-color:var(--met); background:white;
+  box-shadow:0 0 0 3px rgba(27,94,107,0.12);
+}
+.admin-prof-av {
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:white;
+}
+.admin-prof-info { flex:1; min-width:0; }
+.admin-prof-nome { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.admin-prof-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+.admin-prof-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; white-space:nowrap; }
+.admin-prof-check {
+  width:20px; height:20px; border-radius:50%;
+  background:var(--met); color:white;
+  display:none; align-items:center; justify-content:center;
+  font-size:11px; flex-shrink:0;
+}
+.admin-prof-card.selecionado .admin-prof-check { display:flex; }
+
+.admin-prazo-info {
+  font-size:12px; color:var(--muted); background:var(--cream);
+  border-radius:8px; padding:8px 12px; margin-top:10px;
+  border-left:2px solid var(--gold); line-height:1.6;
+}
+.admin-prazo-info strong { color:var(--text); }
+
+.btn-liberar-novo {
+  flex:1; padding:12px; border-radius:10px;
+  background:var(--green); color:white; border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:opacity 0.2s;
+}
+.btn-liberar-novo:hover { opacity:0.9; }
+.btn-liberar-novo:disabled { opacity:0.5; cursor:not-allowed; }
+
+.enc-status-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:600; padding:4px 10px;
+  border-radius:8px; margin-bottom:12px;
+}
+.enc-status-em { background:#FEF3E8; color:#B85C1A; }
+.enc-status-ok { background:#EAF7EE; color:var(--green); }
+.enc-prazo-aviso {
+  font-size:12px; background:#FEF3E8; color:#B85C1A;
+  border-radius:8px; padding:8px 12px; margin-top:8px;
+  border-left:2px solid #B85C1A; line-height:1.6;
+}
 </style>
 <script src="termos.js"></script>
 </head>
@@ -970,9 +1040,19 @@ function renderCasos() {
       : '';
 
     // Info de encaminhado_para (visível apenas para admin)
-    const encaminhadoInfo = isAdmin && c.encaminhado_para
-      ? `<div style="font-size:11px;color:var(--met);margin-top:4px;">→ Encaminhado para: <strong>${c.encaminhado_para}</strong></div>`
-      : '';
+    let encaminhadoInfo = '';
+    if (isAdmin && c.encaminhado_nome) {
+      const prazoExpira = c.prazo_expira ? new Date(c.prazo_expira) : null;
+      const diasR = prazoExpira ? Math.ceil((prazoExpira - new Date()) / (1000*60*60*24)) : null;
+      const prazoTxt = diasR !== null
+        ? (diasR <= 0 ? '⚠️ Prazo vencido' : `⏱ ${diasR}d restante${diasR===1?'':'s'}`)
+        : '';
+      const prazoColor = diasR !== null && diasR <= 0 ? 'var(--red)' : diasR <= 1 ? '#B85C1A' : 'var(--muted)';
+      encaminhadoInfo = `<div style="font-size:11px;color:var(--met);margin-top:4px;">
+        → <strong>${c.encaminhado_nome}</strong>
+        ${prazoTxt ? `<span style="color:${prazoColor};margin-left:6px;">${prazoTxt}</span>` : ''}
+      </div>`;
+    }
 
     return `<div class="caso-card" id="caso-${c.id}">
       <div class="caso-top">
@@ -1042,93 +1122,217 @@ async function registrarInteresse(id, btn) {
 }
 
 // ─── ADMIN ───
-function abrirAdmin(id) {
+let profSelecionadoAdmin = null; // { nome, reg, wa, tipo }
+
+async function abrirAdmin(id) {
   const caso = casos.find(c => c.id === id);
   if (!caso) return;
   casoSelecionado = caso;
+  profSelecionadoAdmin = null;
+
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
   document.getElementById('modal-titulo').textContent = 'Gerenciar — ' + tipoLabel;
 
-  const interessados = caso.interessados || [];
   const encaminhadoPara = caso.encaminhado_para || '';
+  const encaminhadoNome = caso.encaminhado_nome || '';
+  const encaminhadoEm   = caso.encaminhado_em ? new Date(caso.encaminhado_em) : null;
+  const prazoExpira     = encaminhadoEm ? new Date(encaminhadoEm.getTime() + 3*24*60*60*1000) : null;
+  const agora           = new Date();
+  const diasRestantes   = prazoExpira ? Math.ceil((prazoExpira - agora) / (1000*60*60*24)) : null;
 
-  // Monta lista de interessados como opções de seleção
-  const opcoesInteressados = interessados.length
-    ? `<div style="margin-top:12px;">
-        <label style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">
-          Selecionar profissional para encaminhar *
-        </label>
-        <select id="sel-interessado" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);background:var(--cream);outline:none;">
-          <option value="">— escolha um profissional —</option>
-          ${interessados.map(reg => `<option value="${reg}" ${reg === encaminhadoPara ? 'selected' : ''}>${reg}</option>`).join('')}
-        </select>
-      </div>`
-    : `<div style="margin-top:12px;font-size:12px;color:var(--muted);padding:8px 12px;background:var(--cream);border-radius:8px;">Nenhum profissional registrou interesse ainda.</div>`;
+  // Badge de status atual
+  let statusHtml = '';
+  if (caso.status === 'em_atendimento' && encaminhadoPara) {
+    const prazoStr = prazoExpira ? prazoExpira.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const venceu = diasRestantes !== null && diasRestantes <= 0;
+    statusHtml = `
+      <div class="enc-status-badge enc-status-em">🟡 Em atendimento — encaminhado para ${encaminhadoNome || encaminhadoPara}</div>
+      <div class="${venceu ? 'enc-prazo-aviso' : 'admin-prazo-info'}">
+        ${venceu
+          ? `⚠️ <strong>Prazo vencido!</strong> Encaminhamento feito em ${encaminhadoEm.toLocaleDateString('pt-BR')}. Confirme se o atendimento foi concluído.`
+          : `⏱ Prazo de 3 dias expira em <strong>${prazoStr}</strong> (${diasRestantes} dia${diasRestantes===1?'':'s'} restante${diasRestantes===1?'':'s'})`
+        }
+      </div>`;
+  } else if (caso.status === 'concluido') {
+    statusHtml = `<div class="enc-status-badge enc-status-ok">✅ Concluído</div>`;
+  }
 
-  const statusBadge = caso.status === 'em_atendimento'
-    ? `<span style="background:#FEF3E8;color:#B85C1A;font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;margin-left:6px;">🟡 Em atendimento</span>`
-    : caso.status === 'concluido'
-    ? `<span style="background:#EAF7EE;color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;margin-left:6px;">✅ Concluído</span>`
-    : '';
-
+  // Info básica do caso
   document.getElementById('modal-info').innerHTML = `
-    <strong>Demanda:</strong> ${caso.demanda}<br>
-    <strong>Indicado por:</strong> ${caso.indicado_por} (${caso.crp_ou_registro})<br>
-    <strong>WhatsApp do indicador:</strong> ${caso.contato_indicador || 'não informado'}<br>
-    <strong>Interessados (${interessados.length}):</strong> ${interessados.join(', ') || 'nenhum ainda'}<br>
-    ${encaminhadoPara ? `<strong>Encaminhado para:</strong> <span style="color:var(--met);font-weight:600;">${encaminhadoPara}</span> ${statusBadge}<br>` : ''}
-    <strong>Cidade:</strong> ${caso.cidade || '—'}<br>
-    <strong>Urgência:</strong> ${caso.urgencia}
-    ${opcoesInteressados}
+    ${statusHtml}
+    <div style="font-size:13px;line-height:1.9;color:var(--text);margin-bottom:4px;">
+      <strong style="color:var(--met);">Demanda:</strong> ${caso.demanda}<br>
+      <strong style="color:var(--met);">Indicado por:</strong> ${caso.indicado_por} (${caso.crp_ou_registro})<br>
+      <strong style="color:var(--met);">WA do indicador:</strong> ${caso.contato_indicador || 'não informado'}<br>
+      <strong style="color:var(--met);">Interessados (${(caso.interessados||[]).length}):</strong> ${(caso.interessados||[]).join(', ') || 'nenhum ainda'}<br>
+      <strong style="color:var(--met);">Cidade:</strong> ${caso.cidade || '—'} · <strong style="color:var(--met);">Urgência:</strong> ${caso.urgencia}
+    </div>
+    <div class="admin-profs-titulo">Profissionais disponíveis para meet</div>
+    <div class="admin-profs-grid" id="admin-profs-lista">
+      <div style="font-size:12px;color:var(--muted);padding:12px;text-align:center;">⏳ Carregando profissionais...</div>
+    </div>
+    <div class="admin-prazo-info" style="margin-top:10px;">
+      📅 Ao liberar, o caso ficará <strong>em atendimento por 3 dias</strong>. Você receberá um aviso no prazo.
+    </div>
   `;
+
   document.getElementById('btn-liberar').onclick = () => liberarContato(caso);
   document.getElementById('btn-concluir').onclick = () => marcarConcluido(caso.id);
   document.getElementById('modal-admin').classList.add('open');
+
+  // Carrega profissionais compatíveis em background
+  carregarProfsParaAdmin(caso);
+}
+
+async function carregarProfsParaAdmin(caso) {
+  const lista = document.getElementById('admin-profs-lista');
+  try {
+    // Mapeia tipo_buscado para o campo correto nas tabelas
+    const tipoBuscado = caso.tipo_buscado;
+    let profis = [];
+
+    if (tipoBuscado === 'psi') {
+      const r = await api('GET', 'psis?select=nome,crp,whatsapp,abordagem,cidade,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=80');
+      profis = (r||[]).map(p => ({nome:p.nome, reg:p.crp, wa:p.whatsapp, esp:p.abordagem, cidade:p.cidade, foto:p.foto_url, tipo:'Psicólogo(a)', cor:'#2D1B4E', rede:'psi'}));
+    } else {
+      // Para outros tipos, busca em profissionais_saude filtrando pelo tipo
+      const tipoMap = {psiquiatra:'Psiquiatra', nutricionista:'Nutricionista', neurologista:'Neurologista', fisioterapeuta:'Fisioterapeuta', 'clinica geral':'Clínica Geral'};
+      const tipoFiltro = tipoMap[tipoBuscado] || tipoBuscado;
+      const r = await api('GET', `profissionais_saude?select=nome,registro,tipo,whatsapp,especialidade,cidade,foto_url&premium=eq.true&status=eq.aprovado&tipo=ilike.*${encodeURIComponent(tipoFiltro)}*&order=nome.asc&limit=80`);
+      profis = (r||[]).map(p => ({nome:p.nome, reg:p.registro, wa:p.whatsapp, esp:p.especialidade, cidade:p.cidade, foto:p.foto_url, tipo:p.tipo, cor:'#1B5E6B', rede:'med'}));
+    }
+
+    if (!profis.length) {
+      lista.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:12px;text-align:center;">Nenhum profissional premium encontrado para este tipo.</div>`;
+      return;
+    }
+
+    const CORES_ADMIN = ['#2D1B4E','#1B5E6B','#1a5e3a','#5e3a1a','#1a3a5e','#5e1a3a'];
+    lista.innerHTML = profis.map((p, i) => {
+      const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const cor = CORES_ADMIN[i % CORES_ADMIN.length];
+      const av = p.foto
+        ? `<img src="${p.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`
+        : `<div class="admin-prof-av" style="background:${cor}">${ini}</div>`;
+      const cidadeStr = p.cidade ? `📍 ${p.cidade}` : '';
+      const espStr = p.esp ? ` · ${p.esp}` : '';
+      // Serializa dados para o onclick
+      const dados = JSON.stringify({nome:p.nome, reg:p.reg, wa:(p.wa||'').replace(/\D/g,''), tipo:p.tipo, cor, ini});
+      return `<div class="admin-prof-card" id="apcard-${i}" onclick='selecionarProfAdmin(${dados}, ${i}, ${profis.length})'>
+        ${av}
+        <div class="admin-prof-info">
+          <div class="admin-prof-nome">${p.nome||'—'}</div>
+          <div class="admin-prof-sub">${p.reg||''}${espStr} ${cidadeStr}</div>
+        </div>
+        <span class="admin-prof-badge ${p.rede==='psi'?'rede-psi':'rede-med'}">${p.tipo||''}</span>
+        <div class="admin-prof-check">✓</div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    lista.innerHTML = `<div style="font-size:12px;color:var(--red);padding:8px;">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function selecionarProfAdmin(dados, idx, total) {
+  profSelecionadoAdmin = dados;
+  // Remove seleção de todos
+  for (let i = 0; i < total; i++) {
+    const el = document.getElementById('apcard-'+i);
+    if (el) el.classList.remove('selecionado');
+  }
+  document.getElementById('apcard-'+idx).classList.add('selecionado');
 }
 
 async function liberarContato(caso) {
-  const sel = document.getElementById('sel-interessado');
-  const profissionalEscolhido = sel ? sel.value.trim() : '';
-
-  if (!profissionalEscolhido) {
-    toast('Selecione o profissional para encaminhar antes de liberar o contato.', 'err');
-    if (sel) sel.style.borderColor = 'var(--red)';
+  if (!profSelecionadoAdmin) {
+    toast('Selecione um profissional da lista antes de liberar.', 'err');
+    // Pulsa a lista para chamar atenção
+    const lista = document.getElementById('admin-profs-lista');
+    if (lista) { lista.style.outline = '2px solid var(--red)'; setTimeout(()=>lista.style.outline='',1800); }
     return;
   }
 
+  const prof = profSelecionadoAdmin;
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
+  const agora = new Date();
+  const prazoExpira = new Date(agora.getTime() + 3*24*60*60*1000);
+  const prazoStr = prazoExpira.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  // Salva encaminhado_para e muda status para em_atendimento
+  const btn = document.getElementById('btn-liberar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  // Salva no banco
   try {
     await api('PATCH', `encaminhamentos_cruzados?id=eq.${caso.id}`, {
-      encaminhado_para: profissionalEscolhido,
-      status: 'em_atendimento'
+      encaminhado_para:    prof.reg,
+      encaminhado_nome:    prof.nome,
+      encaminhado_wa:      prof.wa,
+      encaminhado_em:      agora.toISOString(),
+      prazo_expira:        prazoExpira.toISOString(),
+      status:              'em_atendimento'
     });
-    // Atualiza cache local
     const idx = casos.findIndex(c => c.id === caso.id);
     if (idx >= 0) {
-      casos[idx].encaminhado_para = profissionalEscolhido;
-      casos[idx].status = 'em_atendimento';
+      Object.assign(casos[idx], {
+        encaminhado_para: prof.reg, encaminhado_nome: prof.nome,
+        encaminhado_wa: prof.wa, encaminhado_em: agora.toISOString(),
+        prazo_expira: prazoExpira.toISOString(), status: 'em_atendimento'
+      });
     }
   } catch(e) {
-    console.warn('Não foi possível salvar encaminhado_para:', e.message);
+    console.warn('Erro ao salvar encaminhamento:', e.message);
   }
 
-  // Mensagem para o indicador com o profissional selecionado
-  const waMsg = encodeURIComponent(
-    `📋 *Indicação no PsiMed Rede Colaborativa*\n\n` +
-    `Olá ${caso.indicado_por}! Encontramos um profissional para o seu encaminhamento.\n\n` +
-    `*Buscando:* ${tipoLabel}\n` +
-    `*Profissional indicado:* ${profissionalEscolhido}\n\n` +
-    `Entre em contato com o profissional para combinar o atendimento. 💙`
-  );
-  const tel = (caso.contato_indicador||'').replace(/\D/g,'');
-  if (tel) window.open(`https://wa.me/55${tel}?text=${waMsg}`, '_blank');
-  else { alert('WhatsApp do indicador não cadastrado.'); }
+  // 1) WA para o profissional escolhido
+  if (prof.wa) {
+    const msgProf = encodeURIComponent(
+      `🔄 *Encaminhamento — PsiMed Rede Colaborativa*\n\n` +
+      `Olá ${prof.nome?.split(' ')[0]}! A admin liberou um paciente para você.\n\n` +
+      `*Tipo de demanda:* ${tipoLabel}\n` +
+      `*Demanda:* ${caso.demanda?.substring(0,120)}\n` +
+      `${caso.cidade ? `*Cidade:* ${caso.cidade}\n` : ''}` +
+      `${caso.publico ? `*Público:* ${caso.publico}\n` : ''}` +
+      `*Indicado por:* ${caso.indicado_por} (${caso.crp_ou_registro})\n` +
+      `${caso.contato_indicador ? `*WA do indicador:* ${caso.contato_indicador}\n` : ''}` +
+      `\n💙 Entre em contato com o(a) indicador(a) para combinar.`
+    );
+    window.open(`https://wa.me/55${prof.wa}?text=${msgProf}`, '_blank');
+  }
+
+  // 2) WA para o indicador avisando que encaminhou
+  const telIndicador = (caso.contato_indicador||'').replace(/\D/g,'');
+  if (telIndicador) {
+    setTimeout(() => {
+      const msgIndicador = encodeURIComponent(
+        `📋 *PsiMed Rede Colaborativa*\n\n` +
+        `Olá ${caso.indicado_por}! Encontramos um(a) profissional para seu paciente.\n\n` +
+        `*Profissional:* ${prof.nome} (${prof.reg})\n` +
+        `*Tipo:* ${tipoLabel}\n` +
+        `${prof.wa ? `*WhatsApp:* ${prof.wa}\n` : ''}` +
+        `\nAguarde o contato ou entre em contato diretamente. 💙`
+      );
+      window.open(`https://wa.me/55${telIndicador}?text=${msgIndicador}`, '_blank');
+    }, 800);
+  }
+
+  // 3) WA para a admin com lembrete de prazo (agendar aviso manual)
+  setTimeout(() => {
+    const msgAdmin = encodeURIComponent(
+      `⏱ *Encaminhamento registrado — PsiMed*\n\n` +
+      `Caso encaminhado para *${prof.nome}* (${prof.reg}).\n` +
+      `*Demanda:* ${caso.demanda?.substring(0,80)}\n` +
+      `*Indicado por:* ${caso.indicado_por}\n\n` +
+      `⚠️ Prazo de 3 dias expira em *${prazoStr}*.\n` +
+      `Lembre de confirmar se o atendimento foi concluído.`
+    );
+    window.open(`https://wa.me/${ADMIN_WA}?text=${msgAdmin}`, '_blank');
+  }, 1600);
 
   fecharModal();
   renderCasos();
-  toast(`✅ Contato liberado — caso em atendimento com ${profissionalEscolhido}`, 'ok');
+  toast(`✅ ${prof.nome} notificado(a)! Prazo: ${prazoStr}`, 'ok');
+  btn.disabled = false; btn.textContent = '📲 Liberar contato via WhatsApp';
 }
 
 async function marcarConcluido(id) {
