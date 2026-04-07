@@ -518,14 +518,12 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
 // 5. Troque as senhas do admin periodicamente.
 // ═══════════════════════════════════════════════
 const NIVEIS = {
-  // Master: acesso total, pode deletar, vê senhas
-  'MasterPsi2026!': { nivel: 'master', label: 'Master', nome: 'Michelle' },
-  // Sócio: aprova, ativa premium, edita — NÃO pode deletar nem ver senhas
-  'SocioPsi2026!':  { nivel: 'socio',  label: 'Sócio',  nome: 'Sócio(a)' },
+  'AdminPsi2026': { nivel: 'master', label: 'Master', nome: 'Michelle' },
+  'SocioPsi2026':  { nivel: 'socio',  label: 'Sócio',  nome: 'Sócio(a)' },
 };
 const SENHAS_VISIVEIS = {
-  master: 'MasterPsi2026!',
-  socio:  'SocioPsi2026!'
+  master: 'AdminPsi2026',
+  socio:  'SocioPsi2026'
 };
 
 const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
