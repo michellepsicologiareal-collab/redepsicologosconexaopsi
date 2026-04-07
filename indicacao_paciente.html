@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quero uma indicação — Conexão Psi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#2D1B4E;--violet:#5B3FA0;
+  --gold:#C8934A;--gold-light:#E8C98A;
+  --green:#27ae60;--red:#c0392b;
+  --cream:#FAF7F2;--white:#fff;
+  --border:#E8E2D8;--muted:#7A7490;--ink:#0F0D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* HERO */
+.hero{
+  background:var(--plum);
+  padding:2.5rem 1.5rem 3rem;
+  text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 80% 20%,rgba(91,63,160,0.5),transparent 60%),
+             radial-gradient(ellipse 40% 40% at 10% 80%,rgba(200,147,74,0.18),transparent 50%);}
+.hero-inner{position:relative;z-index:1;max-width:560px;margin:0 auto;}
+.hero-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:rgba(255,255,255,0.4);margin-bottom:1rem;}
+.hero-brand em{color:var(--gold-light);font-style:italic;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:600;color:#fff;line-height:1.2;margin-bottom:0.8rem;}
+.hero h1 em{color:var(--gold-light);font-style:italic;}
+.hero p{font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.75;max-width:440px;margin:0 auto;}
+
+/* FORM */
+.form-wrap{max-width:560px;margin:-1.5rem auto 3rem;padding:0 1.2rem;}
+.form-card{background:var(--white);border-radius:18px;padding:2rem 1.8rem;box-shadow:0 8px 40px rgba(45,27,78,0.1);}
+
+.step-header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--plum);color:white;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--plum);}
+
+.divider{font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;margin:1.4rem 0 1rem;}
+.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.fg{margin-bottom:1rem;}
+.fg label{display:block;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:0.88rem;
+  color:var(--ink);background:var(--cream);
+  outline:none;transition:border-color 0.2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--violet);}
+.fg textarea{min-height:90px;resize:vertical;}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+@media(max-width:480px){.fg-grid{grid-template-columns:1fr;}}
+
+/* OPÇÕES VISUAIS */
+.opts{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.3rem;}
+.opt{
+  padding:0.4rem 0.9rem;border-radius:999px;
+  border:1.5px solid var(--border);background:var(--cream);
+  color:var(--ink);font-size:0.78rem;font-weight:500;
+  cursor:pointer;transition:all 0.15s;
+}
+.opt.sel{border-color:var(--violet);background:#EDE6F8;color:var(--violet);}
+.opt:hover{border-color:var(--violet);}
+
+/* URGÊNCIA */
+.urg-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;}
+.urg{padding:0.65rem;border-radius:10px;border:1.5px solid var(--border);text-align:center;cursor:pointer;transition:all .15s;}
+.urg-icon{font-size:1.2rem;margin-bottom:3px;}
+.urg-label{font-size:0.72rem;font-weight:600;color:var(--muted);}
+.urg.sel-verde{border-color:var(--green);background:#eafaf1;}
+.urg.sel-verde .urg-label{color:var(--green);}
+.urg.sel-gold{border-color:var(--gold);background:#fef7ea;}
+.urg.sel-gold .urg-label{color:var(--gold);}
+.urg.sel-red{border-color:var(--red);background:#fdecea;}
+.urg.sel-red .urg-label{color:var(--red);}
+
+.btn-submit{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--plum),var(--violet));
+  color:white;border:none;border-radius:12px;
+  font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:opacity 0.2s;margin-top:0.8rem;
+}
+.btn-submit:hover{opacity:0.9;}
+.btn-submit:disabled{opacity:0.55;cursor:not-allowed;}
+
+.nota{font-size:0.73rem;color:var(--muted);line-height:1.6;background:var(--cream);padding:10px 14px;border-radius:8px;border-left:2px solid rgba(200,147,74,0.4);margin-top:1rem;}
+
+/* OBRIGADO */
+#obrigado{display:none;text-align:center;padding:2.5rem 1.5rem;}
+.obr-icon{font-size:3rem;margin-bottom:1rem;}
+.obr-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:white;margin-bottom:0.5rem;}
+.obr-title em{color:var(--gold-light);font-style:italic;}
+.obr-sub{font-size:0.88rem;color:rgba(255,255,255,0.6);line-height:1.75;max-width:400px;margin:0 auto 1.5rem;}
+.obr-btn{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.8rem;background:var(--gold);color:var(--ink);border-radius:11px;font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:600;text-decoration:none;}
+
+/* FOOTER */
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.75rem;border-top:1px solid var(--border);}
+footer a{color:var(--muted);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-inner" id="hero-inner">
+    <div class="hero-brand">Conexão <em>Psi</em></div>
+    <h1>Encontre o psicólogo <em>certo</em> para você</h1>
+    <p>Preencha o formulário abaixo e nossa equipe vai indicar o profissional mais alinhado com o que você precisa. Gratuito e sem compromisso.</p>
+  </div>
+
+  <!-- OBRIGADO (dentro do hero) -->
+  <div id="obrigado">
+    <div class="obr-icon">💜</div>
+    <div class="obr-title">Recebemos seu <em>pedido!</em></div>
+    <div class="obr-sub">Nossa equipe vai analisar seu perfil e entrar em contato pelo WhatsApp em até 24h com a indicação personalizada.</div>
+    <a href="divulgacao.html" class="obr-btn">← Ver o diretório</a>
+  </div>
+</section>
+
+<div class="form-wrap">
+  <div class="form-card" id="form-card">
+
+    <!-- STEP 1: O que você busca -->
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">O que você está buscando?</div>
+    </div>
+
+    <div class="fg">
+      <label>Abordagem (pode escolher mais de uma)</label>
+      <div class="opts" id="opts-abordagem">
+        <div class="opt" data-val="TCC" onclick="toggle(this,'abordagem')">TCC</div>
+        <div class="opt" data-val="Psicanálise" onclick="toggle(this,'abordagem')">Psicanálise</div>
+        <div class="opt" data-val="Humanista" onclick="toggle(this,'abordagem')">Humanista</div>
+        <div class="opt" data-val="Gestalt" onclick="toggle(this,'abordagem')">Gestalt</div>
+        <div class="opt" data-val="ACT" onclick="toggle(this,'abordagem')">ACT</div>
+        <div class="opt" data-val="Não sei" onclick="toggle(this,'abordagem')">Não sei ainda</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Foco principal do atendimento</label>
+      <div class="opts" id="opts-foco">
+        <div class="opt" data-val="Ansiedade" onclick="toggle(this,'foco')">Ansiedade</div>
+        <div class="opt" data-val="Depressão" onclick="toggle(this,'foco')">Depressão</div>
+        <div class="opt" data-val="Relacionamentos" onclick="toggle(this,'foco')">Relacionamentos</div>
+        <div class="opt" data-val="Autoestima" onclick="toggle(this,'foco')">Autoestima</div>
+        <div class="opt" data-val="Burnout" onclick="toggle(this,'foco')">Burnout</div>
+        <div class="opt" data-val="TDAH" onclick="toggle(this,'foco')">TDAH</div>
+        <div class="opt" data-val="Luto" onclick="toggle(this,'foco')">Luto</div>
+        <div class="opt" data-val="Família" onclick="toggle(this,'foco')">Família</div>
+        <div class="opt" data-val="Trauma" onclick="toggle(this,'foco')">Trauma</div>
+        <div class="opt" data-val="Outro" onclick="toggle(this,'foco')">Outro</div>
+      </div>
+    </div>
+
+    <div class="fg-grid">
+      <div class="fg">
+        <label>Formato de atendimento</label>
+        <select id="f-formato">
+          <option value="">Selecione...</option>
+          <option value="Online">Online</option>
+          <option value="Presencial">Presencial</option>
+          <option value="Ambos">Tanto faz</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Cidade / Estado</label>
+        <input type="text" id="f-cidade" placeholder="Ex: São Paulo – SP">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Urgência</label>
+      <div class="urg-opts">
+        <div class="urg" id="urg-baixa" onclick="setUrg('baixa')">
+          <div class="urg-icon">🌱</div>
+          <div class="urg-label">Sem pressa</div>
+        </div>
+        <div class="urg" id="urg-media" onclick="setUrg('media')">
+          <div class="urg-icon">🕐</div>
+          <div class="urg-label">Breve</div>
+        </div>
+        <div class="urg" id="urg-alta" onclick="setUrg('alta')">
+          <div class="urg-icon">🔴</div>
+          <div class="urg-label">Urgente</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">Seus dados para contato</div>
+
+    <div class="fg-grid">
+      <div class="fg">
+        <label>Seu nome *</label>
+        <input type="text" id="f-nome" placeholder="Como prefere ser chamado(a)">
+      </div>
+      <div class="fg">
+        <label>WhatsApp *</label>
+        <input type="tel" id="f-wa" placeholder="11 99999-9999">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Algo importante que devemos saber? (opcional)</label>
+      <textarea id="f-obs" placeholder="Ex: Prefiro atendimento com mulheres. Tenho plano de saúde. Quero manhãs…"></textarea>
+    </div>
+
+    <div class="nota">
+      🔒 Suas informações são confidenciais e serão usadas apenas para fazer a indicação personalizada. Não compartilhamos seus dados com terceiros.
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="enviar()">
+      💜 Quero minha indicação personalizada →
+    </button>
+
+  </div>
+</div>
+
+<footer>
+  <a href="divulgacao.html">← Voltar para o diretório</a>
+  &nbsp;·&nbsp; Conexão Psi · 2026
+</footer>
+
+<script>
+const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const ADMIN_WA = '5511947388423';
+
+const sel = { abordagem: [], foco: [] };
+let urgencia = '';
+
+function toggle(el, grupo) {
+  const v = el.dataset.val;
+  if (el.classList.contains('sel')) {
+    el.classList.remove('sel');
+    sel[grupo] = sel[grupo].filter(x => x !== v);
+  } else {
+    el.classList.add('sel');
+    sel[grupo].push(v);
+  }
+}
+
+function setUrg(u) {
+  urgencia = u;
+  document.querySelectorAll('.urg').forEach(el => {
+    el.classList.remove('sel-verde','sel-gold','sel-red');
+  });
+  const map = { baixa:'sel-verde', media:'sel-gold', alta:'sel-red' };
+  document.getElementById('urg-'+u).classList.add(map[u]);
+}
+
+function g(id){ return document.getElementById(id)?.value?.trim() || ''; }
+
+async function enviar() {
+  const nome = g('f-nome');
+  const wa   = g('f-wa');
+  if (!nome) { alert('Informe seu nome.'); return; }
+  if (!wa)   { alert('Informe seu WhatsApp.'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  const abordagem = sel.abordagem.join(', ') || 'Não informado';
+  const foco      = sel.foco.join(', ') || 'Não informado';
+  const formato   = g('f-formato') || 'Não informado';
+  const cidade    = g('f-cidade') || 'Não informado';
+  const obs       = g('f-obs') || '';
+  const urg       = urgencia || 'Não informado';
+
+  // Monta mensagem WhatsApp para admin
+  const msg = encodeURIComponent(
+    `💜 *Nova solicitação de indicação — Conexão Psi*\n\n` +
+    `*Nome:* ${nome}\n` +
+    `*WhatsApp:* ${wa}\n` +
+    `*Abordagem:* ${abordagem}\n` +
+    `*Foco:* ${foco}\n` +
+    `*Formato:* ${formato}\n` +
+    `*Cidade:* ${cidade}\n` +
+    `*Urgência:* ${urg}\n` +
+    `${obs ? `*Observações:* ${obs}` : ''}`
+  );
+
+  // Abre WA da admin
+  window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
+
+  // Mostra obrigado
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('hero-inner').style.display = 'none';
+  document.getElementById('obrigado').style.display = 'block';
+}
+</script>
+</body>
+</html>
