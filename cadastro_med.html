@@ -321,6 +321,13 @@ footer em{color:var(--gold);}
         ✅ Acesso gratuito durante a fase de testes da PsiMed. Após o cadastro, a equipe da Conexão Psi revisará seus dados e ativará seu perfil em até 48h.
       </div>
 
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1rem;padding:12px 14px;background:#faf8f5;border-radius:10px;border:1.5px solid #E8E2D8;" id="consent-box">
+        <input type="checkbox" id="consent" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:#1B5E6B;cursor:pointer;">
+        <label for="consent" style="font-size:0.78rem;color:#7A7490;line-height:1.6;cursor:pointer;">
+          Li e concordo com a <a href="politica_privacidade.html" target="_blank" style="color:#1B5E6B;font-weight:600;">Política de Privacidade</a> da Conexão Psi e <strong style="color:#0F0D1A;">autorizo o uso dos meus dados profissionais</strong> para participação na rede PsiMed, conforme a LGPD.
+        </label>
+      </div>
+
       <button class="btn-submit" id="btn-submit" onclick="enviarCadastro()">
         Enviar cadastro →
       </button>
@@ -363,6 +370,10 @@ async function enviarCadastro() {
   if (!registro)  { alert('Informe seu registro profissional.'); return; }
   if (!email)     { alert('Informe seu e-mail profissional.'); return; }
   if (!whatsapp)  { alert('Informe seu WhatsApp.'); return; }
+  if (!document.getElementById('consent').checked) {
+    document.getElementById('consent-box').style.borderColor = '#c0392b';
+    alert('Por favor, leia e aceite a Política de Privacidade para continuar.'); return;
+  }
 
   const btn = document.getElementById('btn-submit');
   btn.disabled = true; btn.textContent = 'Enviando...';

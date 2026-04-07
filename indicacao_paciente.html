@@ -216,6 +216,13 @@ footer a{color:var(--muted);text-decoration:none;}
       🔒 Suas informações são confidenciais e serão usadas apenas para fazer a indicação personalizada. Não compartilhamos seus dados com terceiros.
     </div>
 
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-top:1rem;padding:12px 14px;background:var(--cream);border-radius:10px;border:1.5px solid var(--border);" id="consent-box">
+      <input type="checkbox" id="consent" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--violet);cursor:pointer;">
+      <label for="consent" style="font-size:0.78rem;color:var(--muted);line-height:1.6;cursor:pointer;">
+        Li e concordo com a <a href="politica_privacidade.html" target="_blank" style="color:var(--violet);font-weight:600;">Política de Privacidade</a> da Conexão Psi e <strong style="color:var(--ink);">autorizo o uso dos meus dados</strong>, incluindo informações de saúde mental, para fins de indicação personalizada de psicólogo, conforme a LGPD (Art. 11, I).
+      </label>
+    </div>
+
     <button class="btn-submit" id="btn-submit" onclick="enviar()">
       💜 Quero minha indicação personalizada →
     </button>
@@ -263,6 +270,10 @@ async function enviar() {
   const wa   = g('f-wa');
   if (!nome) { alert('Informe seu nome.'); return; }
   if (!wa)   { alert('Informe seu WhatsApp.'); return; }
+  if (!document.getElementById('consent').checked) {
+    document.getElementById('consent-box').style.borderColor = '#c0392b';
+    alert('Por favor, leia e aceite a Política de Privacidade para continuar.'); return;
+  }
 
   const btn = document.getElementById('btn-submit');
   btn.disabled = true; btn.textContent = 'Enviando...';
