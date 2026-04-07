@@ -1289,31 +1289,182 @@ function renderMeetsAdmin() {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div>Nenhum meet registrado ainda.</div>';
     return;
   }
-  const statusColor = {pendente:'#fef6ec;color:#b7600a', aceito:'#edf7f3;color:#1a7a4a', recusado:'#fdecea;color:#c0392b'};
-  el.innerHTML = todosMeets.map(m => {
+
+  const statusColor = {
+    pendente:'#fef6ec;color:#b7600a',
+    aceito:'#edf7f3;color:#1a7a4a',
+    recusado:'#fdecea;color:#c0392b',
+    concluido:'#f0eff5;color:#8A8299'
+  };
+
+  const pendentes  = todosMeets.filter(m => m.status === 'pendente');
+  const aceitos    = todosMeets.filter(m => m.status === 'aceito');
+  const outros     = todosMeets.filter(m => m.status !== 'pendente' && m.status !== 'aceito');
+
+  function cardMeet(m) {
     const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const tempo = tempoDecorrido(m.created_at);
     const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo || '—';
     const stColor = statusColor[m.status] || statusColor.pendente;
     const wa = (m.solicitante_wa||'').replace(/\D/g,'');
     const waLink = wa ? `<a href="https://wa.me/55${wa}" target="_blank" style="color:var(--azul);font-size:12px;">📱 ${m.solicitante_wa}</a>` : '';
-    return `<div class="enc-card" style="margin-bottom:12px;">
+    const isEnc = m.tipo === 'encaminhamento_paciente' || m.tipo === 'encaminhamento';
+    const jaVinculado = m.enc_id || m.encaminhamento_id;
+
+    return `<div class="enc-card" style="margin-bottom:12px;${m.status==='recusado'||m.status==='concluido'?'opacity:0.6;':''}">
       <div class="enc-top">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span style="font-size:13px;font-weight:600;">De: ${m.solicitante_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.solicitante_registro||'—'})</span></span>
-          <span style="font-size:11px;color:var(--muted);">→</span>
-          <span style="font-size:13px;font-weight:600;">Para: ${m.destinatario_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.destinatario_registro||'—'})</span></span>
+          <span style="font-size:13px;font-weight:600;">${m.solicitante_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.solicitante_registro||'—'})</span></span>
+          <span style="font-size:12px;color:var(--muted);">→</span>
+          <span style="font-size:13px;font-weight:600;">${m.destinatario_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.destinatario_registro||'—'})</span></span>
         </div>
-        <span style="background:${stColor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;">${m.status||'pendente'}</span>
+        <div style="text-align:right;">
+          <span style="background:${stColor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;display:block;margin-bottom:3px;">${m.status||'pendente'}</span>
+          <span style="font-size:11px;color:var(--muted);">⏱ ${tempo}</span>
+        </div>
       </div>
-      <div style="margin:8px 0;"><span class="enc-tipo tipo-psi">${tipoLabel}</span></div>
-      <div class="enc-demanda" style="font-size:13px;">${m.mensagem||'—'}</div>
-      ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;">🕐 ${m.disponibilidade}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap;">
+
+      <div style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="enc-tipo tipo-psi">${tipoLabel}</span>
+        ${isEnc ? '<span style="background:#e8f4f6;color:#1B5E6B;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:1px;">ENCAMINHAMENTO</span>' : ''}
+      </div>
+
+      <div class="enc-demanda" style="font-size:13px;margin-bottom:8px;">${m.mensagem||'—'}</div>
+      ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">🕐 ${m.disponibilidade}</div>` : ''}
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
         ${waLink}
         <span style="font-size:11px;color:var(--muted);">${dt}</span>
       </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${m.status === 'pendente' ? `
+          <button onclick="aceitarMeetAdmin('${m.id}')"
+            style="padding:7px 14px;background:#27ae60;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+            ✅ Aceitar
+          </button>
+          <button onclick="recusarMeetAdmin('${m.id}')"
+            style="padding:7px 14px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+            ❌ Recusar
+          </button>
+        ` : ''}
+        ${m.status === 'aceito' && isEnc && !jaVinculado ? `
+          <button onclick="abrirFormEnc('${m.id}')"
+            id="btn-enc-${m.id}"
+            style="padding:7px 14px;background:var(--plum);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+            📋 Registrar encaminhamento
+          </button>
+        ` : ''}
+        ${jaVinculado ? `
+          <span style="font-size:12px;color:#1a7a4a;font-weight:600;">📋 Encaminhamento registrado ✓</span>
+        ` : ''}
+      </div>
+
+      <!-- Form inline de encaminhamento (oculto por padrão) -->
+      <div id="form-enc-${m.id}" style="display:none;margin-top:14px;padding:14px;background:#f8f6ff;border-radius:10px;border:1px solid #e0dbf5;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">📋 Registrar encaminhamento deste meet</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;">Profissional que fica com paciente</label>
+            <input type="text" id="enc-dest-nome-${m.id}" placeholder="Nome" value="${m.destinatario_nome||''}"
+              style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;">CRP / CRM</label>
+            <input type="text" id="enc-dest-reg-${m.id}" placeholder="Registro" value="${m.destinatario_registro||''}"
+              style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;">
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;">Observação clínica (anonimizada)</label>
+          <textarea id="enc-obs-${m.id}" rows="2" placeholder="Contexto do encaminhamento..."
+            style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;resize:vertical;">${m.mensagem||''}</textarea>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="confirmarEncFromMeet('${m.id}','${(m.solicitante_nome||'').replace(/'/g,'')}','${(m.solicitante_registro||'').replace(/'/g,'')}')"
+            style="padding:8px 16px;background:var(--plum);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+            ✅ Confirmar encaminhamento
+          </button>
+          <button onclick="document.getElementById('form-enc-${m.id}').style.display='none'"
+            style="padding:8px 12px;background:#f0eff5;color:var(--muted);border:none;border-radius:8px;font-size:12px;cursor:pointer;">
+            Cancelar
+          </button>
+        </div>
+      </div>
     </div>`;
-  }).join('');
+  }
+
+  let html = '';
+  if (pendentes.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b7600a;margin-bottom:10px;">⏳ ${pendentes.length} pendente(s)</div>`;
+    html += pendentes.map(cardMeet).join('');
+  }
+  if (aceitos.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a7a4a;margin:${pendentes.length?'20px':0} 0 10px;">✅ ${aceitos.length} aceito(s)</div>`;
+    html += aceitos.map(cardMeet).join('');
+  }
+  if (outros.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;">${outros.length} concluído(s) / recusado(s)</div>`;
+    html += outros.map(cardMeet).join('');
+  }
+  el.innerHTML = html;
+}
+
+async function aceitarMeetAdmin(id) {
+  try {
+    await api('PATCH',`meet_requests?id=eq.${id}`,{status:'aceito'});
+    const m = todosMeets.find(x=>x.id===id); if(m) m.status='aceito';
+    renderMeetsAdmin(); carregarMeetsAdmin();
+    toast('✅ Meet aceito!');
+  } catch(e){ toast('Erro: '+e.message,'err'); }
+}
+
+async function recusarMeetAdmin(id) {
+  if(!confirm('Recusar este meet?')) return;
+  try {
+    await api('PATCH',`meet_requests?id=eq.${id}`,{status:'recusado'});
+    const m = todosMeets.find(x=>x.id===id); if(m) m.status='recusado';
+    renderMeetsAdmin();
+    toast('Meet recusado.');
+  } catch(e){ toast('Erro: '+e.message,'err'); }
+}
+
+function abrirFormEnc(meetId) {
+  const form = document.getElementById('form-enc-'+meetId);
+  const btn  = document.getElementById('btn-enc-'+meetId);
+  if (form) { form.style.display = form.style.display==='none'?'block':'none'; }
+  if (btn)  { btn.style.display = 'none'; }
+}
+
+async function confirmarEncFromMeet(meetId, solNome, solReg) {
+  const destNome = document.getElementById('enc-dest-nome-'+meetId)?.value?.trim() || '';
+  const destReg  = document.getElementById('enc-dest-reg-'+meetId)?.value?.trim() || '';
+  const obs      = document.getElementById('enc-obs-'+meetId)?.value?.trim() || '';
+  if (!destNome) { toast('Informe o profissional que ficará com o paciente.','err'); return; }
+
+  try {
+    // 1. Registra encaminhamento
+    await api('POST','encaminhamentos_cruzados',{
+      indicado_por:          solNome,
+      crp_ou_registro:       solReg,
+      tipo_buscado:          'psi',
+      demanda:               obs,
+      status:                'concluido',
+      profissional_atendendo:     destNome,
+      profissional_atendendo_reg: destReg,
+      concluido_em:          new Date().toISOString(),
+      urgencia:              'media'
+    });
+
+    // 2. Marca meet como concluido
+    await api('PATCH',`meet_requests?id=eq.${meetId}`,{status:'concluido'});
+    const m = todosMeets.find(x=>x.id===meetId);
+    if (m) { m.status='concluido'; m.enc_id='registrado'; }
+
+    renderMeetsAdmin();
+    carregarEnc(); // atualiza aba encaminhamentos
+    toast('📋 Encaminhamento registrado com sucesso!','ok');
+  } catch(e){ toast('Erro: '+e.message,'err'); }
 }
 
 // ═══════════════════════════════════════════════
