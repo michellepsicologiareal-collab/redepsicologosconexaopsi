@@ -1418,8 +1418,8 @@ async function carregarProfissionais() {
   try {
     // Usa eq (exato) em vez de ilike para status — mais confiável
     const [psis, meds] = await Promise.all([
-      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=100'),
-      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=eq.aprovado&order=nome.asc&limit=100')
+      api('GET', 'psis?select=nome,crp,handle,abordagem,especialidades,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&order=nome.asc&limit=100'),
+      api('GET', 'profissionais_saude?select=nome,registro,tipo,handle,especialidade,formato,cidade,whatsapp,foto_url&premium=eq.true&status=ilike.aprovado&order=nome.asc&limit=100')
     ]);
 
     const profis = [
@@ -1711,7 +1711,9 @@ async function carregarMeets() {
   grid.innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
   try {
     const r = await api('GET',
-      `meet_requests?select=*&destinatario_registro=eq.${encodeURIComponent(usuarioRegistro)}&order=created_at.desc&limit=50`
+      isAdmin
+      ? `meet_requests?select=*&order=created_at.desc&limit=200`
+      : `meet_requests?select=*&destinatario_registro=eq.${encodeURIComponent(usuarioRegistro)}&order=created_at.desc&limit=50`
     );
     const pendentes = (r||[]).filter(m => m.status === 'pendente').length;
     const badge = document.getElementById('badge-meets');
@@ -1729,7 +1731,7 @@ async function carregarMeets() {
       const wa = (m.solicitante_wa||'').replace(/\D/g,'');
       return `<div class="meet-req-card">
         <div class="meet-req-top">
-          <div class="meet-req-de">De: <strong>${m.solicitante_nome||'—'}</strong> · ${m.solicitante_registro||'—'}</div>
+          <div class="meet-req-de">De: <strong>${m.solicitante_nome||'—'}</strong> · ${m.solicitante_registro||'—'}${isAdmin ? ` → <strong>${m.destinatario_nome||'—'}</strong> · ${m.destinatario_registro||'—'}` : ''}</div>
           <div class="meet-req-data">${dt}</div>
         </div>
         <div class="meet-req-tipo">${tipoLabel}</div>

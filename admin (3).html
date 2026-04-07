@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Conexão Psi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#2D1B4E;--violet:#5B3FA0;--gold:#C8934A;--gold-light:#E8C98A;
+  --teal:#1B5E6B;--green:#27ae60;--red:#c0392b;--orange:#e67e22;
+  --cream:#FAF7F2;--card:#FFFFFF;--border:#E8E2D8;--muted:#7A7490;
+  --ink:#0F0D1A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:#f4f2ef;color:var(--ink);min-height:100vh;}
+
+/* ── LOGIN ── */
+#login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 100%);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+#login-overlay.hidden{display:none;}
+.lbox{background:white;border-radius:20px;padding:40px 36px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.4);}
+.llogo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--plum);margin-bottom:4px;}
+.llogo em{color:var(--gold);font-style:italic;}
+.ltag{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
+.linput{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--cream);outline:none;margin-bottom:10px;transition:border-color 0.2s;}
+.linput:focus{border-color:var(--plum);}
+.lbtn{width:100%;padding:13px;background:var(--plum);color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.2s;}
+.lbtn:hover{opacity:0.88;}
+#lerr{color:var(--red);font-size:12px;margin-top:8px;min-height:16px;}
+.nivel-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(200,147,74,0.12);border:1px solid rgba(200,147,74,0.25);border-radius:8px;padding:4px 12px;margin-bottom:20px;font-size:11px;color:var(--gold);font-weight:600;letter-spacing:0.5px;}
+
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,var(--plum) 0%,#1a0d3a 100%);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,0.25);}
+.hlogo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:white;}
+.hlogo em{color:var(--gold-light);font-style:italic;}
+.hright{display:flex;align-items:center;gap:12px;}
+#nivel-tag{font-size:11px;padding:3px 10px;border-radius:6px;font-weight:600;letter-spacing:0.5px;}
+.tag-master{background:rgba(200,147,74,0.25);color:var(--gold-light);}
+.tag-admin{background:rgba(27,94,107,0.25);color:#7dd3e0;}
+.tag-socio{background:rgba(91,63,160,0.25);color:#c4b5e8;}
+.btn-sair{background:rgba(255,255,255,0.1);color:white;border:none;padding:6px 14px;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;}
+
+/* ── NAV TABS ── */
+.nav-tabs{background:white;border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto;}
+.nav-tab{padding:14px 18px;background:none;border:none;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all 0.15s;}
+.nav-tab:hover{color:var(--plum);}
+.nav-tab.active{color:var(--plum);border-bottom-color:var(--plum);}
+.nbadge{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;margin-left:4px;background:#f0ede8;color:var(--muted);}
+.nbadge-red{background:#fdecea;color:var(--red);}
+.nbadge-green{background:#eafaf1;color:var(--green);}
+.nbadge-gold{background:#fef9ee;color:var(--gold);}
+
+/* ── CONTENT ── */
+.section{display:none;padding:28px 24px;max-width:1200px;margin:0 auto;}
+.section.active{display:block;}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:28px;}
+.stat-card{background:white;border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;line-height:1;margin-bottom:4px;}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+
+/* ── SECTION HEADER ── */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--plum);}
+.btn-action{padding:8px 16px;border-radius:8px;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:0.2s;}
+.btn-refresh{background:#f0ede8;color:var(--muted);}
+.btn-refresh:hover{background:var(--border);}
+.btn-export{background:var(--teal);color:white;}
+
+/* ── CARDS PSI / MED ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.pcard{background:white;border:1px solid var(--border);border-radius:14px;padding:18px;transition:box-shadow 0.2s;}
+.pcard:hover{box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.pcard.pendente{border-left:3px solid var(--orange);}
+.pcard.aprovado{border-left:3px solid var(--green);}
+.pcard.reprovado{border-left:3px solid var(--red);}
+.pcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;}
+.pcard-identity{display:flex;align-items:center;gap:10px;}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0;}
+.pcard-nome{font-size:14px;font-weight:600;color:var(--plum);line-height:1.3;}
+.pcard-reg{font-size:11px;color:var(--gold);font-weight:600;}
+.status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.st-pendente{background:#fef3e8;color:var(--orange);}
+.st-aprovado{background:#eafaf1;color:var(--green);}
+.st-reprovado{background:#fdecea;color:var(--red);}
+.pcard-info{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.info-chip{font-size:11px;padding:3px 9px;border-radius:5px;background:#f4f2ef;color:var(--muted);}
+.info-chip.premium{background:#fef9ee;color:var(--gold);font-weight:600;}
+.pcard-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.btn-aprovar{flex:1;padding:7px;background:var(--green);color:white;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-reprovar{flex:1;padding:7px;background:var(--red);color:white;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-premium{padding:7px 12px;background:var(--gold);color:white;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-unpremium{padding:7px 12px;background:#bbb;color:white;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;}
+.btn-edit{padding:7px 10px;background:#f0ede8;color:var(--muted);border:none;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-del{padding:7px 10px;background:#fdecea;color:var(--red);border:none;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-del.master-only{display:none;}
+.is-master .btn-del.master-only{display:inline-block;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);grid-column:1/-1;}
+.empty-icon{font-size:36px;margin-bottom:10px;opacity:0.4;}
+.loading{text-align:center;padding:40px;color:var(--muted);grid-column:1/-1;font-size:13px;}
+
+/* ── MODAL EDITAR ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal.open{display:flex;}
+.modal-box{background:white;border-radius:18px;padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--plum);margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;transition:border-color 0.2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--violet);}
+.form-group textarea{min-height:70px;resize:vertical;}
+.full{grid-column:span 2;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.btn-salvar{flex:1;padding:12px;background:var(--plum);color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-fechar{padding:12px 20px;background:#f0ede8;color:var(--muted);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;}
+
+/* ── UPLOAD FOTO ADMIN ── */
+.foto-admin-wrap{display:flex;align-items:center;gap:12px;padding:10px;background:var(--cream);border:1.5px dashed var(--border);border-radius:10px;}
+.foto-admin-preview{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none;flex-shrink:0;}
+.foto-admin-ini{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:white;flex-shrink:0;background:var(--plum);}
+.foto-admin-controls{flex:1;}
+.foto-admin-controls input[type=file]{font-size:12px;width:100%;color:var(--muted);}
+.foto-admin-status{font-size:11px;margin-top:4px;min-height:14px;}
+.foto-url-toggle{font-size:11px;color:var(--muted);cursor:pointer;margin-top:4px;text-decoration:underline;}
+.enc-card{background:white;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;}
+.enc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.enc-tipo{font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;}
+.tipo-psi{background:#EEEDFE;color:#3C3489;}
+.tipo-psiq{background:#FDECEA;color:#922;}
+.tipo-nutri{background:#EAF7EE;color:#1a7a3a;}
+.tipo-neuro{background:#E6F1FB;color:#0C447C;}
+.tipo-fisio{background:#FEF3E8;color:#B85C1A;}
+.enc-urg{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:6px;}
+.urg-alta{background:#fdecea;color:var(--red);}
+.urg-media{background:#fef3e8;color:var(--orange);}
+.urg-baixa{background:#eafaf1;color:var(--green);}
+.enc-demanda{font-size:13px;font-weight:500;line-height:1.5;margin-bottom:8px;}
+.enc-meta{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;}
+.enc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-liberar{padding:8px 16px;background:var(--green);color:white;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-concluir{padding:8px 16px;background:var(--teal);color:white;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-del-enc{padding:8px 12px;background:#fdecea;color:var(--red);border:none;border-radius:8px;font-size:12px;cursor:pointer;}
+
+/* ── SISTEMA INFO ── */
+.info-section{background:white;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px;}
+.info-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--plum);margin-bottom:16px;font-weight:600;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f4f2ef;font-size:13px;}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--muted);}
+.info-val{font-weight:600;}
+.chip-link{background:#f0ede8;border-radius:7px;padding:4px 12px;font-size:12px;color:var(--plum);text-decoration:none;font-weight:500;}
+.chip-link:hover{background:var(--border);}
+
+/* ── SQL BLOCK ── */
+.sql-block{background:#1a1a2e;border-radius:12px;padding:18px;margin-bottom:14px;position:relative;}
+.sql-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.sql-code{font-family:monospace;font-size:12px;color:#a8d8ea;line-height:1.7;white-space:pre-wrap;}
+.sql-kw{color:#ff9ff3;}
+.sql-str{color:#ffd93d;}
+.btn-copy-sql{position:absolute;top:12px;right:12px;padding:5px 12px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:none;border-radius:6px;font-size:11px;cursor:pointer;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;color:white;z-index:999;animation:toastIn 0.3s ease;max-width:320px;}
+.toast-ok{background:var(--green);}
+.toast-err{background:var(--red);}
+.toast-info{background:var(--plum);}
+@keyframes toastIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── REDE BADGES ── */
+.rede-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:2px 8px;border-radius:5px;white-space:nowrap;}
+.rede-psi{background:#EEEDFE;color:#3C3489;}
+.rede-med{background:#E8F4F6;color:#1B5E6B;}
+
+/* ── ACESSO RESTRITO ── */
+.locked{opacity:0.4;pointer-events:none;position:relative;}
+.lock-msg{font-size:11px;color:var(--orange);margin-top:4px;}
+
+footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:40px;}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr;}
+  .full{grid-column:span 1;}
+  .section{padding:20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-overlay">
+  <div class="lbox">
+    <div class="nivel-badge">🔐 Acesso restrito</div>
+    <div class="llogo">Conexão <em>Psi</em></div>
+    <div class="ltag">Painel Administrativo</div>
+    <input type="password" class="linput" id="login-pw" placeholder="Sua senha de acesso" autofocus onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="lbtn" onclick="tryLogin()">Entrar no painel</button>
+    <div id="lerr"></div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div>
+    <div class="hlogo">Conexão <em>Psi</em> <span style="font-size:13px;color:rgba(255,255,255,0.4);font-family:'Outfit',sans-serif;font-weight:400;">— Admin</span></div>
+  </div>
+  <div class="hright">
+    <span id="nivel-tag">—</span>
+    <span id="header-user" style="font-size:12px;color:rgba(255,255,255,0.5);"></span>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</header>
+
+<!-- ── TABS ── -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('pendentes')">⏳ Pendentes <span class="nbadge nbadge-red" id="n-pend">0</span></button>
+  <button class="nav-tab" onclick="showTab('aprovados')">✅ Aprovados <span class="nbadge nbadge-green" id="n-aprov">0</span></button>
+  <button class="nav-tab" onclick="showTab('premium')">✨ Premium <span class="nbadge nbadge-gold" id="n-prem">0</span></button>
+  <button class="nav-tab" onclick="showTab('medicos')">🏥 Prof. Saúde <span class="nbadge" id="n-med">0</span></button>
+  <button class="nav-tab" onclick="showTab('encaminhamentos')">🔄 Encaminhamentos <span class="nbadge" id="n-enc">0</span></button>
+  <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
+  <button class="nav-tab" onclick="showTab('meets')">🤝 Meets <span class="nbadge" id="n-meets">0</span></button>
+  <button class="nav-tab" onclick="showTab('termos')">📋 Termos <span class="nbadge nbadge-red" id="n-termos">0</span></button>
+  <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
+  <button class="nav-tab" onclick="abrirDocumentacao()">📖 Documentação</button>
+  <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico')" style="display:none;">🩺 Diagnóstico</button>
+</div>
+
+<!-- ── BUSCA GLOBAL ── -->
+<div id="busca-global-bar" style="display:none;background:white;border-bottom:1px solid var(--border);padding:10px 24px;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;color:var(--muted);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/></svg>
+    <input type="text" id="busca-global" placeholder="Buscar por nome, e-mail, CRP, cidade..." oninput="buscarGlobal()" style="flex:1;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;background:var(--cream);">
+    <span id="busca-resultado-count" style="font-size:12px;color:var(--muted);white-space:nowrap;"></span>
+    <button onclick="limparBusca()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 8px;">✕ Limpar</button>
+  </div>
+</div>
+
+<!-- ── PENDENTES ── -->
+<div class="section active" id="tab-pendentes">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Cadastros pendentes</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Psicólogos aguardando aprovação</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="carregar()">🔄 Atualizar</button>
+  </div>
+  <div id="stats-row" class="stats-row"></div>
+  <div class="grid" id="grid-pend"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── APROVADOS ── -->
+<div class="section" id="tab-aprovados">
+  <div class="sec-header">
+    <div class="sec-title">Psicólogos aprovados</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="search-aprov" placeholder="Filtrar..." oninput="filtrarAba('aprov')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:200px;">
+      <button class="btn-action btn-refresh" onclick="carregar()">🔄</button>
+      <button class="btn-action btn-export" onclick="exportarCSV('psis')">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="grid" id="grid-aprov"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── PREMIUM ── -->
+<div class="section" id="tab-premium">
+  <div class="sec-header">
+    <div class="sec-title">Perfis premium ✨</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="search-prem" placeholder="Filtrar..." oninput="filtrarAba('prem')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:200px;">
+      <button class="btn-action btn-refresh" onclick="carregar()">🔄</button>
+    </div>
+  </div>
+  <div class="grid" id="grid-prem"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── MÉDICOS ── -->
+<div class="section" id="tab-medicos">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Profissionais de saúde</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Psi Med — médicos, nutricionistas, fisioterapeutas</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-action btn-refresh" onclick="carregarMedicos()">🔄 Atualizar</button>
+      <button class="btn-action btn-export" onclick="exportarCSV('medicos')">⬇ CSV</button>
+    </div>
+  </div>
+  <div id="med-stats-row" class="stats-row"></div>
+  <div class="grid" id="grid-med"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── ENCAMINHAMENTOS ── -->
+<div class="section" id="tab-encaminhamentos">
+  <div class="sec-header">
+    <div class="sec-title">Encaminhamentos cruzados</div>
+    <button class="btn-action btn-refresh" onclick="carregarEnc()">🔄 Atualizar</button>
+  </div>
+  <div id="enc-lista"></div>
+</div>
+
+<!-- ── TODOS PSI ── -->
+<div class="section" id="tab-todos">
+  <div class="sec-header">
+    <div class="sec-title">Todos os profissionais</div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="search-todos" placeholder="Buscar por nome, e-mail, CRP, registro..." oninput="filtrarTodos()" style="padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:260px;">
+      <button class="btn-action btn-export" onclick="exportarCSV('todos')">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="grid" id="grid-todos"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── MEETS ── -->
+<div class="section" id="tab-meets">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Meets PsiMed 🤝</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Todas as solicitações de meet entre profissionais</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="carregarMeetsAdmin()">🔄 Atualizar</button>
+  </div>
+  <div id="meets-admin-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div id="meets-admin-lista"></div>
+</div>
+
+<!-- ── TERMOS ── -->
+<div class="section" id="tab-termos">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Aceite de Termos 📋</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Controle de conformidade LGPD e CFP</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="carregarTermos()">🔄 Atualizar</button>
+  </div>
+  <div id="termos-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⏳ Pendentes</div>
+  <div id="termos-pendentes-lista"></div>
+  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">✅ Aceitos</div>
+  <div id="termos-aceitos-lista"></div>
+</div>
+
+<!-- ── SISTEMA ── -->
+<div class="section" id="tab-sistema">
+  <div class="info-section">
+    <div class="info-title">🌐 Links da plataforma</div>
+    <div class="info-row"><span class="info-key">Diretório Conexão Psi</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">Diretório Psi Med</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/med.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">PsiMed Rede Colaborativa</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/met.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">Área de pacientes</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/pacientes.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">Edição de perfil</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/perfil.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">📖 Documentação técnica</span><a href="documentacao_tecnica.html" target="_blank" class="chip-link" style="background:var(--plum);color:white;">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">Cadastro Tally (psis)</span><a href="https://tally.so/r/b5OGYZ" target="_blank" class="chip-link">abrir ↗</a></div>
+    <div class="info-row"><span class="info-key">Grupo WhatsApp</span><a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="chip-link">abrir ↗</a></div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">🔐 Senhas do sistema</div>
+    <div class="info-row"><span class="info-key">Admin Master (você)</span><span class="info-val" id="show-master" style="cursor:pointer;color:var(--muted);" onclick="toggleSenha('master')">clique para ver</span></div>
+    <div class="info-row"><span class="info-key">Admin Sócio</span><span class="info-val" id="show-socio" style="cursor:pointer;color:var(--muted);" onclick="toggleSenha('socio')">clique para ver</span></div>
+    <div class="info-row"><span class="info-key">Área de pacientes (admin)</span><span class="info-val" style="color:var(--muted);">conexaopsi2026</span></div>
+    <div class="info-row"><span class="info-key">Área de pacientes (psis)</span><span class="info-val" style="color:var(--muted);">redepsi2026</span></div>
+    <div class="info-row"><span class="info-key">PsiMed Met</span><span class="info-val" style="color:var(--muted);">login por e-mail cadastrado</span></div>
+    <div style="margin-top:12px;font-size:11px;color:var(--muted);padding:10px;background:#fef9ee;border-radius:8px;border-left:2px solid var(--gold);">⚠️ Senhas visíveis apenas para o nível Master. Troque periodicamente.</div>
+  </div>
+
+  <div class="info-section" id="sql-section">
+    <div class="info-title">🗄️ SQL úteis</div>
+    <div class="sql-block">
+      <div class="sql-label">Resumo por status</div>
+      <div class="sql-code"><span class="sql-kw">SELECT</span> status, <span class="sql-kw">COUNT</span>(*) <span class="sql-kw">FROM</span> psis <span class="sql-kw">GROUP BY</span> status;</div>
+      <button class="btn-copy-sql" onclick="copySQL(this,'SELECT status, COUNT(*) FROM psis GROUP BY status;')">📋 Copiar</button>
+    </div>
+    <div class="sql-block">
+      <div class="sql-label">Psis premium ativas</div>
+      <div class="sql-code"><span class="sql-kw">SELECT</span> nome, crp, email, cidade <span class="sql-kw">FROM</span> psis <span class="sql-kw">WHERE</span> premium = <span class="sql-str">true</span> <span class="sql-kw">AND</span> status = <span class="sql-str">'aprovado'</span>;</div>
+      <button class="btn-copy-sql" onclick="copySQL(this,`SELECT nome, crp, email, cidade FROM psis WHERE premium = true AND status = 'aprovado';`)">📋 Copiar</button>
+    </div>
+    <div class="sql-block">
+      <div class="sql-label">Encaminhamentos em aberto</div>
+      <div class="sql-code"><span class="sql-kw">SELECT</span> indicado_por, tipo_buscado, demanda, urgencia, created_at <span class="sql-kw">FROM</span> encaminhamentos_cruzados <span class="sql-kw">WHERE</span> status = <span class="sql-str">'disponivel'</span> <span class="sql-kw">ORDER BY</span> created_at <span class="sql-kw">DESC</span>;</div>
+      <button class="btn-copy-sql" onclick="copySQL(this,`SELECT indicado_por, tipo_buscado, demanda, urgencia, created_at FROM encaminhamentos_cruzados WHERE status = 'disponivel' ORDER BY created_at DESC;`)">📋 Copiar</button>
+    </div>
+    <div class="sql-block">
+      <div class="sql-label">Psis sem e-mail (não conseguem logar no Met)</div>
+      <div class="sql-code"><span class="sql-kw">SELECT</span> nome, crp, handle <span class="sql-kw">FROM</span> psis <span class="sql-kw">WHERE</span> email <span class="sql-kw">IS NULL OR</span> email = <span class="sql-str">''</span>;</div>
+      <button class="btn-copy-sql" onclick="copySQL(this,`SELECT nome, crp, handle FROM psis WHERE email IS NULL OR email = '';`)">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL EDITAR PSI ── -->
+<div class="modal" id="modal-psi">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Editar psicóloga</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nome</label><input type="text" id="e-nome"></div>
+      <div class="form-group"><label>CRP</label><input type="text" id="e-crp"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="e-email"></div>
+      <div class="form-group"><label>Instagram</label><input type="text" id="e-handle" placeholder="sem @"></div>
+      <div class="form-group"><label>WhatsApp</label><input type="tel" id="e-whatsapp" placeholder="11999999999"></div>
+      <div class="form-group"><label>Abordagem</label><input type="text" id="e-abordagem"></div>
+      <div class="form-group"><label>Formato</label>
+        <select id="e-formato"><option>Online</option><option>Presencial</option><option>Ambos</option></select>
+      </div>
+      <div class="form-group"><label>Cidade</label><input type="text" id="e-cidade"></div>
+      <div class="form-group"><label>Público</label><input type="text" id="e-publico"></div>
+      <div class="form-group"><label>Valor sessão</label><input type="text" id="e-valor"></div>
+      <div class="form-group"><label>Especialidades</label><input type="text" id="e-especialidades"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="e-status"><option value="pendente">Pendente</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option></select>
+      </div>
+      <div class="form-group"><label>Premium</label>
+        <select id="e-premium"><option value="false">Não</option><option value="true">Sim ✨</option></select>
+      </div>
+      <div class="form-group full">
+        <label>Foto de perfil</label>
+        <div class="foto-admin-wrap">
+          <img id="e-foto-preview" class="foto-admin-preview" src="" alt="preview">
+          <div id="e-foto-ini" class="foto-admin-ini">?</div>
+          <div class="foto-admin-controls">
+            <input type="file" id="e-foto-file" accept="image/jpeg,image/png,image/webp" onchange="previewFotoAdmin('e',this)">
+            <input type="hidden" id="e-foto">
+            <div id="e-foto-status" class="foto-admin-status"></div>
+            <span class="foto-url-toggle" onclick="toggleFotoUrl('e')">↕ Colar URL manualmente</span>
+            <input type="url" id="e-foto-url" placeholder="https://..." style="display:none;width:100%;margin-top:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+          </div>
+        </div>
+      </div>
+      <div class="form-group full"><label>Bio</label><textarea id="e-bio"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-salvar" onclick="salvarPsi()">💾 Salvar</button>
+      <button class="btn-fechar" onclick="fecharModal('modal-psi')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL EDITAR MED ── -->
+<div class="modal" id="modal-med">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Editar profissional de saúde</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nome</label><input type="text" id="m-nome"></div>
+      <div class="form-group"><label>Registro (CRM/CRN...)</label><input type="text" id="m-registro"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="m-email"></div>
+      <div class="form-group"><label>WhatsApp</label><input type="tel" id="m-whatsapp"></div>
+      <div class="form-group"><label>Tipo</label>
+        <select id="m-tipo"><option>Psiquiatra</option><option>Nutricionista</option><option>Neurologista</option><option>Fisioterapeuta</option><option>Clínica Geral</option></select>
+      </div>
+      <div class="form-group"><label>Especialidade</label><input type="text" id="m-especialidade"></div>
+      <div class="form-group"><label>Formato</label>
+        <select id="m-formato"><option>Online</option><option>Presencial</option><option>Ambos</option></select>
+      </div>
+      <div class="form-group"><label>Cidade</label><input type="text" id="m-cidade"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="m-status"><option value="pendente">Pendente</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option></select>
+      </div>
+      <div class="form-group"><label>Premium</label>
+        <select id="m-premium"><option value="false">Não</option><option value="true">Sim ✨</option></select>
+      </div>
+      <div class="form-group full">
+        <label>Foto de perfil</label>
+        <div class="foto-admin-wrap">
+          <img id="m-foto-preview" class="foto-admin-preview" src="" alt="preview">
+          <div id="m-foto-ini" class="foto-admin-ini">?</div>
+          <div class="foto-admin-controls">
+            <input type="file" id="m-foto-file" accept="image/jpeg,image/png,image/webp" onchange="previewFotoAdmin('m',this)">
+            <input type="hidden" id="m-foto">
+            <div id="m-foto-status" class="foto-admin-status"></div>
+            <span class="foto-url-toggle" onclick="toggleFotoUrl('m')">↕ Colar URL manualmente</span>
+            <input type="url" id="m-foto-url" placeholder="https://..." style="display:none;width:100%;margin-top:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+          </div>
+        </div>
+      </div>
+      <div class="form-group full"><label>Bio</label><textarea id="m-bio"></textarea></div>
+      <button class="btn-fechar" onclick="fecharModal('modal-med')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIAGNÓSTICO (Master only) ── -->
+<div class="section" id="tab-diagnostico">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">🩺 Diagnóstico do Sistema</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Verifica conexão, tabelas e dados — visível apenas para Master</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="rodarDiagnostico()">▶ Rodar diagnóstico</button>
+  </div>
+
+  <!-- Steps -->
+  <div class="info-section" id="diag-steps-card">
+    <div class="info-title">⚡ Status das tabelas</div>
+    <div id="diag-steps">
+      <div style="color:var(--muted);font-size:13px;">Clique em "Rodar diagnóstico" para verificar.</div>
+    </div>
+  </div>
+
+  <!-- Dados encontrados -->
+  <div class="info-section">
+    <div class="info-title">👥 Dados encontrados</div>
+    <div id="diag-dados"><span style="color:var(--muted);font-size:13px;">Aguardando...</span></div>
+  </div>
+
+  <!-- Teste de login -->
+  <div class="info-section">
+    <div class="info-title">🔐 Simular login — met.html</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Verifica se um e-mail específico consegue acessar o PsiMed</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <input type="email" id="diag-email" placeholder="email@exemplo.com" style="padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;flex:1;min-width:200px;">
+      <button class="btn-action btn-refresh" onclick="testarLoginDiag()" style="white-space:nowrap;">Testar acesso</button>
+    </div>
+    <div id="diag-login" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- Teste de escrita -->
+  <div class="info-section">
+    <div class="info-title">✍️ Teste de escrita — encaminhamentos</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Insere e apaga um registro de teste para confirmar permissões</p>
+    <button class="btn-action btn-refresh" onclick="testarEscritaDiag()">Testar inserção</button>
+    <div id="diag-escrita" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- Psis sem email -->
+  <div class="info-section">
+    <div class="info-title">⚠️ Psis sem e-mail cadastrado</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Essas psis não conseguem fazer login no met.html</p>
+    <button class="btn-action btn-refresh" onclick="buscarSemEmail()">Verificar</button>
+    <div id="diag-sem-email" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<footer>Conexão Psi · Painel Admin · <span id="footer-nivel"></span></footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENCIAIS — ALTERE AQUI
+// ═══════════════════════════════════════════════
+// ⚠️  SEGURANÇA — AÇÕES RECOMENDADAS:
+// 1. Habilite RLS no Supabase para todas as tabelas
+//    (psis, profissionais_saude, encaminhamentos_cruzados)
+// 2. Crie policies RLS que restrinjam UPDATE/DELETE
+//    apenas a chamadas autenticadas via service_role
+// 3. A anon key exposta no JS é inevitável no GitHub
+//    Pages — mas sem RLS ela dá acesso TOTAL ao DB.
+// 4. Considere mover ações destrutivas (delete, patch)
+//    para uma Edge Function com verificação server-side.
+// 5. Troque as senhas do admin periodicamente.
+// ═══════════════════════════════════════════════
+const NIVEIS = {
+  'AdminPsi2026': { nivel: 'master', label: 'Master', nome: 'Michelle' },
+  'SocioPsi2026':  { nivel: 'socio',  label: 'Sócio',  nome: 'Sócio(a)' },
+};
+const SENHAS_VISIVEIS = {
+  master: 'AdminPsi2026',
+  socio:  'SocioPsi2026'
+};
+
+const SB  = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const H   = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+const ADMIN_WA = '5511947388423';
+
+let nivelAtual = null, nomeAtual = '';
+let todosPsis = [], todosMeds = [], todosEnc = [], todosMeets = [];
+let editPsiId = null, editMedId = null;
+let currentAdminPw = null; // armazenada só em memória — nunca persiste além da sessão
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+function tryLogin() {
+  const pw = document.getElementById('login-pw').value;
+  const match = NIVEIS[pw];
+  if (!match) {
+    document.getElementById('lerr').textContent = 'Senha incorreta.';
+    document.getElementById('login-pw').value = '';
+    document.getElementById('login-pw').focus();
+    return;
+  }
+  nivelAtual = match.nivel;
+  nomeAtual  = match.nome;
+  currentAdminPw = pw;                          // ← guardada para Edge Function
+  sessionStorage.setItem('admin-auth', pw);
+
+  document.getElementById('login-overlay').classList.add('hidden');
+  aplicarNivel();
+  carregar();
+  carregarMedicos();
+  carregarEnc();
+  carregarMeetsAdmin();
+  carregarTermos();
+}
+
+function aplicarNivel() {
+  const tag = document.getElementById('nivel-tag');
+  tag.textContent = nomeAtual;
+  tag.className = `tag-${nivelAtual}`;
+  document.getElementById('header-user').textContent = nivelAtual === 'master' ? '👑' : '🔑';
+  document.getElementById('footer-nivel').textContent = `Acesso ${nomeAtual}`;
+
+  if (nivelAtual === 'master') {
+    document.body.classList.add('is-master');
+    document.getElementById('tab-btn-diagnostico').style.display = 'inline-block';
+  }
+}
+
+function sair() {
+  sessionStorage.removeItem('admin-auth');
+  currentAdminPw = null;
+  nivelAtual = null;
+  document.getElementById('login-overlay').classList.remove('hidden');
+  document.getElementById('login-pw').value = '';
+  document.getElementById('lerr').textContent = '';
+}
+
+// Auto-login se sessão ativa
+const savedPw = sessionStorage.getItem('admin-auth');
+if (savedPw && NIVEIS[savedPw]) {
+  nivelAtual     = NIVEIS[savedPw].nivel;
+  nomeAtual      = NIVEIS[savedPw].nome;
+  currentAdminPw = savedPw;                     // ← restaura para Edge Function
+  document.getElementById('login-overlay').classList.add('hidden');
+  aplicarNivel();
+  carregar();
+  carregarMedicos();
+  carregarEnc();
+  carregarMeetsAdmin();
+  carregarTermos();
+}
+
+function toggleSenha(tipo) {
+  if (nivelAtual !== 'master') { toast('Apenas o Master pode ver senhas.', 'err'); return; }
+  const el = document.getElementById('show-' + tipo);
+  if (el.dataset.shown === '1') { el.textContent = 'clique para ver'; el.dataset.shown = '0'; }
+  else { el.textContent = SENHAS_VISIVEIS[tipo]; el.dataset.shown = '1'; }
+}
+
+// ═══════════════════════════════════════════════
+// API — GET e escrita direto no Supabase REST
+// Proteção: senha admin verificada client-side
+//           + RLS permite UPDATE/DELETE para anon
+// ═══════════════════════════════════════════════
+async function api(method, path, body) {
+  const r = await fetch(`${SB}/rest/v1/${path}`, {
+    method,
+    headers: H,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await r.text();
+  if (!r.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
+}
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'medicos' && !todosMeds.length) carregarMedicos();
+  if (id === 'encaminhamentos' && !todosEnc.length) carregarEnc();
+  if (id === 'meets') carregarMeetsAdmin();
+  if (id === 'termos') carregarTermos();
+  // Busca global visível só nas abas de psis
+  const barEl = document.getElementById('busca-global-bar');
+  if (barEl) {
+    barEl.style.display = ['pendentes','aprovados','premium','todos'].includes(id) ? 'block' : 'none';
+    if (barEl.style.display === 'none') limparBusca();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PSI
+// ═══════════════════════════════════════════════
+const CORES = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
+
+async function carregar() {
+  try {
+    const psis = await api('GET', 'psis?select=*&order=created_at.desc&limit=500');
+    todosPsis = (psis || []).map(p => ({...p, _rede:'psi'}));
+    atualizarStatsPsi();
+    renderPsis();
+  } catch(e) { toast('Erro ao carregar: ' + e.message, 'err'); }
+}
+
+function atualizarStatsPsi() {
+  // Stats unificados: psis + profissionais_saude
+  const todos = [...todosPsis, ...todosMeds];
+  const pend  = todos.filter(p => (p.status||'').toLowerCase() === 'pendente').length;
+  const aprov = todos.filter(p => (p.status||'').toLowerCase() === 'aprovado').length;
+  const prem  = todos.filter(p => p.premium === true).length;
+  const reprov= todos.filter(p => (p.status||'').toLowerCase() === 'reprovado').length;
+
+  document.getElementById('n-pend').textContent  = pend;
+  document.getElementById('n-aprov').textContent = aprov;
+  document.getElementById('n-prem').textContent  = prem;
+  document.getElementById('n-med').textContent   = todosMeds.length;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${todosPsis.length}</div><div class="stat-lbl">Psis</div></div>
+    <div class="stat-card"><div class="stat-num">${todosMeds.length}</div><div class="stat-lbl">Prof. Saúde</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${pend}</div><div class="stat-lbl">Pendentes</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${aprov}</div><div class="stat-lbl">Aprovados</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--gold)">${prem}</div><div class="stat-lbl">Premium</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${reprov}</div><div class="stat-lbl">Reprovados</div></div>
+  `;
+}
+
+function renderPsis() {
+  const todos = [...todosPsis, ...todosMeds];
+  renderPsiGrid('pend',  todos.filter(p => (p.status||'').toLowerCase() === 'pendente'));
+  renderPsiGrid('aprov', todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
+  renderPsiGrid('prem',  todos.filter(p => p.premium === true));
+  renderPsiGrid('todos', todos);
+}
+
+function filtrarTodos() {
+  const q = document.getElementById('search-todos').value.toLowerCase();
+  const todos = [...todosPsis, ...todosMeds];
+  const lista = todos.filter(p =>
+    !q ||
+    (p.nome||'').toLowerCase().includes(q) ||
+    (p.email||'').toLowerCase().includes(q) ||
+    (p.crp||p.registro||'').toLowerCase().includes(q) ||
+    (p.cidade||'').toLowerCase().includes(q) ||
+    (p.abordagem||p.especialidade||p.tipo||'').toLowerCase().includes(q)
+  );
+  renderPsiGrid('todos', lista);
+}
+
+function filtrarAba(sufixo) {
+  const q = (document.getElementById('search-'+sufixo)?.value||'').toLowerCase().trim();
+  const todos = [...todosPsis, ...todosMeds];
+  const mapaFiltro = {
+    aprov: p => (p.status||'').toLowerCase() === 'aprovado',
+    prem:  p => p.premium === true,
+    pend:  p => (p.status||'').toLowerCase() === 'pendente',
+  };
+  const lista = todos.filter(p => {
+    if (!mapaFiltro[sufixo]?.(p)) return false;
+    if (!q) return true;
+    return (p.nome||'').toLowerCase().includes(q) ||
+           (p.email||'').toLowerCase().includes(q) ||
+           (p.crp||p.registro||'').toLowerCase().includes(q) ||
+           (p.cidade||'').toLowerCase().includes(q);
+  });
+  renderPsiGrid(sufixo, lista);
+}
+
+function buscarGlobal() {
+  const q = document.getElementById('busca-global').value.toLowerCase().trim();
+  const abaAtiva = document.querySelector('.section.active')?.id?.replace('tab-','');
+  const todos = [...todosPsis, ...todosMeds];
+  const mapaFiltro = {
+    pendentes: p => (p.status||'').toLowerCase() === 'pendente',
+    aprovados: p => (p.status||'').toLowerCase() === 'aprovado',
+    premium:   p => p.premium === true,
+    todos:     ()=> true
+  };
+  const filtroBase = mapaFiltro[abaAtiva] || (()=>true);
+  const lista = todos.filter(p => {
+    if (!filtroBase(p)) return false;
+    if (!q) return true;
+    return (p.nome||'').toLowerCase().includes(q) ||
+           (p.email||'').toLowerCase().includes(q) ||
+           (p.crp||p.registro||'').toLowerCase().includes(q) ||
+           (p.cidade||'').toLowerCase().includes(q) ||
+           (p.abordagem||p.especialidade||p.tipo||'').toLowerCase().includes(q);
+  });
+  const sufixo = {pendentes:'pend',aprovados:'aprov',premium:'prem',todos:'todos'}[abaAtiva];
+  if (sufixo) renderPsiGrid(sufixo, lista);
+  document.getElementById('busca-resultado-count').textContent = q ? `${lista.length} resultado(s)` : '';
+}
+
+function limparBusca() {
+  const el = document.getElementById('busca-global');
+  if (el) el.value = '';
+  document.getElementById('busca-resultado-count').textContent = '';
+  renderPsis();
+}
+
+function renderPsiGrid(sufixo, lista) {
+  const g = document.getElementById('grid-' + sufixo);
+  if (!g) return;
+  if (!lista.length) { g.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Nenhum registro aqui.</div>`; return; }
+  g.innerHTML = lista.map(p => {
+    const st  = (p.status||'pendente').toLowerCase();
+    const isMed = p._rede === 'med';
+    const regStr = isMed ? (p.registro||'—') : (p.crp||'—');
+    const abStr  = isMed ? (p.tipo || p.especialidade || '') : (p.abordagem || '');
+    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cor = CORES[Math.abs((ini.charCodeAt(0)||0)) % CORES.length];
+    const av  = p.foto_url
+      ? `<img src="${p.foto_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
+      : `<div class="avatar" style="background:${cor}">${ini}</div>`;
+    const redeBadge = isMed
+      ? `<span class="rede-badge rede-med">🏥 Psi Med</span>`
+      : `<span class="rede-badge rede-psi">🧠 Conexão Psi</span>`;
+    return `<div class="pcard ${st}">
+      <div class="pcard-top">
+        <div class="pcard-identity">${av}<div>
+          <div class="pcard-nome">${p.nome||'—'}</div>
+          <div class="pcard-reg">${regStr}</div>
+        </div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          ${redeBadge}
+          <span class="status-badge st-${st}">${st}</span>
+        </div>
+      </div>
+      <div class="pcard-info">
+        ${p.email ? `<span class="info-chip">✉ ${p.email}</span>` : ''}
+        ${p.cidade ? `<span class="info-chip">📍 ${p.cidade}</span>` : ''}
+        ${abStr ? `<span class="info-chip">${abStr}</span>` : ''}
+        ${p.formato ? `<span class="info-chip">${p.formato}</span>` : ''}
+        ${p.premium ? `<span class="info-chip premium">⭐ Premium</span>` : ''}
+        ${p.termos_aceitos ? '<span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">📋 Termos ✓</span>' : '<span class="info-chip" style="background:#fff8f0;color:#b7600a;">📋 Termos ⏳</span>'}
+        ${p.whatsapp ? `<span class="info-chip">📱 ${p.whatsapp}</span>` : ''}
+      </div>
+      <div class="pcard-actions">
+        ${st === 'pendente' ? `<button class="btn-aprovar" onclick="aprovar('${p.id}','${p._rede}')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovar('${p.id}','${p._rede}')">❌ Reprovar</button>` : ''}
+        ${st === 'aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremium('${p.id}','${p._rede}',true)">✨ Premium</button>` : ''}
+        ${p.premium ? `<button class="btn-unpremium" onclick="setPremium('${p.id}','${p._rede}',false)">Remover ⭐</button>` : ''}
+        <button class="btn-edit" onclick="abrirEdit('${p.id}','${p._rede}')">✏️</button>
+        <button class="btn-del master-only" onclick="excluir('${p.id}','${p._rede}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Helper: resolve tabela e array local
+function resolveRede(rede) {
+  return rede === 'psi'
+    ? { tbl: 'psis', arr: todosPsis }
+    : { tbl: 'profissionais_saude', arr: todosMeds };
+}
+
+async function aprovar(id, rede) {
+  try {
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {status:'aprovado'});
+    const p = arr.find(x => x.id === id); if(p) p.status='aprovado';
+    atualizarStatsPsi(); renderPsis(); toast('✅ Aprovado!');
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+async function reprovar(id, rede) {
+  if (!confirm('Reprovar este cadastro?')) return;
+  try {
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {status:'reprovado'});
+    const p = arr.find(x => x.id === id); if(p) p.status='reprovado';
+    atualizarStatsPsi(); renderPsis(); toast('❌ Reprovado.');
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+async function setPremium(id, rede, val) {
+  try {
+    const {tbl, arr} = resolveRede(rede);
+    await api('PATCH', `${tbl}?id=eq.${id}`, {premium:val});
+    const p = arr.find(x => x.id === id); if(p) p.premium=val;
+    atualizarStatsPsi(); renderPsis(); toast(val ? '✨ Premium ativado!' : 'Premium removido.');
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+async function excluir(id, rede) {
+  if (nivelAtual !== 'master') { toast('Apenas o Master pode excluir.','err'); return; }
+  if (!confirm('Excluir permanentemente? Esta ação não pode ser desfeita.')) return;
+  try {
+    const {tbl, arr} = resolveRede(rede);
+    await api('DELETE', `${tbl}?id=eq.${id}`);
+    if (rede === 'psi') todosPsis = todosPsis.filter(x => x.id !== id);
+    else todosMeds = todosMeds.filter(x => x.id !== id);
+    atualizarStatsPsi(); renderPsis(); toast('Registro excluído.');
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+
+// Dispatcher — abre modal correto
+function abrirEdit(id, rede) {
+  if (rede === 'psi') abrirEditPsi(id);
+  else abrirEditMed(id);
+}
+
+// Aliases legados (compatibilidade com código existente nos botões de edição interna)
+async function aprovarMed(id) { return aprovar(id, 'med'); }
+async function reprovarMed(id) { return reprovar(id, 'med'); }
+async function setPremiumMed(id, val) { return setPremium(id, 'med', val); }
+async function excluirMed(id) { return excluir(id, 'med'); }
+async function excluirPsi(id) { return excluir(id, 'psi'); }
+
+function abrirEditPsi(id) {
+  const p = todosPsis.find(x => x.id === id); if(!p) return;
+  editPsiId = id;
+  document.getElementById('e-nome').value = p.nome||'';
+  document.getElementById('e-crp').value  = p.crp||'';
+  document.getElementById('e-email').value= p.email||'';
+  document.getElementById('e-handle').value=(p.handle||'').replace('@','');
+  document.getElementById('e-whatsapp').value=p.whatsapp||'';
+  document.getElementById('e-abordagem').value=p.abordagem||'';
+  document.getElementById('e-formato').value=p.formato||'Online';
+  document.getElementById('e-cidade').value=p.cidade||'';
+  document.getElementById('e-publico').value=p.publico||'';
+  document.getElementById('e-valor').value=p.valor_sessao||'';
+  document.getElementById('e-especialidades').value=p.especialidades||'';
+  document.getElementById('e-bio').value=p.bio||'';
+  document.getElementById('e-foto').value=p.foto_url||'';
+  document.getElementById('e-status').value=p.status||'pendente';
+  document.getElementById('e-premium').value=p.premium?'true':'false';
+  // Foto: preview ou iniciais
+  resetFotoAdmin('e', p.foto_url, p.nome);
+  document.getElementById('e-foto-file').value='';
+  document.getElementById('e-foto-status').textContent='';
+  document.getElementById('modal-psi').classList.add('open');
+}
+async function salvarPsi() {
+  if(!editPsiId) return;
+  const btn = document.querySelector('#modal-psi .btn-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  // Resolve foto: file upload > URL manual > hidden atual
+  let fotoUrl = document.getElementById('e-foto').value.trim();
+  const urlManual = document.getElementById('e-foto-url').value.trim();
+  if (urlManual) fotoUrl = urlManual;
+
+  const fotoFile = document.getElementById('e-foto-file').files[0];
+  if (fotoFile) {
+    try {
+      btn.textContent = 'Enviando foto...';
+      document.getElementById('e-foto-status').textContent = '⏳ Enviando...';
+      const email = document.getElementById('e-email').value.trim();
+      const base64 = await fileToBase64(fotoFile);
+      const r = await fetch(`${SB}/functions/v1/clever-handler`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: editPsiId, email, foto: base64, filename: fotoFile.name })
+      });
+      const res = await r.json();
+      if (!r.ok) throw new Error(res.error || 'Erro no upload');
+      fotoUrl = res.url;
+      document.getElementById('e-foto-status').textContent = '✅ Upload feito';
+    } catch(e) {
+      toast('Erro no upload da foto: '+e.message,'err');
+      btn.disabled=false; btn.textContent='💾 Salvar';
+      return;
+    }
+  }
+
+  const updates = {
+    nome:document.getElementById('e-nome').value.trim(),
+    crp:document.getElementById('e-crp').value.trim(),
+    email:document.getElementById('e-email').value.trim(),
+    handle:document.getElementById('e-handle').value.trim().replace('@',''),
+    whatsapp:document.getElementById('e-whatsapp').value.trim().replace(/\D/g,''),
+    abordagem:document.getElementById('e-abordagem').value.trim(),
+    formato:document.getElementById('e-formato').value,
+    cidade:document.getElementById('e-cidade').value.trim(),
+    publico:document.getElementById('e-publico').value.trim(),
+    valor_sessao:document.getElementById('e-valor').value.trim(),
+    especialidades:document.getElementById('e-especialidades').value.trim(),
+    bio:document.getElementById('e-bio').value.trim(),
+    foto_url: fotoUrl,
+    status:document.getElementById('e-status').value,
+    premium:document.getElementById('e-premium').value==='true'
+  };
+  try {
+    await api('PATCH', `psis?id=eq.${editPsiId}`, updates);
+    const p = todosPsis.find(x=>x.id===editPsiId); if(p) Object.assign(p,updates);
+    fecharModal('modal-psi'); atualizarStatsPsi(); renderPsis(); toast('✅ Salvo!');
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+  finally { btn.disabled=false; btn.textContent='💾 Salvar'; }
+}
+
+// ═══════════════════════════════════════════════
+// MÉDICOS
+// ═══════════════════════════════════════════════
+async function carregarMedicos() {
+  try {
+    const meds = await api('GET', 'profissionais_saude?select=*&order=created_at.desc&limit=500') || [];
+    todosMeds = meds.map(p => ({...p, _rede:'med'}));
+    atualizarStatsMed();
+    renderMeds();
+    // Atualiza tabs unificadas também
+    atualizarStatsPsi();
+    renderPsis();
+  } catch(e) { toast('Erro ao carregar Prof. Saúde: '+e.message,'err'); }
+}
+
+function atualizarStatsMed() {
+  const pend  = todosMeds.filter(p => (p.status||'').toLowerCase() === 'pendente').length;
+  const aprov = todosMeds.filter(p => (p.status||'').toLowerCase() === 'aprovado').length;
+  const prem  = todosMeds.filter(p => p.premium === true).length;
+  document.getElementById('n-med').textContent = todosMeds.length;
+  document.getElementById('med-stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${todosMeds.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${pend}</div><div class="stat-lbl">Pendentes</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${aprov}</div><div class="stat-lbl">Aprovados</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--gold)">${prem}</div><div class="stat-lbl">Premium</div></div>
+  `;
+}
+
+function renderMeds() {
+  const g = document.getElementById('grid-med');
+  if (!todosMeds.length) { g.innerHTML='<div class="empty-state"><div class="empty-icon">🏥</div>Nenhum profissional de saúde cadastrado ainda.</div>'; return; }
+  g.innerHTML = todosMeds.map(p => {
+    const st = (p.status||'pendente').toLowerCase();
+    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cor = CORES[Math.abs((ini.charCodeAt(0)||0)) % CORES.length];
+    return `<div class="pcard ${st}">
+      <div class="pcard-top">
+        <div class="pcard-identity">
+          <div class="avatar" style="background:${cor}">${ini}</div>
+          <div><div class="pcard-nome">${p.nome||'—'}</div>
+          <div class="pcard-reg">${p.registro||'—'}</div></div>
+        </div>
+        <span class="status-badge st-${st}">${st}</span>
+      </div>
+      <div class="pcard-info">
+        ${p.tipo ? `<span class="info-chip" style="background:#e8f4f6;color:var(--teal);">${p.tipo}</span>` : ''}
+        ${p.email ? `<span class="info-chip">✉ ${p.email}</span>` : ''}
+        ${p.cidade ? `<span class="info-chip">📍 ${p.cidade}</span>` : ''}
+        ${p.premium ? `<span class="info-chip premium">⭐ Premium</span>` : ''}
+      </div>
+      <div class="pcard-actions">
+        ${st==='pendente' ? `<button class="btn-aprovar" onclick="aprovar('${p.id}','med')">✅ Aprovar</button><button class="btn-reprovar" onclick="reprovar('${p.id}','med')">❌ Reprovar</button>` : ''}
+        ${st==='aprovado' && !p.premium ? `<button class="btn-premium" onclick="setPremium('${p.id}','med',true)">✨ Premium</button>` : ''}
+        ${p.premium ? `<button class="btn-unpremium" onclick="setPremium('${p.id}','med',false)">Remover ⭐</button>` : ''}
+        <button class="btn-edit" onclick="abrirEditMed('${p.id}')">✏️</button>
+        <button class="btn-del master-only" onclick="excluir('${p.id}','med')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// (ver aliases em resolveRede — aprovarMed/reprovarMed/setPremiumMed/excluirMed definidos acima)
+
+function abrirEditMed(id) {
+  const p = todosMeds.find(x=>x.id===id); if(!p) return;
+  editMedId = id;
+  document.getElementById('m-nome').value=p.nome||'';
+  document.getElementById('m-registro').value=p.registro||'';
+  document.getElementById('m-email').value=p.email||'';
+  document.getElementById('m-whatsapp').value=p.whatsapp||'';
+  document.getElementById('m-tipo').value=p.tipo||'Psiquiatra';
+  document.getElementById('m-especialidade').value=p.especialidade||'';
+  document.getElementById('m-formato').value=p.formato||'Online';
+  document.getElementById('m-cidade').value=p.cidade||'';
+  document.getElementById('m-status').value=p.status||'pendente';
+  document.getElementById('m-premium').value=p.premium?'true':'false';
+  document.getElementById('m-bio').value=p.bio||'';
+  document.getElementById('m-foto').value=p.foto_url||'';
+  resetFotoAdmin('m', p.foto_url, p.nome);
+  document.getElementById('m-foto-file').value='';
+  document.getElementById('m-foto-status').textContent='';
+  document.getElementById('modal-med').classList.add('open');
+}
+async function salvarMed() {
+  if(!editMedId) return;
+  const btn = document.querySelector('#modal-med .btn-salvar');
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  let fotoUrl = document.getElementById('m-foto').value.trim();
+  const urlManual = document.getElementById('m-foto-url').value.trim();
+  if (urlManual) fotoUrl = urlManual;
+
+  const fotoFile = document.getElementById('m-foto-file').files[0];
+  if (fotoFile) {
+    try {
+      btn.textContent='Enviando foto...';
+      document.getElementById('m-foto-status').textContent='⏳ Enviando...';
+      const email = document.getElementById('m-email').value.trim();
+      const base64 = await fileToBase64(fotoFile);
+      const r = await fetch(`${SB}/functions/v1/clever-handler`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: editMedId, email, foto: base64, filename: fotoFile.name })
+      });
+      const res = await r.json();
+      if (!r.ok) throw new Error(res.error || 'Erro no upload');
+      fotoUrl = res.url;
+      document.getElementById('m-foto-status').textContent='✅ Upload feito';
+    } catch(e) {
+      toast('Erro no upload da foto: '+e.message,'err');
+      btn.disabled=false; btn.textContent='💾 Salvar'; return;
+    }
+  }
+
+  const updates={
+    nome:document.getElementById('m-nome').value.trim(),
+    registro:document.getElementById('m-registro').value.trim(),
+    email:document.getElementById('m-email').value.trim(),
+    whatsapp:document.getElementById('m-whatsapp').value.trim().replace(/\D/g,''),
+    tipo:document.getElementById('m-tipo').value,
+    especialidade:document.getElementById('m-especialidade').value.trim(),
+    formato:document.getElementById('m-formato').value,
+    cidade:document.getElementById('m-cidade').value.trim(),
+    status:document.getElementById('m-status').value,
+    premium:document.getElementById('m-premium').value==='true',
+    bio:document.getElementById('m-bio').value.trim(),
+    foto_url: fotoUrl
+  };
+  try {
+    await api('PATCH',`profissionais_saude?id=eq.${editMedId}`,updates);
+    const p=todosMeds.find(x=>x.id===editMedId);if(p)Object.assign(p,updates);
+    fecharModal('modal-med'); atualizarStatsMed(); renderMeds(); toast('✅ Salvo!');
+  } catch(e){toast('Erro: '+e.message,'err');}
+  finally { btn.disabled=false; btn.textContent='💾 Salvar'; }
+}
+
+// ═══════════════════════════════════════════════
+// ENCAMINHAMENTOS
+// ═══════════════════════════════════════════════
+const TIPO_LABEL = {psi:'🧠 Psicólogo(a)',psiquiatra:'🏥 Psiquiatra',nutricionista:'🥗 Nutricionista',neurologista:'🧬 Neurologista',fisioterapeuta:'💪 Fisioterapeuta','clinica geral':'🩺 Clínica Geral'};
+const TIPO_CLASS = {psi:'tipo-psi',psiquiatra:'tipo-psiq',nutricionista:'tipo-nutri',neurologista:'tipo-neuro',fisioterapeuta:'tipo-fisio','clinica geral':'tipo-psi'};
+
+async function carregarEnc() {
+  try {
+    todosEnc = await api('GET','encaminhamentos_cruzados?select=*&order=created_at.desc&limit=200')||[];
+    document.getElementById('n-enc').textContent = todosEnc.filter(e=>e.status==='disponivel').length;
+    renderEnc();
+  } catch(e){toast('Erro ao carregar encaminhamentos: '+e.message,'err');}
+}
+
+function renderEnc() {
+  const el = document.getElementById('enc-lista');
+  if(!todosEnc.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔄</div>Nenhum encaminhamento ainda.</div>';return;}
+  el.innerHTML = todosEnc.map(c => {
+    const urgClass={alta:'urg-alta',media:'urg-media',baixa:'urg-baixa'}[c.urgencia]||'urg-media';
+    const urgLabel={alta:'🔴 Urgente',media:'🟡 Média',baixa:'🟢 Sem pressa'}[c.urgencia]||'';
+    const tipoLabel=TIPO_LABEL[c.tipo_buscado]||c.tipo_buscado;
+    const tipoClass=TIPO_CLASS[c.tipo_buscado]||'tipo-psi';
+    const numInt=(c.interessados||[]).length;
+    const dt=new Date(c.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<div class="enc-card">
+      <div class="enc-top">
+        <div>
+          <span class="enc-tipo ${tipoClass}">${tipoLabel}</span>
+          <span class="enc-urg ${urgClass}">${urgLabel}</span>
+        </div>
+        <span style="font-size:11px;color:var(--muted);">${dt} · ${c.status}</span>
+      </div>
+      <div class="enc-demanda">${c.demanda||'—'}</div>
+      <div class="enc-meta">
+        <strong>Indicado por:</strong> ${c.indicado_por} (${c.crp_ou_registro||'—'})<br>
+        <strong>WA:</strong> ${c.contato_indicador||'não informado'} ·
+        <strong>${numInt}</strong> interessado(s): ${(c.interessados||[]).join(', ')||'nenhum'}
+        ${c.cidade?'<br>📍 '+c.cidade:''}
+        ${c.observacoes?'<br><em>'+c.observacoes+'</em>':''}
+      </div>
+      <div class="enc-actions">
+        <button class="btn-liberar" onclick="liberarContato(${JSON.stringify(c).replace(/"/g,'&quot;')})">📲 Liberar contato</button>
+        <button class="btn-concluir" onclick="concluirEnc('${c.id}')">✅ Concluir</button>
+        <button class="btn-del-enc master-only" onclick="excluirEnc('${c.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function liberarContato(caso) {
+  const tipoLabel=TIPO_LABEL[caso.tipo_buscado]||caso.tipo_buscado;
+  const int=(caso.interessados||[]).join(', ')||'ninguém ainda';
+  const waMsg=encodeURIComponent(`📋 *PsiMed Rede Colaborativa*\n\nOlá ${caso.indicado_por}! Seu encaminhamento foi visualizado por profissionais da rede.\n\n*Buscando:* ${tipoLabel}\n*Interessados:* ${int}\n\nEntre em contato para combinar o encaminhamento. 💙`);
+  const tel=(caso.contato_indicador||'').replace(/\D/g,'');
+  if(tel) window.open(`https://wa.me/55${tel}?text=${waMsg}`,'_blank');
+  else toast('WhatsApp do indicador não cadastrado.','err');
+}
+async function concluirEnc(id) {
+  try { await api('PATCH',`encaminhamentos_cruzados?id=eq.${id}`,{status:'concluido'}); const e=todosEnc.find(x=>x.id===id);if(e)e.status='concluido'; renderEnc(); toast('✅ Concluído!'); } catch(e){toast('Erro: '+e.message,'err');}
+}
+async function excluirEnc(id) {
+  if(nivelAtual!=='master'){toast('Apenas o Master pode excluir.','err');return;}
+  if(!confirm('Excluir encaminhamento?'))return;
+  try { await api('DELETE',`encaminhamentos_cruzados?id=eq.${id}`); todosEnc=todosEnc.filter(x=>x.id!==id); renderEnc(); toast('Excluído.'); } catch(e){toast('Erro: '+e.message,'err');}
+}
+
+
+// ═══════════════════════════════════════════════
+// MEETS ADMIN
+// ═══════════════════════════════════════════════
+const MEET_TIPO_LABEL = {
+  encaminhamento:'📋 Encaminhamento de paciente',
+  supervisao:'📚 Supervisão clínica',
+  interconsulta:'🔬 Interconsulta',
+  parceria:'🤝 Parceria profissional',
+  outro:'💬 Outro'
+};
+
+async function carregarMeetsAdmin() {
+  const el = document.getElementById('meets-admin-lista');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Carregando meets...</div>';
+  try {
+    todosMeets = await api('GET','meet_requests?select=*&order=created_at.desc&limit=200') || [];
+    const total = todosMeets.length;
+    const pend  = todosMeets.filter(m => m.status === 'pendente').length;
+    const aceit = todosMeets.filter(m => m.status === 'aceito').length;
+    document.getElementById('n-meets').textContent = pend || '';
+    document.getElementById('meets-admin-stats').innerHTML = `
+      <span class="info-chip">${total} total</span>
+      <span class="info-chip" style="background:#fef6ec;color:#b7600a;">${pend} pendentes</span>
+      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${aceit} aceitos</span>
+    `;
+    renderMeetsAdmin();
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Erro ao carregar meets: '+e.message+'</div>';
+  }
+}
+
+function renderMeetsAdmin() {
+  const el = document.getElementById('meets-admin-lista');
+  if (!todosMeets.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div>Nenhum meet registrado ainda.</div>';
+    return;
+  }
+  const statusColor = {pendente:'#fef6ec;color:#b7600a', aceito:'#edf7f3;color:#1a7a4a', recusado:'#fdecea;color:#c0392b'};
+  el.innerHTML = todosMeets.map(m => {
+    const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo || '—';
+    const stColor = statusColor[m.status] || statusColor.pendente;
+    const wa = (m.solicitante_wa||'').replace(/\D/g,'');
+    const waLink = wa ? `<a href="https://wa.me/55${wa}" target="_blank" style="color:var(--azul);font-size:12px;">📱 ${m.solicitante_wa}</a>` : '';
+    return `<div class="enc-card" style="margin-bottom:12px;">
+      <div class="enc-top">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:13px;font-weight:600;">De: ${m.solicitante_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.solicitante_registro||'—'})</span></span>
+          <span style="font-size:11px;color:var(--muted);">→</span>
+          <span style="font-size:13px;font-weight:600;">Para: ${m.destinatario_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.destinatario_registro||'—'})</span></span>
+        </div>
+        <span style="background:${stColor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;">${m.status||'pendente'}</span>
+      </div>
+      <div style="margin:8px 0;"><span class="enc-tipo tipo-psi">${tipoLabel}</span></div>
+      <div class="enc-demanda" style="font-size:13px;">${m.mensagem||'—'}</div>
+      ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;">🕐 ${m.disponibilidade}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap;">
+        ${waLink}
+        <span style="font-size:11px;color:var(--muted);">${dt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// TERMOS ADMIN
+// ═══════════════════════════════════════════════
+async function carregarTermos() {
+  const el = document.getElementById('termos-pendentes-lista');
+  const el2 = document.getElementById('termos-aceitos-lista');
+  if (!el || !el2) return;
+  el.innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const [psis, meds] = await Promise.all([
+      api('GET','psis?select=nome,crp,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200'),
+      api('GET','profissionais_saude?select=nome,registro,tipo,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200')
+    ]);
+    const todos = [
+      ...(psis||[]).map(p => ({...p, _reg: p.crp, _tipo: '🧠 Psi'})),
+      ...(meds||[]).map(m => ({...m, _reg: m.registro, _tipo: '🏥 Med'}))
+    ];
+    const pendentes = todos.filter(p => !p.termos_aceitos);
+    const aceitos   = todos.filter(p =>  p.termos_aceitos);
+    document.getElementById('n-termos').textContent = pendentes.length || '';
+    document.getElementById('termos-stats').innerHTML = `
+      <span class="info-chip">${todos.length} aprovados total</span>
+      <span class="info-chip" style="background:#fdecea;color:#c0392b;">${pendentes.length} pendentes</span>
+      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${aceitos.length} aceitaram</span>
+    `;
+    const renderLinha = (p) => {
+      const dt = p.termos_aceitos_em
+        ? new Date(p.termos_aceitos_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})
+        : '—';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <span style="font-size:11px;background:#f0eff5;color:var(--muted);padding:2px 8px;border-radius:10px;">${p._tipo}</span>
+        <span style="flex:1;font-size:13px;font-weight:500;">${p.nome||'—'}</span>
+        <span style="font-size:12px;color:var(--muted);">${p._reg||'—'}</span>
+        ${p.premium ? '<span class="info-chip premium" style="font-size:11px;">⭐</span>' : ''}
+        <span style="font-size:11px;color:var(--muted);">${dt}</span>
+      </div>`;
+    };
+    el.innerHTML  = pendentes.length ? pendentes.map(renderLinha).join('') : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum pendente 🎉</div>';
+    el2.innerHTML = aceitos.length   ? aceitos.map(renderLinha).join('')   : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum aceite registrado ainda.</div>';
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state">Erro: '+e.message+'</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════
+function exportarCSV(tipo) {
+  let dados, cols;
+  if (tipo === 'psis') {
+    dados = todosPsis;
+    cols  = ['nome','email','crp','handle','abordagem','formato','cidade','publico','status','premium','whatsapp','created_at'];
+  } else if (tipo === 'medicos') {
+    dados = todosMeds;
+    cols  = ['nome','email','registro','tipo','especialidade','formato','cidade','status','premium','whatsapp','created_at'];
+  } else {
+    // 'todos' — exporta combinados com coluna extra _rede
+    dados = [...todosPsis, ...todosMeds];
+    cols  = ['_rede','nome','email','crp','registro','abordagem','tipo','formato','cidade','status','premium','whatsapp','created_at'];
+  }
+  const rows = dados.map(p => cols.map(c=>`"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv = '\uFEFF' + [cols.join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `conexao-psi-${tipo}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('⬇ CSV exportado!','info');
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function fecharModal(id) {
+  document.getElementById(id).classList.remove('open');
+  editPsiId = null; editMedId = null;
+}
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+function copySQL(btn, text) {
+  navigator.clipboard.writeText(text).then(() => { btn.textContent='✅ Copiado!'; setTimeout(()=>btn.textContent='📋 Copiar',2000); });
+}
+
+// ═══════════════════════════════════════════════
+// DIAGNÓSTICO (Master only)
+// ═══════════════════════════════════════════════
+function diagRow(label, badge, badgeTipo, extra='') {
+  const cores = {ok:'#eafaf1;color:#27ae60',err:'#fdecea;color:#c0392b',warn:'#fef3e8;color:#e67e22',info:'#e8f4f6;color:#1B5E6B'};
+  const cor = cores[badgeTipo] || cores.info;
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f4f2ef;font-size:13px;flex-wrap:wrap;gap:6px;">
+    <span style="color:var(--muted)">${label}</span>
+    <span style="display:flex;align-items:center;gap:8px;">
+      <span style="background:${cor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;">${badge}</span>
+      ${extra ? `<span style="font-size:12px;color:var(--muted)">${extra}</span>` : ''}
+    </span>
+  </div>`;
+}
+
+async function rodarDiagnostico() {
+  const el = document.getElementById('diag-steps');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Verificando...</span>';
+
+  const resultados = [];
+
+  // Tabela psis
+  try {
+    const r = await api('GET', 'psis?select=*&limit=500');
+    const total = r?.length || 0;
+    const aprov = r?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0;
+    const prem  = r?.filter(p => p.premium === true).length || 0;
+    const semEmail = r?.filter(p => !p.email).length || 0;
+    resultados.push(diagRow('Tabela <strong>psis</strong>', '✓ existe', 'ok', `${total} registros · ${aprov} aprovados · ${prem} premium · ${semEmail} sem e-mail`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>psis</strong>', '✗ erro', 'err', e.message));
+  }
+
+  // Tabela profissionais_saude
+  try {
+    const r = await api('GET', 'profissionais_saude?select=id,status&limit=200');
+    const total = r?.length || 0;
+    const aprov = r?.filter(p => p.status?.toLowerCase() === 'aprovado').length || 0;
+    resultados.push(diagRow('Tabela <strong>profissionais_saude</strong>', '✓ existe', 'ok', `${total} registros · ${aprov} aprovados`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>profissionais_saude</strong>', '✗ não existe', 'err', 'rode o SQL de criação'));
+  }
+
+  // Tabela encaminhamentos_cruzados
+  try {
+    const r = await api('GET', 'encaminhamentos_cruzados?select=id,status&limit=200');
+    const total = r?.length || 0;
+    const disp  = r?.filter(e => e.status === 'disponivel').length || 0;
+    resultados.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>', '✓ existe', 'ok', `${total} registros · ${disp} em aberto`));
+  } catch(e) {
+    resultados.push(diagRow('Tabela <strong>encaminhamentos_cruzados</strong>', '✗ não existe', 'err', 'rode o SQL de criação'));
+  }
+
+  el.innerHTML = resultados.join('') +
+    `<div style="padding-top:10px;font-size:12px;color:var(--muted);">Diagnóstico concluído — ${new Date().toLocaleTimeString('pt-BR')}</div>`;
+
+  // Dados por status
+  await renderDadosDiag();
+}
+
+async function renderDadosDiag() {
+  try {
+    const r = await api('GET', 'psis?select=nome,email,status,premium&limit=500');
+    if (!r?.length) { document.getElementById('diag-dados').innerHTML = '<span style="color:var(--muted);font-size:13px;">Nenhum dado.</span>'; return; }
+    const statusMap = {};
+    r.forEach(p => { const s = p.status||'sem status'; statusMap[s] = (statusMap[s]||0)+1; });
+    const semEmail = r.filter(p => !p.email).length;
+    let html = Object.entries(statusMap).map(([s,n]) =>
+      diagRow(`Status: <strong>${s}</strong>`, n + ' psis', s.toLowerCase()==='aprovado'?'ok':'warn', '')
+    ).join('');
+    html += diagRow('Psis sem e-mail', semEmail > 0 ? semEmail + ' registros' : '0 — tudo ok', semEmail > 0 ? 'warn' : 'ok',
+      semEmail > 0 ? 'não conseguem logar no met.html' : '');
+    document.getElementById('diag-dados').innerHTML = html;
+  } catch(e) { document.getElementById('diag-dados').innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+async function testarLoginDiag() {
+  const email = document.getElementById('diag-email').value.trim().toLowerCase();
+  const el = document.getElementById('diag-login');
+  if (!email) { el.innerHTML = '<span style="color:var(--red);font-size:13px;">Informe um e-mail.</span>'; return; }
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Verificando...</span>';
+
+  try {
+    const [rPsi, rMed] = await Promise.all([
+      api('GET', `psis?select=nome,crp,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`),
+      api('GET', `profissionais_saude?select=nome,registro,email,status,premium&email=ilike.${encodeURIComponent(email)}&limit=1`)
+    ]);
+    const psi = rPsi?.[0], med = rMed?.[0], prof = psi || med;
+    if (!prof) { el.innerHTML = diagRow('Resultado', '✗ não encontrado', 'err', 'e-mail não cadastrado em nenhuma tabela'); return; }
+    const rede = psi ? 'Conexão Psi' : 'Psi Med';
+    const statusOk = prof.status?.toLowerCase() === 'aprovado';
+    const premOk = prof.premium === true;
+    el.innerHTML =
+      diagRow('Rede', rede, 'info') +
+      diagRow('Nome', prof.nome||'—', 'info') +
+      diagRow('Status', prof.status||'—', statusOk?'ok':'err', statusOk?'':'← precisa ser "aprovado"') +
+      diagRow('Premium', premOk?'sim':'não', premOk?'ok':'warn', premOk?'':'← precisa de premium para acessar o Met') +
+      diagRow('Acesso ao met.html', (statusOk&&premOk)?'✓ LIBERADO':'✗ NEGADO', (statusOk&&premOk)?'ok':'err');
+  } catch(e) { el.innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+async function testarEscritaDiag() {
+  const el = document.getElementById('diag-escrita');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Testando...</span>';
+  try {
+    const r = await api('POST', 'encaminhamentos_cruzados', {
+      indicado_por:'TESTE_ADMIN', crp_ou_registro:'TESTE',
+      tipo_buscado:'psi', demanda:'Teste automático — apagar', urgencia:'baixa', status:'disponivel'
+    });
+    const id = r?.[0]?.id;
+    if (id) await api('DELETE', `encaminhamentos_cruzados?id=eq.${id}`);
+    el.innerHTML = diagRow('Resultado', '✓ SUCESSO', 'ok', `id ${id} inserido e apagado`);
+  } catch(e) {
+    el.innerHTML = diagRow('Resultado', '✗ FALHOU', 'err', 'tabela não existe ou sem permissão de escrita');
+  }
+}
+
+async function buscarSemEmail() {
+  const el = document.getElementById('diag-sem-email');
+  el.innerHTML = '<span style="font-size:13px;color:var(--muted);">Buscando...</span>';
+  try {
+    const r = await api('GET', 'psis?select=nome,crp,handle,status&email=is.null&limit=200');
+    const r2 = await api('GET', `psis?select=nome,crp,handle,status&email=eq.&limit=200`);
+    const lista = [...(r||[]), ...(r2||[])];
+    if (!lista.length) { el.innerHTML = diagRow('Resultado', '✓ Todas têm e-mail', 'ok'); return; }
+    el.innerHTML = lista.map(p =>
+      diagRow(`${p.nome||'—'} · ${p.crp||'—'}`, p.status||'—', p.status?.toLowerCase()==='aprovado'?'warn':'info', `@${p.handle||'—'}`)
+    ).join('');
+  } catch(e) { el.innerHTML = `<span style="color:var(--red);font-size:13px;">Erro: ${e.message}</span>`; }
+}
+
+// ═══════════════════════════════════════════════
+// FOTO — helpers upload / preview
+// ═══════════════════════════════════════════════
+function resetFotoAdmin(prefix, fotoUrl, nome) {
+  const preview = document.getElementById(prefix+'-foto-preview');
+  const ini     = document.getElementById(prefix+'-foto-ini');
+  const iniText = (nome||'?').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+  ini.textContent = iniText;
+  if (fotoUrl) {
+    preview.src = fotoUrl;
+    preview.style.display = 'block';
+    ini.style.display = 'none';
+    preview.onerror = () => { preview.style.display='none'; ini.style.display='flex'; };
+  } else {
+    preview.style.display = 'none';
+    ini.style.display = 'flex';
+  }
+  // Reset URL manual field
+  const urlField = document.getElementById(prefix+'-foto-url');
+  if (urlField) { urlField.value=''; urlField.style.display='none'; }
+}
+
+function previewFotoAdmin(prefix, input) {
+  const file = input.files[0];
+  const status = document.getElementById(prefix+'-foto-status');
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    status.textContent = '⚠️ Máximo 3MB. Escolha outra.';
+    status.style.color = 'var(--red)';
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById(prefix+'-foto-preview');
+    const ini     = document.getElementById(prefix+'-foto-ini');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    ini.style.display = 'none';
+    status.textContent = '📷 Pronta para upload';
+    status.style.color = 'var(--green)';
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleFotoUrl(prefix) {
+  const field = document.getElementById(prefix+'-foto-url');
+  field.style.display = field.style.display === 'none' ? 'block' : 'none';
+  if (field.style.display === 'block') field.focus();
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result);
+    r.onerror = () => rej(new Error('Erro ao ler arquivo'));
+    r.readAsDataURL(file);
+  });
+}
+
+function abrirDocumentacao() {
+  window.open('documentacao_tecnica.html', '_blank');
+}
+
+function toast(msg, tipo='ok') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${tipo}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+</body>
+</html>
