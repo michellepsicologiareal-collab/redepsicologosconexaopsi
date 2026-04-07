@@ -13,7 +13,7 @@
 const TermosAceite = (() => {
 
   const SUPABASE_URL = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.placeholder'; // substitua pela chave anon real
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los'; // substitua pela chave anon real
   const VERSAO_TERMOS = '1.0'; // atualize aqui quando revisar os termos
 
   const TEXTOS = {
