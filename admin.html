@@ -219,6 +219,8 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
   <button class="nav-tab" onclick="showTab('medicos')">🏥 Prof. Saúde <span class="nbadge" id="n-med">0</span></button>
   <button class="nav-tab" onclick="showTab('encaminhamentos')">🔄 Encaminhamentos <span class="nbadge" id="n-enc">0</span></button>
   <button class="nav-tab" onclick="showTab('todos')">📋 Todos os psis</button>
+  <button class="nav-tab" onclick="showTab('meets')">🤝 Meets <span class="nbadge" id="n-meets">0</span></button>
+  <button class="nav-tab" onclick="showTab('termos')">📋 Termos <span class="nbadge nbadge-red" id="n-termos">0</span></button>
   <button class="nav-tab" onclick="showTab('sistema')">⚙️ Sistema</button>
   <button class="nav-tab" onclick="abrirDocumentacao()">📖 Documentação</button>
   <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico')" style="display:none;">🩺 Diagnóstico</button>
@@ -307,6 +309,35 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
     </div>
   </div>
   <div class="grid" id="grid-todos"><div class="loading">Carregando...</div></div>
+</div>
+
+<!-- ── MEETS ── -->
+<div class="section" id="tab-meets">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Meets PsiMed 🤝</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Todas as solicitações de meet entre profissionais</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="carregarMeetsAdmin()">🔄 Atualizar</button>
+  </div>
+  <div id="meets-admin-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div id="meets-admin-lista"></div>
+</div>
+
+<!-- ── TERMOS ── -->
+<div class="section" id="tab-termos">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Aceite de Termos 📋</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Controle de conformidade LGPD e CFP</div>
+    </div>
+    <button class="btn-action btn-refresh" onclick="carregarTermos()">🔄 Atualizar</button>
+  </div>
+  <div id="termos-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⏳ Pendentes</div>
+  <div id="termos-pendentes-lista"></div>
+  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">✅ Aceitos</div>
+  <div id="termos-aceitos-lista"></div>
 </div>
 
 <!-- ── SISTEMA ── -->
@@ -532,7 +563,7 @@ const H   = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'applicat
 const ADMIN_WA = '5511947388423';
 
 let nivelAtual = null, nomeAtual = '';
-let todosPsis = [], todosMeds = [], todosEnc = [];
+let todosPsis = [], todosMeds = [], todosEnc = [], todosMeets = [];
 let editPsiId = null, editMedId = null;
 let currentAdminPw = null; // armazenada só em memória — nunca persiste além da sessão
 
@@ -558,6 +589,8 @@ function tryLogin() {
   carregar();
   carregarMedicos();
   carregarEnc();
+  carregarMeetsAdmin();
+  carregarTermos();
 }
 
 function aplicarNivel() {
@@ -593,6 +626,8 @@ if (savedPw && NIVEIS[savedPw]) {
   carregar();
   carregarMedicos();
   carregarEnc();
+  carregarMeetsAdmin();
+  carregarTermos();
 }
 
 function toggleSenha(tipo) {
@@ -628,6 +663,8 @@ function showTab(id) {
   event.currentTarget.classList.add('active');
   if (id === 'medicos' && !todosMeds.length) carregarMedicos();
   if (id === 'encaminhamentos' && !todosEnc.length) carregarEnc();
+  if (id === 'meets') carregarMeetsAdmin();
+  if (id === 'termos') carregarTermos();
   // Busca global visível só nas abas de psis
   const barEl = document.getElementById('busca-global-bar');
   if (barEl) {
@@ -780,6 +817,7 @@ function renderPsiGrid(sufixo, lista) {
         ${abStr ? `<span class="info-chip">${abStr}</span>` : ''}
         ${p.formato ? `<span class="info-chip">${p.formato}</span>` : ''}
         ${p.premium ? `<span class="info-chip premium">⭐ Premium</span>` : ''}
+        ${p.termos_aceitos ? '<span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">📋 Termos ✓</span>' : '<span class="info-chip" style="background:#fff8f0;color:#b7600a;">📋 Termos ⏳</span>'}
         ${p.whatsapp ? `<span class="info-chip">📱 ${p.whatsapp}</span>` : ''}
       </div>
       <div class="pcard-actions">
@@ -1131,6 +1169,116 @@ async function excluirEnc(id) {
   if(nivelAtual!=='master'){toast('Apenas o Master pode excluir.','err');return;}
   if(!confirm('Excluir encaminhamento?'))return;
   try { await api('DELETE',`encaminhamentos_cruzados?id=eq.${id}`); todosEnc=todosEnc.filter(x=>x.id!==id); renderEnc(); toast('Excluído.'); } catch(e){toast('Erro: '+e.message,'err');}
+}
+
+
+// ═══════════════════════════════════════════════
+// MEETS ADMIN
+// ═══════════════════════════════════════════════
+const MEET_TIPO_LABEL = {
+  encaminhamento:'📋 Encaminhamento de paciente',
+  supervisao:'📚 Supervisão clínica',
+  interconsulta:'🔬 Interconsulta',
+  parceria:'🤝 Parceria profissional',
+  outro:'💬 Outro'
+};
+
+async function carregarMeetsAdmin() {
+  const el = document.getElementById('meets-admin-lista');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Carregando meets...</div>';
+  try {
+    todosMeets = await api('GET','meet_requests?select=*&order=created_at.desc&limit=200') || [];
+    const total = todosMeets.length;
+    const pend  = todosMeets.filter(m => m.status === 'pendente').length;
+    const aceit = todosMeets.filter(m => m.status === 'aceito').length;
+    document.getElementById('n-meets').textContent = pend || '';
+    document.getElementById('meets-admin-stats').innerHTML = `
+      <span class="info-chip">${total} total</span>
+      <span class="info-chip" style="background:#fef6ec;color:#b7600a;">${pend} pendentes</span>
+      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${aceit} aceitos</span>
+    `;
+    renderMeetsAdmin();
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Erro ao carregar meets: '+e.message+'</div>';
+  }
+}
+
+function renderMeetsAdmin() {
+  const el = document.getElementById('meets-admin-lista');
+  if (!todosMeets.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div>Nenhum meet registrado ainda.</div>';
+    return;
+  }
+  const statusColor = {pendente:'#fef6ec;color:#b7600a', aceito:'#edf7f3;color:#1a7a4a', recusado:'#fdecea;color:#c0392b'};
+  el.innerHTML = todosMeets.map(m => {
+    const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo || '—';
+    const stColor = statusColor[m.status] || statusColor.pendente;
+    const wa = (m.solicitante_wa||'').replace(/\D/g,'');
+    const waLink = wa ? `<a href="https://wa.me/55${wa}" target="_blank" style="color:var(--azul);font-size:12px;">📱 ${m.solicitante_wa}</a>` : '';
+    return `<div class="enc-card" style="margin-bottom:12px;">
+      <div class="enc-top">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:13px;font-weight:600;">De: ${m.solicitante_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.solicitante_registro||'—'})</span></span>
+          <span style="font-size:11px;color:var(--muted);">→</span>
+          <span style="font-size:13px;font-weight:600;">Para: ${m.destinatario_nome||'—'} <span style="color:var(--muted);font-weight:400;">(${m.destinatario_registro||'—'})</span></span>
+        </div>
+        <span style="background:${stColor};padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;">${m.status||'pendente'}</span>
+      </div>
+      <div style="margin:8px 0;"><span class="enc-tipo tipo-psi">${tipoLabel}</span></div>
+      <div class="enc-demanda" style="font-size:13px;">${m.mensagem||'—'}</div>
+      ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;">🕐 ${m.disponibilidade}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap;">
+        ${waLink}
+        <span style="font-size:11px;color:var(--muted);">${dt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// TERMOS ADMIN
+// ═══════════════════════════════════════════════
+async function carregarTermos() {
+  const el = document.getElementById('termos-pendentes-lista');
+  const el2 = document.getElementById('termos-aceitos-lista');
+  if (!el || !el2) return;
+  el.innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const [psis, meds] = await Promise.all([
+      api('GET','psis?select=nome,crp,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200'),
+      api('GET','profissionais_saude?select=nome,registro,tipo,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200')
+    ]);
+    const todos = [
+      ...(psis||[]).map(p => ({...p, _reg: p.crp, _tipo: '🧠 Psi'})),
+      ...(meds||[]).map(m => ({...m, _reg: m.registro, _tipo: '🏥 Med'}))
+    ];
+    const pendentes = todos.filter(p => !p.termos_aceitos);
+    const aceitos   = todos.filter(p =>  p.termos_aceitos);
+    document.getElementById('n-termos').textContent = pendentes.length || '';
+    document.getElementById('termos-stats').innerHTML = `
+      <span class="info-chip">${todos.length} aprovados total</span>
+      <span class="info-chip" style="background:#fdecea;color:#c0392b;">${pendentes.length} pendentes</span>
+      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${aceitos.length} aceitaram</span>
+    `;
+    const renderLinha = (p) => {
+      const dt = p.termos_aceitos_em
+        ? new Date(p.termos_aceitos_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})
+        : '—';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <span style="font-size:11px;background:#f0eff5;color:var(--muted);padding:2px 8px;border-radius:10px;">${p._tipo}</span>
+        <span style="flex:1;font-size:13px;font-weight:500;">${p.nome||'—'}</span>
+        <span style="font-size:12px;color:var(--muted);">${p._reg||'—'}</span>
+        ${p.premium ? '<span class="info-chip premium" style="font-size:11px;">⭐</span>' : ''}
+        <span style="font-size:11px;color:var(--muted);">${dt}</span>
+      </div>`;
+    };
+    el.innerHTML  = pendentes.length ? pendentes.map(renderLinha).join('') : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum pendente 🎉</div>';
+    el2.innerHTML = aceitos.length   ? aceitos.map(renderLinha).join('')   : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum aceite registrado ainda.</div>';
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state">Erro: '+e.message+'</div>';
+  }
 }
 
 // ═══════════════════════════════════════════════
