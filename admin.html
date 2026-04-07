@@ -1119,39 +1119,97 @@ async function carregarEnc() {
   } catch(e){toast('Erro ao carregar encaminhamentos: '+e.message,'err');}
 }
 
+
+// ── Tempo decorrido ──
+function tempoDecorrido(dateStr) {
+  if (!dateStr) return '—';
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60)   return diff + 's atrás';
+  if (diff < 3600) return Math.floor(diff/60) + 'min atrás';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h atrás';
+  const dias = Math.floor(diff/86400);
+  if (dias === 1)  return '1 dia atrás';
+  if (dias < 30)   return dias + ' dias atrás';
+  return Math.floor(dias/30) + ' meses atrás';
+}
+
 function renderEnc() {
   const el = document.getElementById('enc-lista');
   if(!todosEnc.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔄</div>Nenhum encaminhamento ainda.</div>';return;}
-  el.innerHTML = todosEnc.map(c => {
+
+  // Separar por status
+  const disponiveis = todosEnc.filter(c => c.status !== 'concluido');
+  const concluidos  = todosEnc.filter(c => c.status === 'concluido');
+
+  function renderCard(c) {
     const urgClass={alta:'urg-alta',media:'urg-media',baixa:'urg-baixa'}[c.urgencia]||'urg-media';
     const urgLabel={alta:'🔴 Urgente',media:'🟡 Média',baixa:'🟢 Sem pressa'}[c.urgencia]||'';
     const tipoLabel=TIPO_LABEL[c.tipo_buscado]||c.tipo_buscado;
     const tipoClass=TIPO_CLASS[c.tipo_buscado]||'tipo-psi';
     const numInt=(c.interessados||[]).length;
-    const dt=new Date(c.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    return `<div class="enc-card">
+    const dt=new Date(c.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const tempo=tempoDecorrido(c.created_at);
+    const concluiuEm=c.concluido_em?tempoDecorrido(c.concluido_em):'';
+    const atendendo=c.profissional_atendendo||'';
+    const atendendoReg=c.profissional_atendendo_reg||'';
+    const isConcluido=c.status==='concluido';
+
+    return `<div class="enc-card" style="${isConcluido?'opacity:0.65;':''}">
       <div class="enc-top">
-        <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span class="enc-tipo ${tipoClass}">${tipoLabel}</span>
           <span class="enc-urg ${urgClass}">${urgLabel}</span>
+          ${isConcluido?'<span style="background:#edf7f3;color:#1a7a4a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:1px;">✅ CONCLUÍDO</span>':''}
         </div>
-        <span style="font-size:11px;color:var(--muted);">${dt} · ${c.status}</span>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--muted);">${dt}</div>
+          <div style="font-size:11px;color:${isConcluido?'#1a7a4a':'#b7600a'};font-weight:600;">⏱ ${isConcluido&&concluiuEm?'Concluído '+concluiuEm:tempo}</div>
+        </div>
       </div>
       <div class="enc-demanda">${c.demanda||'—'}</div>
       <div class="enc-meta">
-        <strong>Indicado por:</strong> ${c.indicado_por} (${c.crp_ou_registro||'—'})<br>
+        <strong>Indicado por:</strong> ${c.indicado_por||'—'} (${c.crp_ou_registro||'—'})<br>
         <strong>WA:</strong> ${c.contato_indicador||'não informado'} ·
         <strong>${numInt}</strong> interessado(s): ${(c.interessados||[]).join(', ')||'nenhum'}
         ${c.cidade?'<br>📍 '+c.cidade:''}
+        ${atendendo?`<br>👤 <strong>Em atendimento com:</strong> ${atendendo}${atendendoReg?' ('+atendendoReg+')':''}` :''}
         ${c.observacoes?'<br><em>'+c.observacoes+'</em>':''}
+      </div>
+      ${!isConcluido?`
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;">👤 Registrar profissional atendendo</label>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="atend-nome-${c.id}" placeholder="Nome do profissional" value="${atendendo}"
+            style="flex:2;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;">
+          <input type="text" id="atend-reg-${c.id}" placeholder="CRP / CRM" value="${atendendoReg}"
+            style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;">
+          <button onclick="salvarAtendendo('${c.id}')"
+            style="padding:7px 12px;background:var(--plum);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+            Salvar
+          </button>
+        </div>
       </div>
       <div class="enc-actions">
         <button class="btn-liberar" onclick="liberarContato(${JSON.stringify(c).replace(/"/g,'&quot;')})">📲 Liberar contato</button>
         <button class="btn-concluir" onclick="concluirEnc('${c.id}')">✅ Concluir</button>
         <button class="btn-del-enc master-only" onclick="excluirEnc('${c.id}')">🗑️</button>
-      </div>
+      </div>`:
+      `<div class="enc-actions">
+        <button class="btn-del-enc master-only" onclick="excluirEnc('${c.id}')">🗑️</button>
+      </div>`}
     </div>`;
-  }).join('');
+  }
+
+  let html = '';
+  if (disponiveis.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">${disponiveis.length} em aberto</div>`;
+    html += disponiveis.map(renderCard).join('');
+  }
+  if (concluidos.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;">${concluidos.length} concluídos</div>`;
+    html += concluidos.map(renderCard).join('');
+  }
+  el.innerHTML = html;
 }
 
 function liberarContato(caso) {
@@ -1163,7 +1221,28 @@ function liberarContato(caso) {
   else toast('WhatsApp do indicador não cadastrado.','err');
 }
 async function concluirEnc(id) {
-  try { await api('PATCH',`encaminhamentos_cruzados?id=eq.${id}`,{status:'concluido'}); const e=todosEnc.find(x=>x.id===id);if(e)e.status='concluido'; renderEnc(); toast('✅ Concluído!'); } catch(e){toast('Erro: '+e.message,'err');}
+  try {
+    const agora = new Date().toISOString();
+    await api('PATCH',`encaminhamentos_cruzados?id=eq.${id}`,{status:'concluido', concluido_em: agora});
+    const e=todosEnc.find(x=>x.id===id);
+    if(e){e.status='concluido'; e.concluido_em=agora;}
+    renderEnc(); toast('✅ Concluído!');
+  } catch(e){toast('Erro: '+e.message,'err');}
+}
+
+async function salvarAtendendo(id) {
+  const nome = document.getElementById('atend-nome-'+id)?.value?.trim() || '';
+  const reg  = document.getElementById('atend-reg-'+id)?.value?.trim() || '';
+  try {
+    await api('PATCH',`encaminhamentos_cruzados?id=eq.${id}`,{
+      profissional_atendendo: nome,
+      profissional_atendendo_reg: reg,
+      status: nome ? 'em_atendimento' : 'disponivel'
+    });
+    const e=todosEnc.find(x=>x.id===id);
+    if(e){e.profissional_atendendo=nome; e.profissional_atendendo_reg=reg; if(nome) e.status='em_atendimento';}
+    renderEnc(); toast('👤 Profissional registrado!');
+  } catch(e){toast('Erro: '+e.message,'err');}
 }
 async function excluirEnc(id) {
   if(nivelAtual!=='master'){toast('Apenas o Master pode excluir.','err');return;}
