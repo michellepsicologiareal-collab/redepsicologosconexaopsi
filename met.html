@@ -925,8 +925,13 @@ function setFiltro(btn) {
 async function carregarCasos() {
   document.getElementById('casos-grid').innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
   try {
-    casos = await api('GET', "encaminhamentos_cruzados?select=*&status=eq.disponivel&order=created_at.desc&limit=100") || [];
-    document.getElementById('badge-casos').textContent = casos.length;
+    // Admin vê disponivel + em_atendimento; profissionais só veem disponivel
+    const query = isAdmin
+      ? 'encaminhamentos_cruzados?select=*&status=in.(disponivel,em_atendimento)&order=created_at.desc&limit=100'
+      : 'encaminhamentos_cruzados?select=*&status=eq.disponivel&order=created_at.desc&limit=100';
+    casos = await api('GET', query) || [];
+    const disponiveis = casos.filter(c => c.status === 'disponivel').length;
+    document.getElementById('badge-casos').textContent = disponiveis;
     renderCasos();
   } catch(e) {
     document.getElementById('casos-grid').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar. Tente novamente.</div>`;
@@ -959,11 +964,22 @@ function renderCasos() {
 
     const dataStr = new Date(c.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
 
+    // Badge de status (em_atendimento visível)
+    const statusBadge = c.status === 'em_atendimento'
+      ? `<span style="background:#FEF3E8;color:#B85C1A;font-size:10px;font-weight:600;letter-spacing:0.5px;padding:3px 9px;border-radius:7px;">🟡 Em atendimento</span>`
+      : '';
+
+    // Info de encaminhado_para (visível apenas para admin)
+    const encaminhadoInfo = isAdmin && c.encaminhado_para
+      ? `<div style="font-size:11px;color:var(--met);margin-top:4px;">→ Encaminhado para: <strong>${c.encaminhado_para}</strong></div>`
+      : '';
+
     return `<div class="caso-card" id="caso-${c.id}">
       <div class="caso-top">
-        <div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <span class="caso-tipo ${tipoClass}">${tipoLabel}</span>
           <span class="caso-urgencia ${urgClass}">${urgLabel}</span>
+          ${statusBadge}
         </div>
         <span style="font-size:11px;color:var(--muted);">${dataStr}</span>
       </div>
@@ -976,6 +992,7 @@ function renderCasos() {
         <div>
           <div class="caso-indicador">Indicado por <strong>${c.indicado_por}</strong> (${c.crp_ou_registro||'—'})</div>
           <div class="caso-int">${numInt} ${numInt===1?'profissional':' profissionais'} com interesse</div>
+          ${encaminhadoInfo}
         </div>
         <div class="caso-actions">
           ${isAdmin
@@ -1031,13 +1048,38 @@ function abrirAdmin(id) {
   casoSelecionado = caso;
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
   document.getElementById('modal-titulo').textContent = 'Gerenciar — ' + tipoLabel;
+
+  const interessados = caso.interessados || [];
+  const encaminhadoPara = caso.encaminhado_para || '';
+
+  // Monta lista de interessados como opções de seleção
+  const opcoesInteressados = interessados.length
+    ? `<div style="margin-top:12px;">
+        <label style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;">
+          Selecionar profissional para encaminhar *
+        </label>
+        <select id="sel-interessado" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);background:var(--cream);outline:none;">
+          <option value="">— escolha um profissional —</option>
+          ${interessados.map(reg => `<option value="${reg}" ${reg === encaminhadoPara ? 'selected' : ''}>${reg}</option>`).join('')}
+        </select>
+      </div>`
+    : `<div style="margin-top:12px;font-size:12px;color:var(--muted);padding:8px 12px;background:var(--cream);border-radius:8px;">Nenhum profissional registrou interesse ainda.</div>`;
+
+  const statusBadge = caso.status === 'em_atendimento'
+    ? `<span style="background:#FEF3E8;color:#B85C1A;font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;margin-left:6px;">🟡 Em atendimento</span>`
+    : caso.status === 'concluido'
+    ? `<span style="background:#EAF7EE;color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;margin-left:6px;">✅ Concluído</span>`
+    : '';
+
   document.getElementById('modal-info').innerHTML = `
     <strong>Demanda:</strong> ${caso.demanda}<br>
     <strong>Indicado por:</strong> ${caso.indicado_por} (${caso.crp_ou_registro})<br>
     <strong>WhatsApp do indicador:</strong> ${caso.contato_indicador || 'não informado'}<br>
-    <strong>Interessados:</strong> ${(caso.interessados||[]).join(', ') || 'nenhum ainda'}<br>
+    <strong>Interessados (${interessados.length}):</strong> ${interessados.join(', ') || 'nenhum ainda'}<br>
+    ${encaminhadoPara ? `<strong>Encaminhado para:</strong> <span style="color:var(--met);font-weight:600;">${encaminhadoPara}</span> ${statusBadge}<br>` : ''}
     <strong>Cidade:</strong> ${caso.cidade || '—'}<br>
     <strong>Urgência:</strong> ${caso.urgencia}
+    ${opcoesInteressados}
   `;
   document.getElementById('btn-liberar').onclick = () => liberarContato(caso);
   document.getElementById('btn-concluir').onclick = () => marcarConcluido(caso.id);
@@ -1045,19 +1087,48 @@ function abrirAdmin(id) {
 }
 
 async function liberarContato(caso) {
+  const sel = document.getElementById('sel-interessado');
+  const profissionalEscolhido = sel ? sel.value.trim() : '';
+
+  if (!profissionalEscolhido) {
+    toast('Selecione o profissional para encaminhar antes de liberar o contato.', 'err');
+    if (sel) sel.style.borderColor = 'var(--red)';
+    return;
+  }
+
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
-  const int = (caso.interessados||[]).join(', ') || 'ninguém ainda';
+
+  // Salva encaminhado_para e muda status para em_atendimento
+  try {
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${caso.id}`, {
+      encaminhado_para: profissionalEscolhido,
+      status: 'em_atendimento'
+    });
+    // Atualiza cache local
+    const idx = casos.findIndex(c => c.id === caso.id);
+    if (idx >= 0) {
+      casos[idx].encaminhado_para = profissionalEscolhido;
+      casos[idx].status = 'em_atendimento';
+    }
+  } catch(e) {
+    console.warn('Não foi possível salvar encaminhado_para:', e.message);
+  }
+
+  // Mensagem para o indicador com o profissional selecionado
   const waMsg = encodeURIComponent(
     `📋 *Indicação no PsiMed Rede Colaborativa*\n\n` +
-    `Olá ${caso.indicado_por}! Seu caso foi visualizado por profissionais da rede.\n\n` +
+    `Olá ${caso.indicado_por}! Encontramos um profissional para o seu encaminhamento.\n\n` +
     `*Buscando:* ${tipoLabel}\n` +
-    `*Interessados:* ${int}\n\n` +
-    `Entre em contato com os interessados para combinar o encaminhamento. 💙`
+    `*Profissional indicado:* ${profissionalEscolhido}\n\n` +
+    `Entre em contato com o profissional para combinar o atendimento. 💙`
   );
   const tel = (caso.contato_indicador||'').replace(/\D/g,'');
   if (tel) window.open(`https://wa.me/55${tel}?text=${waMsg}`, '_blank');
   else { alert('WhatsApp do indicador não cadastrado.'); }
+
   fecharModal();
+  renderCasos();
+  toast(`✅ Contato liberado — caso em atendimento com ${profissionalEscolhido}`, 'ok');
 }
 
 async function marcarConcluido(id) {
