@@ -152,9 +152,21 @@ code{font-family:'JetBrains Mono',monospace;font-size:0.73rem;
 <body>
 
 <div class="hub-header">
-  <div class="hub-top">
-    <span class="hub-icon">📋</span>
-    <div class="hub-title">Guia do <em>Sistema</em></div>
+  <div style="position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:0.25rem;">
+    <div class="hub-top" style="margin-bottom:0;">
+      <span class="hub-icon">📋</span>
+      <div class="hub-title">Guia do <em>Sistema</em></div>
+    </div>
+    <!-- CAIXA ADMIN -->
+    <a href="admin.html" target="_blank" style="
+      display:inline-flex;align-items:center;gap:7px;
+      background:rgba(200,147,74,0.15);border:1.5px solid rgba(200,147,74,0.35);
+      border-radius:10px;padding:7px 14px;text-decoration:none;
+      font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:600;
+      color:var(--gold-light);transition:all 0.15s;white-space:nowrap;flex-shrink:0;
+    " onmouseover="this.style.background='rgba(200,147,74,0.25)'" onmouseout="this.style.background='rgba(200,147,74,0.15)'">
+      <span style="font-size:0.85rem;">👑</span> Painel Admin
+    </a>
   </div>
   <div class="hub-sub">Conexão Psi · Central de Links · 2026</div>
   <div class="tabs">
