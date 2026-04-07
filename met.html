@@ -996,9 +996,10 @@ async function carregarCasos() {
   document.getElementById('casos-grid').innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
   try {
     // Admin vê disponivel + em_atendimento; profissionais só veem disponivel
+    const reg = encodeURIComponent(usuarioRegistro);
     const query = isAdmin
-      ? 'encaminhamentos_cruzados?select=*&status=in.(disponivel,em_atendimento)&order=created_at.desc&limit=100'
-      : 'encaminhamentos_cruzados?select=*&status=eq.disponivel&order=created_at.desc&limit=100';
+      ? 'encaminhamentos_cruzados?select=*&status=in.(disponivel,oferecido,em_atendimento)&order=created_at.desc&limit=100'
+      : `encaminhamentos_cruzados?select=*&or=(status.eq.disponivel,and(status.eq.oferecido,or(oferecido_para_1_reg.eq.${reg},oferecido_para_2_reg.eq.${reg})))&order=created_at.desc&limit=100`;
     casos = await api('GET', query) || [];
     const disponiveis = casos.filter(c => c.status === 'disponivel').length;
     document.getElementById('badge-casos').textContent = disponiveis;
@@ -1034,24 +1035,30 @@ function renderCasos() {
 
     const dataStr = new Date(c.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
 
-    // Badge de status (em_atendimento visível)
+    // Badge de status
+    const euSouOferecido1 = c.oferecido_para_1_reg === usuarioRegistro;
+    const euSouOferecido2 = c.oferecido_para_2_reg === usuarioRegistro;
+    const euFuiOferecido  = euSouOferecido1 || euSouOferecido2;
     const statusBadge = c.status === 'em_atendimento'
       ? `<span style="background:#FEF3E8;color:#B85C1A;font-size:10px;font-weight:600;letter-spacing:0.5px;padding:3px 9px;border-radius:7px;">🟡 Em atendimento</span>`
-      : '';
+      : c.status === 'oferecido' && euFuiOferecido
+        ? `<span style="background:#e8f4f6;color:#1B5E6B;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:3px 9px;border-radius:7px;">🔔 Disponibilizado para você</span>`
+        : c.status === 'oferecido'
+          ? `<span style="background:#f0eff5;color:#8A8299;font-size:10px;font-weight:600;padding:3px 9px;border-radius:7px;">⏳ Aguardando confirmação</span>`
+          : '';
 
     // Info de encaminhado_para (visível apenas para admin)
     let encaminhadoInfo = '';
-    if (isAdmin && c.encaminhado_nome) {
-      const prazoExpira = c.prazo_expira ? new Date(c.prazo_expira) : null;
-      const diasR = prazoExpira ? Math.ceil((prazoExpira - new Date()) / (1000*60*60*24)) : null;
-      const prazoTxt = diasR !== null
-        ? (diasR <= 0 ? '⚠️ Prazo vencido' : `⏱ ${diasR}d restante${diasR===1?'':'s'}`)
-        : '';
-      const prazoColor = diasR !== null && diasR <= 0 ? 'var(--red)' : diasR <= 1 ? '#B85C1A' : 'var(--muted)';
-      encaminhadoInfo = `<div style="font-size:11px;color:var(--met);margin-top:4px;">
-        → <strong>${c.encaminhado_nome}</strong>
-        ${prazoTxt ? `<span style="color:${prazoColor};margin-left:6px;">${prazoTxt}</span>` : ''}
-      </div>`;
+    if (isAdmin) {
+      const linhas = [];
+      if (c.oferecido_para_1_nome) linhas.push(`→ <strong>${c.oferecido_para_1_nome}</strong> (${c.oferecido_para_1_reg||'—'})`);
+      if (c.oferecido_para_2_nome) linhas.push(`→ <strong>${c.oferecido_para_2_nome}</strong> (${c.oferecido_para_2_reg||'—'})`);
+      if (c.aceito_por_nome) linhas.push(`✅ Aceito por <strong>${c.aceito_por_nome}</strong> (${c.aceito_por_reg||'—'})`);
+      if (c.desfecho) {
+        const df = {concluido:'✅ Concluído',declinio:'❌ Declínio',reaberto:'🔄 Reaberto'}[c.desfecho]||c.desfecho;
+        linhas.push(`${df}${c.desfecho_obs?' — '+c.desfecho_obs:''}`);
+      }
+      if (linhas.length) encaminhadoInfo = `<div style="font-size:11px;color:var(--met);margin-top:6px;line-height:1.8;">${linhas.join('<br>')}</div>`;
     }
 
     return `<div class="caso-card" id="caso-${c.id}">
@@ -1077,11 +1084,20 @@ function renderCasos() {
         <div class="caso-actions">
           ${isAdmin
             ? `<button class="btn-interesse" onclick="abrirAdmin('${c.id}')" style="background:var(--gold)">⚙️ Gerenciar</button>`
-            : `<button class="btn-interesse ${euTenho?'ja-tenho':''}"
-                onclick="registrarInteresse('${c.id}',this)"
-                ${euTenho?'disabled':''}>
-                ${euTenho ? '✅ Interesse registrado' : 'Tenho interesse'}
-              </button>`
+            : euFuiOferecido && c.status === 'oferecido'
+              ? `<button class="btn-interesse" onclick="aceitarEncaminhamento('${c.id}')"
+                  style="background:#1B5E6B;color:white;font-weight:700;">
+                  ✅ Aceitar paciente
+                </button>
+                <button class="btn-interesse ja-tenho" onclick="recusarEncaminhamento('${c.id}')"
+                  style="margin-left:6px;">
+                  ❌ Recusar
+                </button>`
+              : `<button class="btn-interesse ${euTenho?'ja-tenho':''}"
+                  onclick="registrarInteresse('${c.id}',this)"
+                  ${euTenho||c.status==='oferecido'||c.status==='em_atendimento'?'disabled':''}>
+                  ${euTenho ? '✅ Interesse registrado' : c.status==='em_atendimento'?'Em atendimento':'Tenho interesse'}
+                </button>`
           }
         </div>
       </div>
@@ -1129,6 +1145,7 @@ async function abrirAdmin(id) {
   if (!caso) return;
   casoSelecionado = caso;
   profSelecionadoAdmin = null;
+  profSelecionados = [];
 
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
   document.getElementById('modal-titulo').textContent = 'Gerenciar — ' + tipoLabel;
@@ -1177,7 +1194,24 @@ async function abrirAdmin(id) {
   `;
 
   document.getElementById('btn-liberar').onclick = () => liberarContato(caso);
-  document.getElementById('btn-concluir').onclick = () => marcarConcluido(caso.id);
+  document.getElementById('btn-concluir').onclick = () => registrarDesfecho(caso.id, 'concluido');
+  // Adiciona botões de desfecho se em_atendimento
+  const extraBtns = document.getElementById('btn-extra-desfecho');
+  if (extraBtns) {
+    if (caso.status === 'em_atendimento' || caso.status === 'oferecido') {
+      extraBtns.innerHTML = `
+        <button onclick="registrarDesfecho('${caso.id}','declinio')"
+          style="padding:10px 16px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+          ❌ Declínio
+        </button>
+        <button onclick="registrarDesfecho('${caso.id}','reaberto')"
+          style="padding:10px 16px;background:#fef6ec;color:#b7600a;border:1px solid #f5ddb0;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+          🔄 Reabrir
+        </button>`;
+    } else {
+      extraBtns.innerHTML = '';
+    }
+  }
   document.getElementById('modal-admin').classList.add('open');
 
   // Carrega profissionais compatíveis em background
@@ -1234,26 +1268,41 @@ async function carregarProfsParaAdmin(caso) {
   }
 }
 
+// Suporta até 2 seleções
+let profSelecionados = []; // array com até 2 profissionais
+
 function selecionarProfAdmin(dados, idx, total) {
-  profSelecionadoAdmin = dados;
-  // Remove seleção de todos
-  for (let i = 0; i < total; i++) {
-    const el = document.getElementById('apcard-'+i);
-    if (el) el.classList.remove('selecionado');
+  const already = profSelecionados.findIndex(p => p.reg === dados.reg);
+  if (already >= 0) {
+    // Desselecionar
+    profSelecionados.splice(already, 1);
+    document.getElementById('apcard-'+idx).classList.remove('selecionado');
+  } else if (profSelecionados.length >= 2) {
+    toast('Máximo 2 profissionais por encaminhamento.', 'err');
+    return;
+  } else {
+    profSelecionados.push(dados);
+    document.getElementById('apcard-'+idx).classList.add('selecionado');
   }
-  document.getElementById('apcard-'+idx).classList.add('selecionado');
+  // Atualiza label do botão liberar
+  const btn = document.getElementById('btn-liberar');
+  if (btn) btn.textContent = profSelecionados.length === 0
+    ? '📲 Liberar contato via WhatsApp'
+    : `📲 Oferecer para ${profSelecionados.length} profissional(is)`;
+  // Compatibilidade com código antigo
+  profSelecionadoAdmin = profSelecionados[0] || null;
 }
 
 async function liberarContato(caso) {
-  if (!profSelecionadoAdmin) {
-    toast('Selecione um profissional da lista antes de liberar.', 'err');
-    // Pulsa a lista para chamar atenção
+  if (!profSelecionados.length) {
+    toast('Selecione 1 ou 2 profissionais antes de disponibilizar.', 'err');
     const lista = document.getElementById('admin-profs-lista');
     if (lista) { lista.style.outline = '2px solid var(--red)'; setTimeout(()=>lista.style.outline='',1800); }
     return;
   }
 
-  const prof = profSelecionadoAdmin;
+  const prof  = profSelecionados[0];
+  const prof2 = profSelecionados[1] || null;
   const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
   const agora = new Date();
   const prazoExpira = new Date(agora.getTime() + 3*24*60*60*1000);
@@ -1264,22 +1313,25 @@ async function liberarContato(caso) {
 
   // Salva no banco
   try {
-    await api('PATCH', `encaminhamentos_cruzados?id=eq.${caso.id}`, {
-      encaminhado_para:    prof.reg,
-      encaminhado_nome:    prof.nome,
-      encaminhado_wa:      prof.wa,
-      encaminhado_em:      agora.toISOString(),
-      prazo_expira:        prazoExpira.toISOString(),
-      status:              'em_atendimento'
-    });
-    const idx = casos.findIndex(c => c.id === caso.id);
-    if (idx >= 0) {
-      Object.assign(casos[idx], {
-        encaminhado_para: prof.reg, encaminhado_nome: prof.nome,
-        encaminhado_wa: prof.wa, encaminhado_em: agora.toISOString(),
-        prazo_expira: prazoExpira.toISOString(), status: 'em_atendimento'
-      });
+    const patchData = {
+      oferecido_para_1_nome: prof.nome,
+      oferecido_para_1_reg:  prof.reg,
+      oferecido_para_1_wa:   prof.wa,
+      oferecido_em:          agora.toISOString(),
+      prazo_expira:          prazoExpira.toISOString(),
+      status:                'oferecido',
+      // Mantém campos antigos para compatibilidade
+      encaminhado_para: prof.reg, encaminhado_nome: prof.nome,
+      encaminhado_wa: prof.wa, encaminhado_em: agora.toISOString()
+    };
+    if (prof2) {
+      patchData.oferecido_para_2_nome = prof2.nome;
+      patchData.oferecido_para_2_reg  = prof2.reg;
+      patchData.oferecido_para_2_wa   = prof2.wa;
     }
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${caso.id}`, patchData);
+    const idx = casos.findIndex(c => c.id === caso.id);
+    if (idx >= 0) Object.assign(casos[idx], patchData);
   } catch(e) {
     console.warn('Erro ao salvar encaminhamento:', e.message);
   }
@@ -1288,7 +1340,8 @@ async function liberarContato(caso) {
   if (prof.wa) {
     const msgProf = encodeURIComponent(
       `🔄 *Encaminhamento — PsiMed Rede Colaborativa*\n\n` +
-      `Olá ${prof.nome?.split(' ')[0]}! A admin liberou um paciente para você.\n\n` +
+      `Olá ${prof.nome?.split(' ')[0]}! A admin disponibilizou um paciente para você.\n` +
+      `${prof2 ? '⚡ *Primeiro a confirmar fica com o paciente!*\n' : ''}\n` +
       `*Tipo de demanda:* ${tipoLabel}\n` +
       `*Demanda:* ${caso.demanda?.substring(0,120)}\n` +
       `${caso.cidade ? `*Cidade:* ${caso.cidade}\n` : ''}` +
@@ -1329,9 +1382,27 @@ async function liberarContato(caso) {
     window.open(`https://wa.me/${ADMIN_WA}?text=${msgAdmin}`, '_blank');
   }, 1600);
 
+  // WA para segundo profissional
+  if (prof2 && prof2.wa) {
+    setTimeout(() => {
+      const msgProf2 = encodeURIComponent(
+        `🔄 *Encaminhamento — PsiMed Rede Colaborativa*\n\n` +
+        `Olá ${prof2.nome?.split(' ')[0]}! A admin disponibilizou um paciente para você.\n` +
+        `⚡ *Primeiro a aceitar fica com o paciente!*\n\n` +
+        `*Tipo de demanda:* ${tipoLabel}\n` +
+        `*Demanda:* ${caso.demanda?.substring(0,120)}\n` +
+        `${caso.cidade ? `*Cidade:* ${caso.cidade}\n` : ''}` +
+        `*Indicado por:* ${caso.indicado_por}\n\n` +
+        `Acesse o sistema para aceitar ou recusar.`
+      );
+      window.open(\`https://wa.me/55\${prof2.wa}?text=\${msgProf2}\`, '_blank');
+    }, 1200);
+  }
+
   fecharModal();
   renderCasos();
-  toast(`✅ ${prof.nome} notificado(a)! Prazo: ${prazoStr}`, 'ok');
+  const nomes = prof2 ? `${prof.nome} e ${prof2.nome}` : prof.nome;
+  toast(`✅ Disponibilizado para ${nomes}!`, 'ok');
   btn.disabled = false; btn.textContent = '📲 Liberar contato via WhatsApp';
 }
 
@@ -1347,6 +1418,104 @@ async function marcarConcluido(id) {
 }
 
 function fecharModal() { document.getElementById('modal-admin').classList.remove('open'); }
+
+async function aceitarEncaminhamento(id) {
+  const caso = casos.find(c => c.id === id);
+  if (!caso) return;
+  const agora = new Date().toISOString();
+  try {
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${id}`, {
+      aceito_por_nome: usuarioNome,
+      aceito_por_reg:  usuarioRegistro,
+      aceito_em:       agora,
+      status:          'em_atendimento',
+      profissional_atendendo:     usuarioNome,
+      profissional_atendendo_reg: usuarioRegistro
+    });
+    // Atualiza local
+    const idx = casos.findIndex(c => c.id === id);
+    if (idx >= 0) Object.assign(casos[idx], {
+      aceito_por_nome: usuarioNome, aceito_por_reg: usuarioRegistro,
+      aceito_em: agora, status: 'em_atendimento'
+    });
+    renderCasos();
+    toast('✅ Você aceitou o paciente! Aguarde o contato do indicador.', 'ok');
+
+    // Notifica o segundo profissional se houver
+    const outro = caso.oferecido_para_1_reg === usuarioRegistro
+      ? { nome: caso.oferecido_para_2_nome, wa: (caso.oferecido_para_2_wa||'').replace(/\D/g,'') }
+      : { nome: caso.oferecido_para_1_nome, wa: (caso.oferecido_para_1_wa||'').replace(/\D/g,'') };
+    if (outro.wa) {
+      setTimeout(() => {
+        const msg = encodeURIComponent(
+          `📋 *PsiMed Rede Colaborativa*\n\nOlá ${outro.nome?.split(' ')[0]}! O paciente que foi oferecido para você já foi aceito por outro profissional. Obrigada pela disponibilidade! 💙`
+        );
+        window.open(\`https://wa.me/55\${outro.wa}?text=\${msg}\`, '_blank');
+      }, 600);
+    }
+
+    // Notifica o indicador
+    const telInd = (caso.contato_indicador||'').replace(/\D/g,'');
+    if (telInd) {
+      setTimeout(() => {
+        const tipoLabel = TIPO_LABEL[caso.tipo_buscado] || caso.tipo_buscado;
+        const msg = encodeURIComponent(
+          `📋 *PsiMed Rede Colaborativa*\n\nOlá ${caso.indicado_por}! ${usuarioNome} (${usuarioRegistro}) aceitou o encaminhamento do seu paciente.\n\n*Tipo:* ${tipoLabel}\n\nEntre em contato para combinar. 💙`
+        );
+        window.open(\`https://wa.me/55\${telInd}?text=\${msg}\`, '_blank');
+      }, 1200);
+    }
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+async function recusarEncaminhamento(id) {
+  if (!confirm('Recusar este paciente?')) return;
+  try {
+    // Marca que este profissional recusou (sem bloquear o outro)
+    const caso = casos.find(c => c.id === id);
+    const patch = {};
+    if (caso?.oferecido_para_1_reg === usuarioRegistro) {
+      patch.oferecido_para_1_reg = null;
+    } else {
+      patch.oferecido_para_2_reg = null;
+    }
+    // Se ambos recusaram, volta para disponivel
+    const outro1 = caso?.oferecido_para_1_reg;
+    const outro2 = caso?.oferecido_para_2_reg;
+    const ambosnulos = (!outro1 || outro1 === usuarioRegistro) && (!outro2 || outro2 === usuarioRegistro);
+    if (ambosnulos) patch.status = 'disponivel';
+
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${id}`, patch);
+    const idx = casos.findIndex(c => c.id === id);
+    if (idx >= 0) Object.assign(casos[idx], patch);
+    renderCasos();
+    toast('Encaminhamento recusado. O caso voltou para a fila.', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
+async function registrarDesfecho(id, desfecho) {
+  const obs = prompt(
+    desfecho === 'concluido'
+      ? 'Observação (opcional): como o paciente evoluiu?'
+      : desfecho === 'declinio'
+        ? 'Motivo do declínio (opcional):'
+        : 'Observação para reabertura (opcional):'
+  );
+  try {
+    const agora = new Date().toISOString();
+    await api('PATCH', `encaminhamentos_cruzados?id=eq.${id}`, {
+      desfecho, desfecho_obs: obs||'', desfecho_em: agora,
+      status: desfecho === 'reaberto' ? 'disponivel' : desfecho
+    });
+    casos = desfecho === 'reaberto'
+      ? casos.map(c => c.id===id ? {...c, desfecho, status:'disponivel'} : c)
+      : casos.filter(c => c.id !== id);
+    renderCasos();
+    fecharModal();
+    const labels = {concluido:'✅ Concluído com sucesso!', declinio:'Declínio registrado.', reaberto:'Caso reaberto na fila.'};
+    toast(labels[desfecho]||'Atualizado.', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
 
 // ─── INDICAR ───
 async function enviarIndicacao() {

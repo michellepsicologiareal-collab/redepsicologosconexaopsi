@@ -1152,7 +1152,14 @@ function renderEnc() {
     const concluiuEm=c.concluido_em?tempoDecorrido(c.concluido_em):'';
     const atendendo=c.profissional_atendendo||'';
     const atendendoReg=c.profissional_atendendo_reg||'';
-    const isConcluido=c.status==='concluido';
+    const isConcluido=c.status==='concluido'||c.status==='declinio';
+    const desfechoLabel = {concluido:'✅ Concluído',declinio:'❌ Declínio',reaberto:'🔄 Reaberto'}[c.desfecho]||'';
+    const oferecidoInfo = c.oferecido_para_1_nome
+      ? `👤 Disponibilizado para: ${c.oferecido_para_1_nome}${c.oferecido_para_2_nome?' + '+c.oferecido_para_2_nome:''}`
+      : '';
+    const aceitoInfo = c.aceito_por_nome
+      ? `✅ Aceito por: ${c.aceito_por_nome} (${c.aceito_por_reg||'—'})`
+      : '';
 
     return `<div class="enc-card" style="${isConcluido?'opacity:0.65;':''}">
       <div class="enc-top">
@@ -1172,7 +1179,10 @@ function renderEnc() {
         <strong>WA:</strong> ${c.contato_indicador||'não informado'} ·
         <strong>${numInt}</strong> interessado(s): ${(c.interessados||[]).join(', ')||'nenhum'}
         ${c.cidade?'<br>📍 '+c.cidade:''}
-        ${atendendo?`<br>👤 <strong>Em atendimento com:</strong> ${atendendo}${atendendoReg?' ('+atendendoReg+')':''}` :''}
+        ${oferecidoInfo?'<br>'+oferecidoInfo:''}
+        ${aceitoInfo?'<br>'+aceitoInfo:''}
+        ${atendendo&&!aceitoInfo?`<br>👤 <strong>Em atendimento com:</strong> ${atendendo}${atendendoReg?' ('+atendendoReg+')':''}` :''}
+        ${desfechoLabel?`<br><strong>Desfecho:</strong> ${desfechoLabel}${c.desfecho_obs?' — '+c.desfecho_obs:''}` :''}
         ${c.observacoes?'<br><em>'+c.observacoes+'</em>':''}
       </div>
       ${!isConcluido?`
@@ -1191,7 +1201,11 @@ function renderEnc() {
       </div>
       <div class="enc-actions">
         <button class="btn-liberar" onclick="liberarContato(${JSON.stringify(c).replace(/"/g,'&quot;')})">📲 Liberar contato</button>
-        <button class="btn-concluir" onclick="concluirEnc('${c.id}')">✅ Concluir</button>
+        ${c.status==='em_atendimento'?`
+          <button class="btn-concluir" onclick="desfechoEnc('${c.id}','concluido')">✅ Concluído</button>
+          <button style="padding:7px 12px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;" onclick="desfechoEnc('${c.id}','declinio')">❌ Declínio</button>
+          <button style="padding:7px 12px;background:#fef6ec;color:#b7600a;border:1px solid #f5ddb0;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;" onclick="desfechoEnc('${c.id}','reaberto')">🔄 Reabrir</button>
+        `:`<button class="btn-concluir" onclick="concluirEnc('${c.id}')">✅ Concluir</button>`}
         <button class="btn-del-enc master-only" onclick="excluirEnc('${c.id}')">🗑️</button>
       </div>`:
       `<div class="enc-actions">
@@ -1227,6 +1241,23 @@ async function concluirEnc(id) {
     const e=todosEnc.find(x=>x.id===id);
     if(e){e.status='concluido'; e.concluido_em=agora;}
     renderEnc(); toast('✅ Concluído!');
+  } catch(e){toast('Erro: '+e.message,'err');}
+}
+
+async function desfechoEnc(id, desfecho) {
+  const labels = {concluido:'✅ Concluído com sucesso!', declinio:'Declínio registrado.', reaberto:'Caso reaberto.'};
+  const prompts = {concluido:'Observação (opcional): como o paciente evoluiu?', declinio:'Motivo do declínio (opcional):', reaberto:'Observação para reabertura:'};
+  const obs = prompt(prompts[desfecho]||'Observação:') || '';
+  try {
+    const agora = new Date().toISOString();
+    await api('PATCH',`encaminhamentos_cruzados?id=eq.${id}`,{
+      desfecho, desfecho_obs: obs, desfecho_em: agora,
+      status: desfecho === 'reaberto' ? 'disponivel' : desfecho,
+      concluido_em: agora
+    });
+    const e=todosEnc.find(x=>x.id===id);
+    if(e){e.desfecho=desfecho; e.desfecho_obs=obs; e.desfecho_em=agora; e.status=desfecho==='reaberto'?'disponivel':desfecho;}
+    renderEnc(); toast(labels[desfecho]||'Atualizado.','ok');
   } catch(e){toast('Erro: '+e.message,'err');}
 }
 
