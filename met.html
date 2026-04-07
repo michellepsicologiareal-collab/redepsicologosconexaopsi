@@ -1395,7 +1395,7 @@ async function liberarContato(caso) {
         `*Indicado por:* ${caso.indicado_por}\n\n` +
         `Acesse o sistema para aceitar ou recusar.`
       );
-      window.open(\`https://wa.me/55\${prof2.wa}?text=\${msgProf2}\`, '_blank');
+      window.open(`https://wa.me/55${prof2.wa}?text=${msgProf2}`, '_blank');
     }, 1200);
   }
 
@@ -1450,7 +1450,7 @@ async function aceitarEncaminhamento(id) {
         const msg = encodeURIComponent(
           `📋 *PsiMed Rede Colaborativa*\n\nOlá ${outro.nome?.split(' ')[0]}! O paciente que foi oferecido para você já foi aceito por outro profissional. Obrigada pela disponibilidade! 💙`
         );
-        window.open(\`https://wa.me/55\${outro.wa}?text=\${msg}\`, '_blank');
+        window.open(`https://wa.me/55${outro.wa}?text=${msg}`, '_blank');
       }, 600);
     }
 
@@ -1462,7 +1462,7 @@ async function aceitarEncaminhamento(id) {
         const msg = encodeURIComponent(
           `📋 *PsiMed Rede Colaborativa*\n\nOlá ${caso.indicado_por}! ${usuarioNome} (${usuarioRegistro}) aceitou o encaminhamento do seu paciente.\n\n*Tipo:* ${tipoLabel}\n\nEntre em contato para combinar. 💙`
         );
-        window.open(\`https://wa.me/55\${telInd}?text=\${msg}\`, '_blank');
+        window.open(`https://wa.me/55${telInd}?text=${msg}`, '_blank');
       }, 1200);
     }
   } catch(e) { toast('Erro: '+e.message, 'err'); }
