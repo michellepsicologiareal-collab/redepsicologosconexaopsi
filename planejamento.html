@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planejamento Estratégico — Conexão Psi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --plum:#1E1040; --plum-mid:#2D1B4E; --violet:#5B3FA0;
+  --gold:#C8934A; --gold-light:#E8C98A; --gold-pale:#fef9ee;
+  --azul:#1B5EA6; --ciano:#29A8CC; --roxo:#6B3FA0;
+  --laranja:#E8652A;
+  --green:#27ae60; --red:#c0392b;
+  --cream:#F8F5F0; --white:#FFFFFF;
+  --border:#E4DDD4; --border-dark:rgba(200,147,74,0.2);
+  --muted:#8A8299; --ink:#0F0D1A; --ink-dim:#4A4660;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* ══════════════════════════════════
+   LOCK SCREEN
+══════════════════════════════════ */
+#lock-screen {
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(145deg,var(--plum) 0%,#261550 60%,#1a2a4a 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+#lock-screen::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 60% at 85% 20%,rgba(200,147,74,0.12),transparent 60%),
+    radial-gradient(ellipse 40% 50% at 10% 90%,rgba(41,168,204,0.08),transparent 55%);
+}
+.lock-card {
+  position:relative;z-index:1;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(200,147,74,0.25);
+  border-radius:20px;
+  padding:44px 40px 40px;
+  width:100%;max-width:380px;
+  text-align:center;
+  backdrop-filter:blur(12px);
+  box-shadow:0 24px 80px rgba(0,0,0,0.4);
+}
+.lock-icon { font-size:2.2rem; margin-bottom:12px; display:block; }
+.lock-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.7rem;font-weight:700;color:#fff;
+  margin-bottom:4px;
+}
+.lock-title em { color:var(--gold-light);font-style:italic; }
+.lock-sub {
+  font-size:0.72rem;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);margin-bottom:28px;
+}
+.lock-label {
+  font-size:0.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.4);text-align:left;margin-bottom:8px;
+}
+.lock-input {
+  width:100%;background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(200,147,74,0.3);border-radius:10px;
+  padding:12px 16px;color:#fff;font-family:'Outfit',sans-serif;font-size:15px;
+  outline:none;transition:border-color .2s;
+  letter-spacing:2px;
+}
+.lock-input:focus { border-color:var(--gold); }
+.lock-input::placeholder { color:rgba(255,255,255,0.2);letter-spacing:0; }
+.lock-btn {
+  width:100%;margin-top:14px;
+  background:var(--gold);border:none;border-radius:10px;
+  padding:13px;color:var(--ink);font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+}
+.lock-btn:hover { background:var(--gold-light);transform:translateY(-1px); }
+.lock-error {
+  margin-top:12px;font-size:13px;color:#ff7070;
+  display:none;
+}
+.lock-hint {
+  margin-top:18px;font-size:11px;color:rgba(255,255,255,0.18);
+  line-height:1.5;
+}
+
+/* ══════════════════════════════════
+   MAIN CONTENT (hidden until unlock)
+══════════════════════════════════ */
+#main-content { display:none; }
+
+/* ══ HEADER ══ */
+.hub-header {
+  background:linear-gradient(145deg,var(--plum) 0%,#261550 55%,#1a2a4a 100%);
+  border-radius:18px;
+  margin:1.4rem auto 0;
+  max-width:960px;
+  padding:2rem 2.2rem 1.8rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 8px 40px rgba(15,13,26,0.2);
+}
+.hub-header::before {
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 70% at 90% 30%,rgba(200,147,74,0.13),transparent 60%),
+    radial-gradient(ellipse 40% 50% at 5% 85%,rgba(41,168,204,0.08),transparent 55%);
+}
+.hub-top{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin-bottom:0.2rem;}
+.hub-icon{font-size:1.35rem;}
+.hub-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:white;}
+.hub-title em{color:var(--gold-light);font-style:italic;}
+.hub-sub{font-size:0.61rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:1.4rem;position:relative;z-index:1;}
+
+/* ── STATS RÁPIDAS ── */
+.hub-stats{display:flex;gap:28px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:1.4rem;}
+.hstat{text-align:left;}
+.hstat-val{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--gold-light);line-height:1;}
+.hstat-label{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:2px;}
+
+/* TABS */
+.tabs{display:flex;gap:0.4rem;flex-wrap:wrap;position:relative;z-index:1;}
+.tab{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:0.38rem 0.9rem;border-radius:999px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.5);
+  font-size:0.73rem;font-weight:500;
+  cursor:pointer;transition:all 0.16s;white-space:nowrap;
+}
+.tab:hover{background:rgba(255,255,255,0.13);color:rgba(255,255,255,0.85);}
+.tab.active{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:600;}
+
+/* ══ WRAP ══ */
+.wrap{max-width:960px;margin:0 auto;padding:0 1.4rem 5rem;}
+.section{display:none;}
+.section.active{display:block;animation:fi 0.22s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LABEL DIVISOR ── */
+.label{
+  font-size:0.61rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:8px;margin:1.8rem 0 1rem;
+}
+.label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── CARDS BASE ── */
+.card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:14px;padding:1.2rem 1.3rem;
+}
+.card-gold{ border-left:3px solid var(--gold); }
+.card-ciano{ border-left:3px solid var(--ciano); }
+.card-roxo{ border-left:3px solid var(--roxo); }
+.card-laranja{ border-left:3px solid var(--laranja); }
+
+/* ── GRIDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:0.85rem;}
+@media(max-width:720px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+/* ── FRENTE CARDS ── */
+.frente-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:box-shadow .2s, transform .2s;
+}
+.frente-card:hover{box-shadow:0 6px 24px rgba(15,13,26,0.1);transform:translateY(-2px);}
+.frente-top{padding:1rem 1.2rem 0.8rem;border-top:3px solid var(--f-accent);}
+.frente-num{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;line-height:1;color:var(--f-accent);opacity:0.18;}
+.frente-name{font-size:14px;font-weight:600;color:var(--ink);margin-top:2px;}
+.frente-tag{
+  font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;display:inline-block;margin-top:5px;
+  background:color-mix(in srgb, var(--f-accent) 12%, transparent);
+  color:var(--f-accent);
+  border:1px solid color-mix(in srgb, var(--f-accent) 25%, transparent);
+}
+.frente-list{padding:0 1.2rem 1.2rem;list-style:none;}
+.frente-list li{
+  font-size:12.5px;color:var(--ink-dim);padding:5px 0;
+  border-bottom:1px solid rgba(15,13,26,0.05);
+  display:flex;align-items:flex-start;gap:7px;line-height:1.5;
+}
+.frente-list li::before{content:'→';color:var(--gold);flex-shrink:0;font-size:11px;margin-top:1px;}
+
+/* ── FLOW ── */
+.flow-wrap{overflow-x:auto;padding-bottom:4px;}
+.flow{display:flex;align-items:stretch;gap:0;min-width:600px;margin:12px 0 20px;}
+.flow-step{
+  background:var(--white);border:1.5px solid var(--border);border-radius:10px;
+  padding:12px 14px;flex:1;min-width:100px;
+}
+.flow-step-title{font-size:12px;font-weight:600;color:var(--ink);}
+.flow-step-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.flow-arrow{display:flex;align-items:center;color:var(--gold);font-size:18px;padding:0 6px;flex-shrink:0;}
+
+/* ── RISK ── */
+.risk-row{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.risk-badge{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px;
+}
+.r-alto{background:#fff0ed;color:#c0392b;border:1px solid #f5c6c0;}
+.r-medio{background:#fef6ec;color:#b7600a;border:1px solid #f5ddb0;}
+.r-baixo{background:#edf7f3;color:#1a7a4a;border:1px solid #b0dcc8;}
+.risk-title{font-size:13.5px;font-weight:600;margin-bottom:4px;color:var(--ink);}
+.risk-desc{font-size:12.5px;color:var(--ink-dim);line-height:1.6;}
+.risk-action{font-size:12px;color:var(--azul);margin-top:5px;font-style:italic;}
+
+/* ── REVENUE TABLE ── */
+.rev-table{width:100%;border-collapse:collapse;}
+.rev-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.rev-table td:first-child{color:var(--ink);font-weight:500;}
+.rev-table td:last-child{text-align:right;}
+.rev-table tr:last-child td{border-bottom:none;}
+.pill{
+  display:inline-block;padding:2px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;
+}
+.pill-green{background:#edf7f3;color:#1a7a4a;border:1px solid #b0dcc8;}
+.pill-gold{background:#fef6ec;color:#b7600a;border:1px solid #f5ddb0;}
+.pill-blue{background:#edf3fc;color:#1B5EA6;border:1px solid #b0c8f0;}
+.pill-grey{background:#f0eff5;color:var(--muted);border:1px solid #d8d4e4;}
+
+/* ── SCENARIO CARDS ── */
+.scenario-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:14px;padding:1.4rem;text-align:center;
+}
+.sc-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.sc-val{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;line-height:1;margin-bottom:6px;}
+.sc-note{font-size:12px;color:var(--ink-dim);line-height:1.6;}
+
+/* ── COMP TABLE ── */
+.comp-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.comp-table th{
+  background:var(--cream);padding:10px 14px;text-align:left;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);border-bottom:1.5px solid var(--border);
+}
+.comp-table td{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  color:var(--ink-dim);vertical-align:top;line-height:1.5;
+}
+.comp-table tr:hover td{background:#fafaf8;}
+.comp-table td:first-child{color:var(--ink);font-weight:600;}
+.check{color:var(--green);font-weight:600;}
+.cross{color:var(--red);}
+
+/* ── MOAT BARS ── */
+.moat-bar{margin:10px 0;}
+.moat-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.moat-row span:last-child{font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:11px;}
+.bar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--azul),var(--ciano));transition:width 1s ease;}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:28px;margin-top:4px;}
+.timeline::before{
+  content:'';position:absolute;left:7px;top:8px;bottom:8px;
+  width:1px;background:linear-gradient(to bottom,var(--gold),var(--roxo),var(--ciano));
+}
+.tl-item{position:relative;margin-bottom:28px;}
+.tl-dot{
+  position:absolute;left:-22px;top:5px;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--gold);border:2px solid var(--cream);
+}
+.tl-phase{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:4px;
+}
+.tl-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.tl-desc{font-size:13px;color:var(--ink-dim);line-height:1.6;margin-bottom:8px;}
+.tl-list{list-style:none;}
+.tl-list li{
+  font-size:12.5px;color:var(--ink-dim);padding:3px 0 3px 14px;position:relative;
+}
+.tl-list li::before{content:'·';position:absolute;left:4px;color:var(--gold);font-size:16px;line-height:1;}
+
+/* ── HIGHLIGHT / ALERT ── */
+.highlight{
+  background:linear-gradient(135deg,#fef9ee,#fdf5e6);
+  border:1px solid rgba(200,147,74,0.35);
+  border-radius:12px;padding:16px 18px;margin:16px 0;
+}
+.highlight .hl-tag{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.highlight p{font-size:13px;color:var(--ink-dim);line-height:1.7;}
+
+.alert{
+  background:#fff8f6;border:1px solid #f5c6c0;
+  border-radius:12px;padding:16px 18px;margin:16px 0;
+}
+.alert .al-tag{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c0392b;margin-bottom:8px;}
+.alert p{font-size:13px;color:var(--ink-dim);line-height:1.6;}
+
+/* ── LOCK BTN NO HEADER ── */
+.lock-btn-header{
+  position:absolute;top:1.4rem;right:1.6rem;z-index:2;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);
+  border-radius:8px;padding:6px 12px;color:rgba(255,255,255,0.45);
+  font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;
+  font-family:'Outfit',sans-serif;
+}
+.lock-btn-header:hover{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);}
+
+/* ── BACK LINK ── */
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  margin:1.2rem auto 0;max-width:960px;padding:0 1.4rem;
+  font-size:12px;color:var(--muted);cursor:pointer;
+  text-decoration:none;
+}
+.back-link:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     LOCK SCREEN
+═══════════════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <span class="lock-icon">🔐</span>
+    <div class="lock-title">Conexão <em>Psi</em></div>
+    <div class="lock-sub">Planejamento Estratégico</div>
+    <div class="lock-label">Senha de acesso</div>
+    <input class="lock-input" type="password" id="senha-input" placeholder="Digite a senha" autocomplete="off"
+      onkeydown="if(event.key==='Enter') verificarSenha()">
+    <button class="lock-btn" onclick="verificarSenha()">Entrar →</button>
+    <div class="lock-error" id="lock-error">Senha incorreta. Tente novamente.</div>
+    <div class="lock-hint">Acesso restrito · Dados confidenciais</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════ -->
+<div id="main-content">
+
+  <!-- HEADER -->
+  <div style="max-width:960px;margin:0 auto;padding:0 1.4rem;">
+    <div class="hub-header">
+      <button class="lock-btn-header" onclick="bloquear()">🔒 Bloquear</button>
+      <div class="hub-top">
+        <span class="hub-icon">📊</span>
+        <div class="hub-title">Planejamento <em>Estratégico</em></div>
+      </div>
+      <div class="hub-sub">Conexão Psi · Confidencial · 2026</div>
+      <div class="hub-stats">
+        <div class="hstat"><span class="hstat-val">4</span><div class="hstat-label">Frentes</div></div>
+        <div class="hstat"><span class="hstat-val">R$27,90</span><div class="hstat-label">Ticket premium</div></div>
+        <div class="hstat"><span class="hstat-val">~50</span><div class="hstat-label">Psis p/ break-even</div></div>
+        <div class="hstat"><span class="hstat-val">≈0</span><div class="hstat-label">Custo fixo atual</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('frentes',this)">📌 Frentes</div>
+        <div class="tab" onclick="showTab('fluxo',this)">🔄 Fluxos</div>
+        <div class="tab" onclick="showTab('financeiro',this)">💰 Financeiro</div>
+        <div class="tab" onclick="showTab('riscos',this)">⚠️ Riscos</div>
+        <div class="tab" onclick="showTab('competitivo',this)">🏁 Competitivo</div>
+        <div class="tab" onclick="showTab('escala',this)">🚀 Escala</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+  <!-- ═══════ FRENTES ═══════ -->
+  <div class="section active" id="sec-frentes">
+
+    <div class="label">Arquitetura de valor</div>
+    <div class="grid-2">
+
+      <div class="frente-card" style="--f-accent:#29A8CC">
+        <div class="frente-top">
+          <div class="frente-num">01</div>
+          <div class="frente-name">Rede WhatsApp Psi–Psi</div>
+          <span class="frente-tag">Topo do funil · Gratuito</span>
+        </div>
+        <ul class="frente-list">
+          <li>Canal de aquecimento e onboarding da base de psis</li>
+          <li>Psis indicam pacientes entre si por abordagem e cidade</li>
+          <li>Constrói o ativo principal: <strong>confiança de pares</strong></li>
+          <li>Alimenta percepção de valor antes da assinatura</li>
+          <li>Custo operacional: zero (WhatsApp nativo)</li>
+        </ul>
+      </div>
+
+      <div class="frente-card" style="--f-accent:#1B5EA6">
+        <div class="frente-top">
+          <div class="frente-num">02</div>
+          <div class="frente-name">Perfil Gratuito no Sistema</div>
+          <span class="frente-tag">Mid-funnel · Freemium</span>
+        </div>
+        <ul class="frente-list">
+          <li>Psi aprovado tem perfil interno (CRP, abordagem, foto)</li>
+          <li>Visível internamente — pode reservar paciente indicado</li>
+          <li>Não aparece no diretório público para pacientes</li>
+          <li>Fricção deliberada para motivar upgrade para premium</li>
+          <li>Quem reserva paciente tem alta taxa de conversão</li>
+        </ul>
+      </div>
+
+      <div class="frente-card" style="--f-accent:#C8934A">
+        <div class="frente-top">
+          <div class="frente-num">03</div>
+          <div class="frente-name">Plano Premium Pago</div>
+          <span class="frente-tag">Receita principal · R$27,90/mês</span>
+        </div>
+        <ul class="frente-list">
+          <li>Aparece em divulgacao.html com WhatsApp visível</li>
+          <li>Pacientes contatam diretamente via WhatsApp</li>
+          <li>Bio completa, especialidades, valor da sessão, foto</li>
+          <li>Badge "verificado" — diferenciação perceptual</li>
+          <li>Acesso ao PsiMed (met.html)</li>
+          <li>Custo marginal de adicionar psi: praticamente zero</li>
+        </ul>
+      </div>
+
+      <div class="frente-card" style="--f-accent:#6B3FA0">
+        <div class="frente-top">
+          <div class="frente-num">04</div>
+          <div class="frente-name">PsiMed — Rede Interprofissional</div>
+          <span class="frente-tag">Expansão · B2B embrionário</span>
+        </div>
+        <ul class="frente-list">
+          <li>Meets diretos psi + médicos (psiquiatras, clínica geral, neuro)</li>
+          <li>Médico indica paciente → vê psis premium disponíveis</li>
+          <li>Encaminhamentos cruzados anonimizados por urgência</li>
+          <li>Gratuito para médicos na fase atual (aquisição)</li>
+          <li>Requer 50+ psis premium antes de lançar publicamente</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="highlight" style="margin-top:20px">
+      <div class="hl-tag">⚙ Lógica de flywheel</div>
+      <p>WA gera <strong>volume de psis</strong> → Cadastro gera <strong>comprometimento</strong> → Premium monetiza <strong>visibilidade</strong> → PsiMed amplifica <strong>valor percebido</strong>, fechando o ciclo. Cada psi premium atrai mais médicos, que atraem mais psis, que aumentam o valor da rede para todos.</p>
+    </div>
+
+    <div class="label">Proposta de valor por audiência</div>
+    <div class="grid-3">
+      <div class="card card-ciano">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Psicólogo Gratuito</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Visibilidade entre pares, acesso a indicações dentro da rede e perfil verificado — sem custo, com entrega real.</p>
+      </div>
+      <div class="card card-gold">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Psicólogo Premium</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Captação via diretório público, contato direto pelo WhatsApp, acesso ao PsiMed e badge de verificado.</p>
+      </div>
+      <div class="card card-roxo">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Médico / Prof. de Saúde</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Rede de psis verificados para encaminhar pacientes com segurança, por especialidade e urgência.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ FLUXOS ═══════ -->
+  <div class="section" id="sec-fluxo">
+
+    <div class="label">Jornada do psicólogo (F1 + F2)</div>
+    <div class="flow-wrap"><div class="flow">
+      <div class="flow-step"><div class="flow-step-title">Descoberta</div><div class="flow-step-desc">Instagram / indicação de psi</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Grupo WA</div><div class="flow-step-desc">Entra na rede gratuita</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Cadastro</div><div class="flow-step-desc">Tally b5OGYZ</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Aprovação</div><div class="flow-step-desc">Admin valida CRP</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Perfil ativo</div><div class="flow-step-desc">Visível internamente</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Reserva pct.</div><div class="flow-step-desc">Vê indicação, clica reservar</div></div>
+    </div></div>
+
+    <div class="label">Conversão para premium (F3)</div>
+    <div class="flow-wrap"><div class="flow">
+      <div class="flow-step"><div class="flow-step-title">Gatilho</div><div class="flow-step-desc">Quer captar pacientes OU recebe indicação</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Planos</div><div class="flow-step-desc">Visita planos.html</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Pagamento</div><div class="flow-step-desc">Kiwify checkout</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Ativação</div><div class="flow-step-desc">premium=true (admin)</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Diretório</div><div class="flow-step-desc">Aparece em divulgacao.html</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">PsiMed</div><div class="flow-step-desc">Acessa met.html</div></div>
+    </div></div>
+
+    <div class="label">Jornada do médico (F4 · PsiMed)</div>
+    <div class="flow-wrap"><div class="flow">
+      <div class="flow-step"><div class="flow-step-title">Cadastro</div><div class="flow-step-desc">cadastro_med.html</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Aprovação</div><div class="flow-step-desc">Admin valida CRM</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Login</div><div class="flow-step-desc">met.html por e-mail</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Indica</div><div class="flow-step-desc">Encaminhamento anônimo</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Psis veem</div><div class="flow-step-desc">Premium se interessam</div></div>
+      <div class="flow-arrow">›</div>
+      <div class="flow-step"><div class="flow-step-title">Meet</div><div class="flow-step-desc">Médico agenda meet</div></div>
+    </div></div>
+
+    <div class="label">Pontos críticos de atenção</div>
+    <div class="grid-2">
+      <div class="card card-laranja">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--laranja);margin-bottom:8px;">⚠ Gargalo 1 — Ativação manual</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">A ativação premium depende de operação manual no admin. Com volume isso vira gargalo. <strong>Solução:</strong> webhook Kiwify → Edge Function que ativa premium=true automaticamente após pagamento confirmado.</p>
+      </div>
+      <div class="card card-laranja">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--laranja);margin-bottom:8px;">⚠ Gargalo 2 — Aprovação de cadastros</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Aprovação manual de cada CRP. Com 100+ cadastros fica insustentável. <strong>Solução:</strong> aprovação em lote no admin + critérios documentados para poder delegar.</p>
+      </div>
+      <div class="card card-gold">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">💡 Gatilho de conversão F2 → F3</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">O psi gratuito precisa sentir que está perdendo algo. Sugestão: "3 pacientes indicados para você este mês — desbloqueie premium para aceitar" via WhatsApp ou e-mail.</p>
+      </div>
+      <div class="card card-gold">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">💡 Retenção premium</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Se não receber nenhum contato no 1º mês, cancela. Implemente relatório mensal: "seu perfil foi visto 14x" ancora valor percebido mesmo sem contato direto.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ FINANCEIRO ═══════ -->
+  <div class="section" id="sec-financeiro">
+
+    <div class="label">Estrutura de custos (stack serverless)</div>
+    <div class="card" style="margin-bottom:4px">
+      <table class="rev-table">
+        <tr><td>GitHub Pages (hosting)</td><td><span class="pill pill-green">R$ 0/mês</span></td></tr>
+        <tr><td>Supabase Free (banco + storage + edge functions)</td><td><span class="pill pill-green">R$ 0/mês</span></td></tr>
+        <tr><td>Tally Free (formulários)</td><td><span class="pill pill-green">R$ 0/mês</span></td></tr>
+        <tr><td>Kiwify (taxa por transação ~4,99% + R$0,50)</td><td><span class="pill pill-gold">~R$ 1,70/venda</span></td></tr>
+        <tr><td>Domínio personalizado (opcional)</td><td><span class="pill pill-blue">~R$ 40/ano</span></td></tr>
+        <tr><td>Supabase Pro (recomendado a partir de 50 psis)</td><td><span class="pill pill-gold">~R$ 125/mês</span></td></tr>
+        <tr><td style="font-weight:700">Custo fixo mensal atual</td><td><span class="pill pill-green">≈ R$ 0–40</span></td></tr>
+      </table>
+    </div>
+
+    <div class="label">Cenários de receita mensal</div>
+    <div class="grid-3">
+      <div class="scenario-card">
+        <div class="sc-label">Conservador</div>
+        <div class="sc-val" style="color:var(--ciano)">R$ 836</div>
+        <div class="sc-note">30 psis premium × R$27,90<br>Break-even atingido<br>~10% da base convertida</div>
+      </div>
+      <div class="scenario-card" style="border-color:var(--gold);box-shadow:0 4px 20px rgba(200,147,74,0.12)">
+        <div class="sc-label">Realista (6 meses)</div>
+        <div class="sc-val" style="color:var(--gold)">R$ 2.790</div>
+        <div class="sc-note">100 psis premium × R$27,90<br>Renda complementar relevante<br>~20% da base convertida</div>
+      </div>
+      <div class="scenario-card">
+        <div class="sc-label">Otimista (12 meses)</div>
+        <div class="sc-val" style="color:var(--green)">R$ 8.370</div>
+        <div class="sc-note">300 psis premium × R$27,90<br>Operação semi-autônoma<br>+ PsiMed gerando receita</div>
+      </div>
+    </div>
+
+    <div class="label">Linhas de receita potencial</div>
+    <div class="card">
+      <table class="rev-table">
+        <tr><td><strong>Assinatura Premium Psi</strong> — R$27,90/mês</td><td><span class="pill pill-green">Ativo</span></td></tr>
+        <tr><td><strong>Plano Anual</strong> — desconto 2 meses (~R$230/ano)</td><td><span class="pill pill-blue">Implementar</span></td></tr>
+        <tr><td><strong>Tier Pro</strong> — R$49,90 com destaque + relatórios</td><td><span class="pill pill-blue">Fase 2</span></td></tr>
+        <tr><td><strong>PsiMed Premium Médico</strong> — cobrar após massa crítica</td><td><span class="pill pill-grey">Fase 3</span></td></tr>
+        <tr><td><strong>Destaque no diretório</strong> — primeiro por cidade/abordagem</td><td><span class="pill pill-grey">Fase 3</span></td></tr>
+        <tr><td><strong>Relatórios de visualização de perfil</strong></td><td><span class="pill pill-grey">Fase 3</span></td></tr>
+      </table>
+    </div>
+
+    <div class="highlight">
+      <div class="hl-tag">💰 Por que a margem é excepcionalmente alta</div>
+      <p>Com custo fixo próximo a zero, cada novo assinante representa quase receita líquida. 100 psis = R$2.790/mês com margem bruta de ~94% (descontando taxa Kiwify). A ameaça não é o custo — é o <strong>churn</strong> e a velocidade de aquisição.</p>
+    </div>
+
+    <div class="label">Estratégia de precificação</div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Tier atual — R$27,90/mês</div>
+        <p style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">Valor baixo facilita conversão. Ideal para aquisição. Risco: âncora difícil de quebrar depois. Não suba o preço de quem já assinou, mas novos tiers podem ter preço maior.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Proposta de tiers futuros</div>
+        <table class="rev-table">
+          <tr><td style="font-size:12px">Gratuito · Perfil básico interno</td><td><span class="pill pill-green">R$ 0</span></td></tr>
+          <tr><td style="font-size:12px">Essencial · Diretório + WA</td><td><span class="pill pill-gold">R$ 27,90</span></td></tr>
+          <tr><td style="font-size:12px">Pro · + Destaque + Relatórios</td><td><span class="pill pill-blue">R$ 49,90</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ RISCOS ═══════ -->
+  <div class="section" id="sec-riscos">
+
+    <div class="alert">
+      <div class="al-tag">⚠ Alerta Regulatório — CFP Resolução 06/2019</div>
+      <p>A resolução proíbe captação de clientela e anúncios que pareçam comercialização da relação terapêutica. Um diretório pago pode ser enquadrado como prática vedada dependendo do posicionamento. O ponto defensável: a plataforma é de <em>indicação entre profissionais</em>, não de publicidade ao público geral. Documentar nos termos de uso antes de escalar.</p>
+    </div>
+
+    <div class="label">Mapa de riscos</div>
+
+    <div class="risk-row">
+      <span class="risk-badge r-alto">Alto</span>
+      <div>
+        <div class="risk-title">Dependência de operação manual</div>
+        <div class="risk-desc">Toda aprovação, ativação premium e moderação passa por você. Com 200+ cadastros torna-se inviável e gera atrasos que deterioram a experiência.</div>
+        <div class="risk-action">→ Prioridade imediata: automatizar webhook Kiwify + aprovação em lote. Meta: 0 etapas manuais para ativação premium.</div>
+      </div>
+    </div>
+    <div class="risk-row">
+      <span class="risk-badge r-alto">Alto</span>
+      <div>
+        <div class="risk-title">Churn por falta de resultado percebido</div>
+        <div class="risk-desc">Se o psi premium não receber pacientes no 1º mês, cancela. O valor prometido depende de volume de tráfego para o diretório, ainda baixo.</div>
+        <div class="risk-action">→ Construir prova social ativa: depoimentos, número de visualizações de perfil, indicações recebidas. Gerenciar expectativas no onboarding.</div>
+      </div>
+    </div>
+    <div class="risk-row">
+      <span class="risk-badge r-alto">Alto</span>
+      <div>
+        <div class="risk-title">Regulação CFP sobre captação digital</div>
+        <div class="risk-desc">Posicionamento atual vulnerável se concorrente ou colega acionar o CFP. "Plataforma de indicação entre profissionais" é defensável mas precisa ser explícito.</div>
+        <div class="risk-action">→ Consultar advogado com expertise em saúde digital. Redigir termos de uso com linguagem alinhada ao CFP antes de escalar.</div>
+      </div>
+    </div>
+    <div class="risk-row">
+      <span class="risk-badge r-medio">Médio</span>
+      <div>
+        <div class="risk-title">Lançar PsiMed antes de ter massa crítica</div>
+        <div class="risk-desc">Médicos que entram e encontram poucos psis premium disponíveis simplesmente saem. Custo de reativação é alto.</div>
+        <div class="risk-action">→ Threshold mínimo: lançar PsiMed com 50+ psis premium e distribuição em ao menos SP + RJ.</div>
+      </div>
+    </div>
+    <div class="risk-row">
+      <span class="risk-badge r-medio">Médio</span>
+      <div>
+        <div class="risk-title">Plataforma sem backup nem redundância</div>
+        <div class="risk-desc">Supabase Free Plan sem backups agendados. Drop acidental pode causar perda irreversível de dados (já ocorreu).</div>
+        <div class="risk-action">→ Com a primeira receita, migrar para Supabase Pro (~USD 25/mês). Exportação mensal via SQL como seguro adicional.</div>
+      </div>
+    </div>
+    <div class="risk-row">
+      <span class="risk-badge r-medio">Médio</span>
+      <div>
+        <div class="risk-title">Marca "Conexão Psi" sem registro</div>
+        <div class="risk-desc">Concorrente pode registrar antes e forçar rebranding custoso.</div>
+        <div class="risk-action">→ Protocolar registro no INPI (classe 44). Custo: ~R$355. A data de protocolo garante prioridade mesmo enquanto tramita.</div>
+      </div>
+    </div>
+    <div class="risk-row" style="border:none">
+      <span class="risk-badge r-baixo">Baixo</span>
+      <div>
+        <div class="risk-title">Cópia por concorrente maior (Wepsy, etc.)</div>
+        <div class="risk-desc">Concorrentes B2C não replicam o diferencial psi-a-psi porque seu modelo é outro. O moat real é a rede de confiança, não a tecnologia.</div>
+        <div class="risk-action">→ Acelerar crescimento da rede — em redes profissionais, tamanho é defesa.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ COMPETITIVO ═══════ -->
+  <div class="section" id="sec-competitivo">
+
+    <div class="label">Comparativo de plataformas</div>
+    <div style="overflow-x:auto">
+    <table class="comp-table">
+      <thead>
+        <tr><th>Plataforma</th><th>Modelo</th><th>Rede psi-psi</th><th>PsiMed</th><th>Preço psi</th><th>Foco</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>🔵 Conexão Psi</td><td>B2B2C + Comunidade</td><td><span class="check">✓ Core</span></td><td><span class="check">✓ Único</span></td><td>R$27,90/mês</td><td>Indicação entre profissionais</td></tr>
+        <tr><td>Wepsy</td><td>Marketplace B2C</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td>~R$59/mês</td><td>Pacientes encontram psis</td></tr>
+        <tr><td>Doctoralia</td><td>Marketplace B2C</td><td><span class="cross">✗</span></td><td>Parcial</td><td>R$150+/mês</td><td>Todas especialidades</td></tr>
+        <tr><td>Psicologia Viva</td><td>Telepsicologia</td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td>Taxa % sessão</td><td>Online apenas</td></tr>
+        <tr><td>Grupos WA / LinkedIn</td><td>Informal</td><td>Parcial, sem controle</td><td><span class="cross">✗</span></td><td>Gratuito</td><td>Sem estrutura</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="label">Força do moat (vantagem competitiva)</div>
+    <div class="card" style="margin-bottom:16px" id="moat-card">
+      <div class="moat-bar">
+        <div class="moat-row"><span>Confiança de pares (rede psi-psi)</span><span>95/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="95%"></div></div>
+      </div>
+      <div class="moat-bar">
+        <div class="moat-row"><span>Diferencial PsiMed (interprofissional)</span><span>88/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="88%"></div></div>
+      </div>
+      <div class="moat-bar">
+        <div class="moat-row"><span>Custo de troca para o psi cadastrado</span><span>72/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="72%"></div></div>
+      </div>
+      <div class="moat-bar">
+        <div class="moat-row"><span>Reconhecimento de marca atual</span><span>30/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="30%"></div></div>
+      </div>
+      <div class="moat-bar">
+        <div class="moat-row"><span>Barreira técnica de entrada</span><span>25/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="25%"></div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:10px;">✓ Ninguém replica facilmente</div>
+        <ul style="list-style:none">
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Cultura de indicação psi-psi é construída, não comprada</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Canal WhatsApp já ativo com psis engajados</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Michelle é psi — fala a língua da audiência</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0">→ PsiMed sem intermediário psi↔médico</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:10px;">✗ Vulnerabilidades a resolver</div>
+        <ul style="list-style:none">
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Plataforma técnica copiável em semanas</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Sem marca registrada ainda</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--border)">→ Diretório público com tráfego SEO ainda baixo</li>
+          <li style="font-size:12.5px;color:var(--ink-dim);padding:5px 0">→ Operação dependente de uma única pessoa</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ ESCALA ═══════ -->
+  <div class="section" id="sec-escala">
+
+    <div class="label">Roadmap em 3 fases</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--gold)"></div>
+        <div class="tl-phase">Fase 1 · Meses 1–3 · Consolidação</div>
+        <div class="tl-title">Construir a base — sem acelerar prematuramente</div>
+        <div class="tl-desc">Foco exclusivo em qualidade da rede e conversão para premium. Não lançar PsiMed publicamente ainda.</div>
+        <ul class="tl-list">
+          <li>Meta: 50 psis premium ativos</li>
+          <li>Automatizar ativação premium via webhook Kiwify → Edge Function</li>
+          <li>Criar fluxo de onboarding pós-aprovação (e-mail boas-vindas + tutorial)</li>
+          <li>Implementar relatório mensal de visualizações de perfil para premium</li>
+          <li>Registrar marca "Conexão Psi" no INPI (classe 44) — ~R$355</li>
+          <li>Migrar Supabase para Pro com backup automatizado</li>
+          <li>Documentar aprovação de CRP para poder delegar</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--ciano)"></div>
+        <div class="tl-phase">Fase 2 · Meses 4–8 · Expansão controlada</div>
+        <div class="tl-title">Lançar PsiMed + Expandir geograficamente</div>
+        <div class="tl-desc">Com 50+ psis premium, a rede tem valor mínimo para médicos. Iniciar aquisição ativa de médicos (psiquiatras primeiro).</div>
+        <ul class="tl-list">
+          <li>Meta: 100 psis premium + 30 médicos ativos no PsiMed</li>
+          <li>Plano anual (2 meses grátis) para reduzir churn</li>
+          <li>SEO por cidade/especialidade em divulgacao.html</li>
+          <li>Tier Pro (R$49,90 com destaque + relatórios)</li>
+          <li>Parcerias estratégicas: CRP regional, faculdades de psicologia</li>
+          <li>SLA de aprovação: máx 48h após cadastro</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--roxo)"></div>
+        <div class="tl-phase">Fase 3 · Meses 9–18 · Escalabilidade real</div>
+        <div class="tl-title">Monetizar PsiMed + Automação total</div>
+        <div class="tl-desc">Sistema operando sem intervenção manual. Receita suficiente para contratar suporte ou dev part-time.</div>
+        <ul class="tl-list">
+          <li>Meta: 300+ psis premium · R$8.000+/mês</li>
+          <li>Cobrar médicos por acesso premium ao PsiMed</li>
+          <li>Destaque pago no diretório por cidade/abordagem</li>
+          <li>PWA mobile — diferencial perceptual enorme</li>
+          <li>Estruturar equipe: 1 CS + 1 dev part-time</li>
+          <li>Avaliar aceleração (SEBRAE, investidor anjo)</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="label">Canais de aquisição de psis</div>
+    <div style="overflow-x:auto">
+    <table class="comp-table">
+      <thead><tr><th>Canal</th><th>Custo</th><th>Tempo p/ resultado</th><th>Potencial</th></tr></thead>
+      <tbody>
+        <tr><td>Indicação psi-psi (boca a boca)</td><td><span class="pill pill-green">Zero</span></td><td>Imediato</td><td>⭐⭐⭐⭐⭐</td></tr>
+        <tr><td>Instagram (@psimichelledonega)</td><td><span class="pill pill-green">Baixo</span></td><td>2–4 semanas</td><td>⭐⭐⭐⭐</td></tr>
+        <tr><td>Parcerias CRP / faculdades</td><td><span class="pill pill-green">Zero</span></td><td>1–3 meses</td><td>⭐⭐⭐⭐</td></tr>
+        <tr><td>Grupos Facebook / WhatsApp de psis</td><td><span class="pill pill-green">Zero</span></td><td>Imediato</td><td>⭐⭐⭐</td></tr>
+        <tr><td>SEO orgânico (diretório por cidade)</td><td><span class="pill pill-blue">Tempo</span></td><td>3–6 meses</td><td>⭐⭐⭐⭐⭐</td></tr>
+        <tr><td>Tráfego pago (Meta Ads)</td><td><span class="pill pill-gold">Alto</span></td><td>Imediato (caro)</td><td>⭐⭐⭐</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="highlight" style="margin-top:20px">
+      <div class="hl-tag">🎯 As 3 decisões mais importantes agora</div>
+      <p>
+        <strong>1. Não lançar tudo ao mesmo tempo.</strong> Consolide 50 psis premium antes de qualquer outra iniciativa.<br><br>
+        <strong>2. Automatizar a ativação premium hoje.</strong> O webhook Kiwify → Edge Function é uma tarde de implementação que resolve meses de trabalho manual futuro.<br><br>
+        <strong>3. Registrar a marca antes de escalar.</strong> O custo de rebranding forçado é infinitamente maior que os ~R$355 do protocolo INPI agora.
+      </p>
+    </div>
+
+  </div>
+
+  </div><!-- /wrap -->
+</div><!-- /main-content -->
+
+<script>
+// ── SENHA ──
+const SENHA = 'plano2026';
+
+function verificarSenha() {
+  const v = document.getElementById('senha-input').value;
+  if (v === SENHA) {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    sessionStorage.setItem('plano_auth', '1');
+  } else {
+    const err = document.getElementById('lock-error');
+    err.style.display = 'block';
+    document.getElementById('senha-input').value = '';
+    document.getElementById('senha-input').focus();
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function bloquear() {
+  sessionStorage.removeItem('plano_auth');
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('senha-input').value = '';
+  document.getElementById('senha-input').focus();
+}
+
+// Persistir sessão
+if (sessionStorage.getItem('plano_auth') === '1') {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+}
+
+// ── TABS ──
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'competitivo') setTimeout(animateBars, 150);
+}
+
+// ── MOAT BARS ──
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(bar => {
+    const w = bar.getAttribute('data-w');
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = w; }, 80);
+  });
+}
+</script>
+</body>
+</html>
