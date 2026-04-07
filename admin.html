@@ -635,13 +635,29 @@ async function api(method, path, body) {
   const action = { 'PATCH': 'update', 'DELETE': 'delete', 'POST': 'insert' }[method];
   if (!action) throw new Error('Método não suportado: ' + method);
 
-  const r = await fetch(PROXY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'apikey': KEY },
-    body: JSON.stringify({ action, table, id, payload: body, adminPassword: currentAdminPw })
-  });
-  const res = await r.json();
-  if (!res.ok) throw new Error(res.error || 'Erro na operação');
+  let r, res;
+  try {
+    r = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': KEY },
+      body: JSON.stringify({ action, table, id, payload: body, adminPassword: currentAdminPw })
+    });
+  } catch(netErr) {
+    throw new Error('Edge Function inacessível. Verifique se admin-proxy está deployada no Supabase. (' + netErr.message + ')');
+  }
+
+  // Tenta parsear JSON
+  const text = await r.text();
+  try { res = JSON.parse(text); } catch { res = {}; }
+
+  if (!r.ok || !res.ok) {
+    // Mensagens de erro específicas
+    if (r.status === 401) throw new Error('Senha incorreta na Edge Function. Verifique os Secrets: ADMIN_MASTER_PASSWORD e ADMIN_SOCIO_PASSWORD.');
+    if (r.status === 404) throw new Error('Edge Function "admin-proxy" não encontrada. Deploy no Supabase → Edge Functions.');
+    if (r.status === 403) throw new Error(res.error || 'Acesso negado (nível insuficiente).');
+    throw new Error(res.error || `HTTP ${r.status}: ${text.slice(0,200)}`);
+  }
+
   return res.data ?? null;
 }
 
@@ -670,12 +686,8 @@ const CORES = ['#4A3570','#7B5EA7','#3D7A5E','#9B6B3B','#2A5FAC','#6B3B5E'];
 
 async function carregar() {
   try {
-    const [psis, meds] = await Promise.all([
-      api('GET', 'psis?select=*&order=created_at.desc&limit=500'),
-      api('GET', 'profissionais_saude?select=*&order=created_at.desc&limit=500')
-    ]);
+    const psis = await api('GET', 'psis?select=*&order=created_at.desc&limit=500');
     todosPsis = (psis || []).map(p => ({...p, _rede:'psi'}));
-    todosMeds = (meds || []).map(p => ({...p, _rede:'med'}));
     atualizarStatsPsi();
     renderPsis();
   } catch(e) { toast('Erro ao carregar: ' + e.message, 'err'); }
