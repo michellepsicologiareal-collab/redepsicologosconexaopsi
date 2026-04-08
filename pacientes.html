@@ -253,11 +253,41 @@ function sair(){
   document.getElementById('senha-input').value='';
 }
 
+let profissionaisElegiveis = [];
+
+async function carregarElegiveis(){
+  if(profissionaisElegiveis.length) return;
+  try{
+    const [psis,meds] = await Promise.all([
+      api('GET','psis?select=nome,crp,whatsapp&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=200'),
+      api('GET','profissionais_saude?select=nome,registro,tipo,whatsapp&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=200')
+    ]);
+    profissionaisElegiveis = [
+      ...(psis||[]).map(x=>({nome:x.nome,crp:x.crp,wa:x.whatsapp,tipo:'🧠'})),
+      ...(meds||[]).map(x=>({nome:x.nome,crp:x.registro,wa:x.whatsapp,tipo:'🏥'}))
+    ].sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  }catch(e){console.warn('elegíveis:',e.message);}
+}
+
+function preencherPsiManual(id){
+  const sel = document.getElementById('cf-psi-sel-'+id);
+  const val = sel?.value||'';
+  if(!val) return;
+  const parts = val.split('|');
+  const nomeEl = document.getElementById('cf-psi-'+id);
+  const crpEl  = document.getElementById('cf-crp-'+id);
+  if(nomeEl) nomeEl.value = parts[0]||'';
+  if(crpEl)  crpEl.value  = parts[1]||'';
+}
+
 function iniciar(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('chip').textContent=perfil==='admin'?'⚙️ Admin':`🧠 ${psiNome.split(' ')[0]} · ${psiCRP}`;
-  if(perfil==='admin') document.getElementById('search-bar').style.display='flex';
+  if(perfil==='admin'){
+    document.getElementById('search-bar').style.display='flex';
+    carregarElegiveis();
+  }
   carregar();
 }
 
@@ -331,9 +361,37 @@ function render(){
       ${p.valor_final?`<div style="color:#27ae60;font-size:12px;font-weight:600;">💰 ${p.valor_final}</div>`:''}
       ${p.desfecho_obs?`<div style="font-size:11px;color:var(--muted);font-style:italic;">${p.desfecho_obs}</div>`:''}`;
 
+    // Timeline de datas
+    const dtChegada = p.created_at ? new Date(p.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const dtReserva = p.reservado_em ? new Date(p.reservado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const dtFim     = p.concluido_em ? new Date(p.concluido_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    const timelineHtml = perfil==='admin' ? `
+      <div style="background:#f8f9ff;border:1px solid rgba(27,94,166,.15);border-radius:9px;padding:10px 12px;font-size:11px;line-height:2;color:var(--muted);">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">📅 Timeline</div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px;">
+          <span>📥 Chegada</span><span style="font-family:monospace;color:var(--text);">${dtChegada}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px;">
+          <span>🔖 Reserva</span><span style="font-family:monospace;color:${p.reservado_em?'var(--azul)':'var(--muted)'};">${dtReserva}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>🏁 Desfecho</span><span style="font-family:monospace;color:${p.concluido_em?'#27ae60':'var(--muted)'};">${dtFim}</span>
+        </div>
+        ${p.obs?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--text);font-size:12px;">📝 ${p.obs}</div>`:''}
+        ${p.desfecho_obs?`<div style="margin-top:4px;color:var(--text);font-size:12px;font-style:italic;">💬 ${p.desfecho_obs}</div>`:''}
+      </div>` : '';
+
     const cfForm=perfil==='admin'?`
       <div class="cf-form" id="cf-${p.id}" style="display:none;">
-        <label>Psi que atendeu</label>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:10px;">📋 Registrar desfecho</div>
+
+        <label>Indicar psi manualmente</label>
+        <select id="cf-psi-sel-${p.id}" onchange="preencherPsiManual('${p.id}')">
+          <option value="">— Selecionar da base —</option>
+          ${profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp}|${x.wa}">${x.tipo} ${x.nome} (${x.crp})</option>`).join('')}
+        </select>
+
+        <label>Nome do psi (ou confirme o selecionado)</label>
         <input id="cf-psi-${p.id}" placeholder="Nome do profissional">
         <label>CRP</label>
         <input id="cf-crp-${p.id}" placeholder="CRP">
@@ -344,8 +402,10 @@ function render(){
           <option value="concluido">✅ Concluído com sucesso</option>
           <option value="declinou">❌ Paciente declinou</option>
         </select>
-        <label>Observação (opcional)</label>
+        <label>Observação do desfecho</label>
         <input id="cf-obs-${p.id}" placeholder="Como foi o encaminhamento?">
+        <label>Observação interna (visível só para admin)</label>
+        <input id="cf-obs-int-${p.id}" placeholder="Notas internas..." value="${(p.obs||'').replace(/"/g,'&quot;')}">
         <div class="cf-actions">
           <button class="cf-ok" onclick="confirmarConclusao('${p.id}')">✅ Confirmar</button>
           <button class="cf-cancel" onclick="document.getElementById('cf-${p.id}').style.display='none'">Cancelar</button>
@@ -378,6 +438,7 @@ function render(){
       </div>
       ${p.crp_indicou?`<div class="crp-tag">Indicado por CRP: ${p.crp_indicou}</div>`:''}
       ${intBox}${extra}${cfForm}
+      ${timelineHtml}
       ${acts?`<div class="acts">${acts}</div>`:''}
     </div>`;
   }).join('');
@@ -391,8 +452,11 @@ async function registrarInt(id){
     if(ints.length>=MAX_INT){toast('Vagas esgotadas.');return;}
     if(ints.some(x=>x.crp===psiCRP)){toast('Já registrado!');return;}
     ints.push({nome:psiNome,crp:psiCRP,wa:psiWA,email:psiEmail});
-    await api('PATCH',`pacientes?id=eq.${id}`,{interessados:JSON.stringify(ints),status:'interessados'});
+    const reservaPatch = {interessados:JSON.stringify(ints),status:'interessados'};
+    if(ints.length===1) reservaPatch.reservado_em=new Date().toISOString();
+    await api('PATCH',`pacientes?id=eq.${id}`,reservaPatch);
     p.interessados=JSON.stringify(ints);p.status='interessados';
+    if(ints.length===1) p.reservado_em=reservaPatch.reservado_em;
     badges();render();
     // Notifica admin
     const msg=encodeURIComponent(`🔔 *Novo interesse — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar.`);
@@ -439,21 +503,26 @@ function abrirCF(id){
 }
 
 async function confirmarConclusao(id){
-  const psiAt=document.getElementById('cf-psi-'+id)?.value?.trim()||'';
-  const crpAt=document.getElementById('cf-crp-'+id)?.value?.trim()||'';
-  const valor=document.getElementById('cf-valor-'+id)?.value?.trim()||'';
-  const des  =document.getElementById('cf-des-'+id)?.value||'concluido';
-  const obs  =document.getElementById('cf-obs-'+id)?.value?.trim()||'';
+  const psiAt  =document.getElementById('cf-psi-'+id)?.value?.trim()||'';
+  const crpAt  =document.getElementById('cf-crp-'+id)?.value?.trim()||'';
+  const valor  =document.getElementById('cf-valor-'+id)?.value?.trim()||'';
+  const des    =document.getElementById('cf-des-'+id)?.value||'concluido';
+  const obs    =document.getElementById('cf-obs-'+id)?.value?.trim()||'';
+  const obsInt =document.getElementById('cf-obs-int-'+id)?.value?.trim()||'';
+  const agora  =new Date().toISOString();
   try{
-    await api('PATCH',`pacientes?id=eq.${id}`,{
+    const patch = {
       status:des,
       psi_atendeu:psiAt?`${psiAt}${crpAt?' ('+crpAt+')':''}` :'',
       valor_final:valor,
       desfecho_obs:obs,
-      concluido_em:new Date().toISOString()
-    });
+      obs:obsInt||undefined,
+      concluido_em:agora
+    };
+    if(!patch.obs) delete patch.obs;
+    await api('PATCH',`pacientes?id=eq.${id}`,patch);
     const p=todos.find(x=>x.id===id);
-    if(p){p.status=des;p.psi_atendeu=psiAt;p.valor_final=valor;p.desfecho_obs=obs;}
+    if(p){p.status=des;p.psi_atendeu=psiAt;p.valor_final=valor;p.desfecho_obs=obs;p.concluido_em=agora;if(obsInt)p.obs=obsInt;}
     badges();render();
     // Notifica indicador
     if(p?.contato_indicador){
