@@ -127,6 +127,12 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .empty p{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--muted);margin-bottom:4px;}
 .empty span{font-size:13px;color:#a0b5bc;}
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.assign-box{background:#f0f4ff;border:1px solid rgba(27,94,166,.2);border-radius:9px;padding:10px 12px;}
+.assign-box label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:5px;}
+.assign-row{display:flex;gap:6px;}
+.assign-sel{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;background:var(--white);}
+.assign-sel:focus{border-color:var(--azul);}
+.assign-btn{padding:7px 12px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--azul);color:#fff;padding:.8rem 1.4rem;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(27,94,166,.3);animation:fadeUp .25s ease;}
 @media(max-width:500px){.content{padding:16px 14px;}.grid{grid-template-columns:1fr;}}
 </style>
@@ -424,6 +430,18 @@ function render(){
       acts=`<div class="brow">${waBtn}${fimBtn}</div>`;
     }
 
+    // Quick assign box (admin only — shows on all active cards)
+    const quickAssign = perfil==='admin' && p.status !== 'concluido' && p.status !== 'declinou' ? `
+      <div class="assign-box" id="qa-${p.id}">
+        <label>➕ Atribuir psi manualmente</label>
+        <div class="assign-row">
+          <select class="assign-sel" id="qa-sel-${p.id}">
+            <option value="">— carregando... —</option>
+          </select>
+          <button class="assign-btn" onclick="atribuirPsiManual('${p.id}')">Atribuir</button>
+        </div>
+      </div>` : '';
+
     return`<div class="card s-${p.status}" style="animation-delay:${Math.min(i,10)*0.04}s">
       <div class="chead">${statusEl}${del}</div>
       <div class="info">
@@ -436,11 +454,23 @@ function render(){
         ${p.horario?`<div>🕐 ${p.horario}</div>`:''}
       </div>
       ${p.crp_indicou?`<div class="crp-tag">Indicado por CRP: ${p.crp_indicou}</div>`:''}
-      ${intBox}${extra}${cfForm}
+      ${intBox}${extra}${quickAssign}${cfForm}
       ${timelineHtml}
       ${acts?`<div class="acts">${acts}</div>`:''}
     </div>`;
   }).join('');
+  // Populate all quick-assign dropdowns asynchronously
+  if(perfil==='admin'){
+    setTimeout(async()=>{
+      await carregarElegiveis();
+      document.querySelectorAll('[id^="qa-sel-"]').forEach(sel=>{
+        if(sel.dataset.loaded) return;
+        sel.dataset.loaded='1';
+        sel.innerHTML='<option value="">— Selecionar da base —</option>'
+          +profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp}|${x.wa}">${x.tipo} ${x.nome} (${x.crp})</option>`).join('');
+      });
+    },100);
+  }
 }
 
 async function registrarInt(id){
@@ -494,6 +524,45 @@ function waParaPsi(wa,id,nome){
   const p=todos.find(x=>x.id===id);
   const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente para você*\n\nOlá ${nome?.split(' ')[0]}! A admin liberou este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
   window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank');
+}
+
+async function populateQA(id){
+  await carregarElegiveis();
+  const sel = document.getElementById('qa-sel-'+id);
+  if(!sel || sel.dataset.loaded) return;
+  sel.dataset.loaded = '1';
+  sel.innerHTML = '<option value="">— Selecionar da base —</option>'
+    + profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp}|${x.wa}">${x.tipo} ${x.nome} (${x.crp})</option>`).join('');
+}
+
+async function atribuirPsiManual(id){
+  const sel = document.getElementById('qa-sel-'+id);
+  const val = sel?.value||'';
+  if(!val){ toast('Selecione um profissional.'); return; }
+  const parts = val.split('|');
+  const nome = parts[0]||'', crp = parts[1]||'', wa = parts[2]||'';
+  // Also pre-fill the desfecho form if open
+  const nEl = document.getElementById('cf-psi-'+id);
+  const cEl = document.getElementById('cf-crp-'+id);
+  if(nEl) nEl.value = nome;
+  if(cEl) cEl.value = crp;
+  // Update reservado_por in DB
+  try{
+    await api('PATCH',`pacientes?id=eq.${id}`,{reservado_por:`${nome}${crp?' ('+crp+')':''}`});
+    const pac = todos.find(x=>x.id===id);
+    if(pac) pac.reservado_por = nome;
+    toast(`✅ Psi atribuída: ${nome}`);
+    // Notify psi via WA if has number
+    if(wa){
+      const pac2 = todos.find(x=>x.id===id);
+      const waClean = wa.replace(/\D/g,'');
+      const msg = encodeURIComponent(`*📋 Conexão Psi — Paciente atribuído a você*\n\n`
+        +`Olá ${nome.split(' ')[0]}! A admin atribuiu um paciente para você:\n\n`
+        +`🧠 ${pac2?.demanda||'—'}\n📍 ${pac2?.cidade||'—'}\n💰 ${pac2?.valor||'—'}\n\n`
+        +`_Entre em contato com a admin para obter os dados do paciente._`);
+      setTimeout(()=>window.open(`https://wa.me/55${waClean}?text=${msg}`,'_blank'),300);
+    }
+  }catch(e){ toast('Erro: '+e.message); }
 }
 
 async function abrirCF(id){
