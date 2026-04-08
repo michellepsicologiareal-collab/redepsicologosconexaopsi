@@ -4,167 +4,76 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conexão Psi — Pacientes</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --plum:#1E1040; --azul:#1B5EA6; --azul-mid:#164880;
-  --gold:#C8934A; --gold-light:#E8C98A;
-  --cream:#F5F8F9; --cream-dark:#E8EFF0; --white:#fff;
-  --text:#0f2830; --muted:#5a7580; --border:rgba(27,94,166,0.1);
-  --green:#27ae60; --red:#c0392b;
+  --azul:#1B5EA6;--azul-mid:#164880;--azul-deep:#0d2a4a;
+  --gold:#C8934A;--gold-light:#E8C98A;
+  --cream:#F5F8FA;--white:#fff;
+  --text:#0f2030;--muted:#5a6f80;--border:rgba(27,94,166,0.12);
+  --green:#27ae60;--red:#c0392b;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
 
-/* ── LOGIN ── */
-#login{
-  min-height:100vh;
-  background:linear-gradient(160deg, #0d2a33 0%, var(--azul) 60%, #1a2a4a 100%);
-  display:flex;align-items:center;justify-content:center;padding:2rem;
-  position:relative;overflow:hidden;
-}
-#login::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(200,147,74,0.15), transparent 60%),
-    radial-gradient(ellipse 40% 40% at 10% 80%, rgba(255,255,255,0.05), transparent 55%);
-}
-.login-wrap{position:relative;z-index:1;width:100%;max-width:400px;text-align:center;}
-.login-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:2.2rem;font-weight:700;color:#fff;margin-bottom:4px;
-}
+#login{min-height:100vh;background:linear-gradient(160deg,var(--azul-deep) 0%,var(--azul) 55%,#1a2a5a 100%);display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+#login::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 50% at 85% 20%,rgba(200,147,74,0.15),transparent 60%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(255,255,255,0.05),transparent 55%);}
+.login-wrap{position:relative;z-index:1;width:100%;max-width:420px;text-align:center;}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#fff;margin-bottom:4px;}
 .login-title em{color:var(--gold-light);font-style:italic;}
-.login-sub{
-  font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;
-  color:rgba(255,255,255,0.35);margin-bottom:2rem;
-}
-.login-card{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:18px;padding:2rem;
-  backdrop-filter:blur(10px);
-}
-.login-card h2{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.3rem;color:#fff;margin-bottom:6px;
-}
-.login-card p{font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:1.5rem;line-height:1.6;}
-.linput{
-  width:100%;padding:0.85rem 1rem;
-  background:rgba(255,255,255,0.08);
-  border:1.5px solid rgba(255,255,255,0.12);
-  border-radius:10px;color:#fff;
-  font-family:'Outfit',sans-serif;font-size:0.9rem;
-  margin-bottom:0.8rem;outline:none;transition:border-color .2s;
-}
+.login-sub{font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2rem;}
+.login-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:18px;padding:2rem;backdrop-filter:blur(10px);}
+.login-card h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:6px;}
+.login-card p{font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:1.4rem;line-height:1.6;}
+.login-tabs{display:flex;gap:8px;margin-bottom:1.4rem;}
+.ltab{flex:1;padding:8px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);border-radius:9px;color:rgba(255,255,255,0.5);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.ltab.active{background:rgba(27,94,166,0.4);border-color:rgba(100,150,220,0.5);color:#fff;}
+.login-section{display:none;}
+.login-section.active{display:block;}
+.linput{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.09);border:1.5px solid rgba(255,255,255,0.14);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:0.9rem;margin-bottom:0.8rem;outline:none;transition:border-color .2s;}
 .linput:focus{border-color:var(--gold);}
 .linput::placeholder{color:rgba(255,255,255,0.3);}
-.lbtn{
-  width:100%;padding:0.88rem;
-  background:linear-gradient(135deg, var(--gold), #E8A845);
-  color:#0f2830;border:none;border-radius:10px;
-  font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:700;
-  cursor:pointer;transition:all .2s;
-}
+.lbtn{width:100%;padding:0.88rem;background:linear-gradient(135deg,var(--gold),#E8A845);color:#0f2030;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;transition:all .2s;}
 .lbtn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,147,74,0.3);}
 .lerr{color:#ff8a80;font-size:0.8rem;margin-top:0.5rem;min-height:1.2rem;}
-.login-hint{
-  margin-top:1.2rem;font-size:0.75rem;color:rgba(255,255,255,0.25);
-  line-height:1.7;
-}
-.login-hint strong{color:rgba(255,255,255,0.4);}
+.login-hint{margin-top:1rem;font-size:0.75rem;color:rgba(255,255,255,0.25);line-height:1.7;}
 
-/* ── APP ── */
 #app{display:none;}
-
-/* TOPBAR */
-.topbar{
-  background:linear-gradient(135deg, var(--azul) 0%, var(--azul-mid) 100%);
-  padding:0;
-  position:sticky;top:0;z-index:100;
-  box-shadow:0 2px 12px rgba(0,0,0,0.15);
-}
-.topbar-inner{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0.9rem 1.6rem;flex-wrap:wrap;gap:0.6rem;
-}
-.topbar-brand{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.3rem;font-weight:700;color:#fff;
-}
+.topbar{background:linear-gradient(135deg,var(--azul) 0%,var(--azul-mid) 100%);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.6rem;flex-wrap:wrap;gap:.6rem;}
+.topbar-brand{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#fff;}
 .topbar-brand em{color:var(--gold-light);font-style:italic;}
-.topbar-sub{
-  font-size:0.58rem;letter-spacing:2.5px;text-transform:uppercase;
-  color:rgba(255,255,255,0.4);margin-top:1px;
-}
-.topbar-right{display:flex;align-items:center;gap:0.8rem;}
-.topbar-chip{
-  font-size:0.72rem;color:rgba(255,255,255,0.8);
-  background:rgba(255,255,255,0.12);
-  border:1px solid rgba(255,255,255,0.18);
-  border-radius:999px;padding:4px 12px;
-}
-.topbar-sair{
-  padding:0.38rem 0.9rem;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.18);
-  color:rgba(255,255,255,0.6);
-  border-radius:8px;font-size:0.77rem;cursor:pointer;
-  font-family:'Outfit',sans-serif;transition:all .2s;
-}
-.topbar-sair:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.topbar-sub{font-size:.58rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:.8rem;}
+.topbar-chip{font-size:.72rem;color:rgba(255,255,255,.85);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 12px;}
+.topbar-sair{padding:.38rem .9rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.6);border-radius:8px;font-size:.77rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+.topbar-sair:hover{background:rgba(255,255,255,.15);color:#fff;}
 
-/* TABS */
-.tabs-bar{
-  background:var(--white);border-bottom:1.5px solid var(--border);
-  display:flex;overflow-x:auto;scrollbar-width:none;
-}
+.tabs-bar{background:var(--white);border-bottom:1.5px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;}
 .tabs-bar::-webkit-scrollbar{display:none;}
-.tab{
-  padding:0 20px;height:48px;
-  background:none;border:none;border-bottom:2.5px solid transparent;
-  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
-  color:var(--muted);cursor:pointer;white-space:nowrap;
-  transition:all .15s;display:flex;align-items:center;gap:6px;
-}
+.tab{padding:0 18px;height:48px;background:none;border:none;border-bottom:2.5px solid transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px;}
 .tab:hover{color:var(--azul);}
 .tab.active{color:var(--azul);border-bottom-color:var(--azul);font-weight:600;}
-.badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:18px;height:18px;padding:0 5px;
-  border-radius:999px;font-size:10px;font-weight:700;
-  background:var(--azul);color:#fff;
-}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;font-size:10px;font-weight:700;background:var(--azul);color:#fff;}
 
-/* CONTENT */
 .content{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+.search-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.search-input{flex:1;min-width:200px;padding:8px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;outline:none;}
+.search-input:focus{border-color:var(--azul);}
+.btn-action{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
 
-/* CARDS */
-.card{
-  background:var(--white);border:1.5px solid var(--border);
-  border-radius:14px;padding:16px;
-  display:flex;flex-direction:column;gap:10px;
-  animation:fadeUp .3s ease both;
-  transition:box-shadow .2s;
-  border-top:3px solid transparent;
-}
-.card:hover{box-shadow:0 6px 20px rgba(27,94,166,0.1);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;animation:fadeUp .3s ease both;transition:box-shadow .2s;border-top:3px solid transparent;}
+.card:hover{box-shadow:0 6px 20px rgba(27,94,166,.1);}
 .card.s-disponivel{border-top-color:#27ae60;}
-.card.s-interessados{border-top-color:#f39c12;}
+.card.s-interessados{border-top-color:#e67e22;}
 .card.s-em_atendimento{border-top-color:#2980b9;}
 .card.s-concluido{border-top-color:#8e44ad;}
 .card.s-declinou{border-top-color:#95a5a6;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 .chead{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
-.ssel{
-  font-size:12px;padding:4px 8px;
-  border:1px solid var(--border);border-radius:6px;
-  background:var(--cream);font-family:'Outfit',sans-serif;color:var(--text);
-  cursor:pointer;outline:none;
-}
+.ssel{font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--cream);font-family:'Outfit',sans-serif;color:var(--text);cursor:pointer;outline:none;}
 .pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
 .p-disponivel{background:#e9f7ef;color:#27ae60;}
 .p-interessados{background:#fef6ec;color:#b7600a;}
@@ -173,74 +82,84 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .p-declinou{background:#f4f4f5;color:#7f8c8d;}
 .bdel{background:none;border:none;cursor:pointer;color:#ddd;font-size:13px;padding:2px;}
 .bdel:hover{color:var(--red);}
-
 .info{font-size:13px;color:var(--text);line-height:1.9;}
 .info div{display:flex;align-items:flex-start;gap:6px;}
-.crp-tag{font-size:11px;color:var(--muted);margin-top:-4px;}
+.crp-tag{font-size:11px;color:var(--muted);}
 
-/* INTERESSADOS */
-.interessados-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
-.interessados-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
-.psi-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);}
+.int-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
+.int-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.psi-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
 .psi-item:last-child{border:none;}
 .psi-nome{font-size:12px;color:var(--azul);font-weight:600;}
-.psi-crp{font-size:11px;color:var(--muted);}
+.psi-reg{font-size:11px;color:var(--muted);}
+.btn-wa-psi{padding:3px 8px;background:#128C7E;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
 
-/* ACTIONS */
+.cf-form{background:#f0f4ff;border:1px solid rgba(27,94,166,.2);border-radius:10px;padding:12px 14px;margin-top:4px;}
+.cf-form label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px;}
+.cf-form input,.cf-form select{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;outline:none;margin-bottom:8px;background:var(--white);}
+.cf-form input:focus,.cf-form select:focus{border-color:var(--azul);}
+.cf-actions{display:flex;gap:6px;}
+.cf-ok{flex:1;padding:8px;background:var(--azul);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.cf-cancel{padding:8px 12px;background:var(--cream);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;}
+
 .acts{margin-top:auto;display:flex;flex-direction:column;gap:6px;}
-.bint{
-  width:100%;padding:9px;background:var(--azul);color:#fff;
-  border:none;border-radius:9px;font-size:12px;font-weight:600;
-  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;
-}
+.bint{width:100%;padding:9px;background:var(--azul);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
 .bint:hover{background:var(--azul-mid);}
-.bint:disabled{opacity:0.5;cursor:not-allowed;}
-.brow{display:flex;gap:6px;}
-.bwa{
-  flex:1;padding:8px;background:#128C7E;color:#fff;
-  border:none;border-radius:8px;font-size:12px;font-weight:600;
-  cursor:pointer;font-family:'Outfit',sans-serif;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-}
-.bfim{flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
-.bdec{width:100%;padding:7px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.bint:disabled{opacity:.45;cursor:not-allowed;}
+.brow{display:flex;gap:6px;flex-wrap:wrap;}
+.bwa{flex:1;min-width:120px;padding:8px;background:#128C7E;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.bfim{flex:1;min-width:100px;padding:8px;background:#edf3fc;color:var(--azul);border:1px solid rgba(27,94,166,.3);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.bdec-btn{width:100%;padding:7px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;}
 
-/* EMPTY / LOADING */
+.report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.report-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.report-val{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;display:block;}
+.report-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.hist-item{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.hist-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.hist-info{flex:1;min-width:160px;}
+.hist-demanda{font-size:13px;font-weight:500;margin-bottom:3px;}
+.hist-meta{font-size:11px;color:var(--muted);line-height:1.7;}
+.hist-date{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+
 .empty{text-align:center;padding:50px 20px;}
 .empty-icon{font-size:2.5rem;margin-bottom:10px;}
 .empty p{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--muted);margin-bottom:4px;}
 .empty span{font-size:13px;color:#a0b5bc;}
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
-
-/* TOAST */
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--azul);color:#fff;padding:0.8rem 1.4rem;border-radius:12px;font-size:13px;z-index:999;box-shadow:0 8px 24px rgba(27,94,166,0.25);animation:fadeUp .25s ease;}
-
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--azul);color:#fff;padding:.8rem 1.4rem;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(27,94,166,.3);animation:fadeUp .25s ease;}
 @media(max-width:500px){.content{padding:16px 14px;}.grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <div class="login-wrap">
     <div class="login-title">Conexão <em>Psi</em></div>
     <div class="login-sub">Gestão de Pacientes</div>
     <div class="login-card">
-      <h2>Área Restrita</h2>
-      <p>Acesso para psicólogos da rede e administradores.</p>
-      <input type="password" class="linput" id="senha" placeholder="Digite sua senha"
-        onkeydown="if(event.key==='Enter') entrar()">
-      <button class="lbtn" onclick="entrar()">Entrar →</button>
-      <div class="lerr" id="lerr"></div>
-      <div class="login-hint">
-        <strong>Psis da rede:</strong> use a senha enviada pela admin<br>
-        <strong>Admin:</strong> senha do painel administrativo
+      <h2>Área Psi</h2>
+      <p>Psis entram com e-mail da rede. Admin usa a senha do painel.</p>
+      <div class="login-tabs">
+        <button class="ltab active" onclick="switchTab('email',this)">🧠 Sou psi da rede</button>
+        <button class="ltab" onclick="switchTab('senha',this)">🔐 Admin</button>
       </div>
+      <div class="login-section active" id="ls-email">
+        <input type="email" class="linput" id="email-input" placeholder="seu@email.com"
+          onkeydown="if(event.key==='Enter') entrarEmail()">
+        <button class="lbtn" onclick="entrarEmail()">Entrar →</button>
+      </div>
+      <div class="login-section" id="ls-senha">
+        <input type="password" class="linput" id="senha-input" placeholder="Senha admin"
+          onkeydown="if(event.key==='Enter') entrarSenha()">
+        <button class="lbtn" onclick="entrarSenha()">Entrar →</button>
+      </div>
+      <div class="lerr" id="lerr"></div>
+      <div class="login-hint">Sem acesso? Entre em contato com a admin.</div>
     </div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <header class="topbar">
     <div class="topbar-inner">
@@ -254,16 +173,21 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
       </div>
     </div>
     <div class="tabs-bar">
-      <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel">0</span></button>
-      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados" style="background:#f39c12;">0</span></button>
-      <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento" style="background:#2980b9;">0</span></button>
-      <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido" style="background:#8e44ad;">0</span></button>
-      <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou" style="background:#7f8c8d;">0</span></button>
+      <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel"></span></button>
+      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados" style="background:#e67e22;"></span></button>
+      <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento" style="background:#2980b9;"></span></button>
+      <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido" style="background:#8e44ad;"></span></button>
+      <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou" style="background:#7f8c8d;"></span></button>
+      <button class="tab" onclick="mudarAba('historico',this)">📊 Relatório</button>
     </div>
   </header>
-
   <div class="content">
+    <div class="search-bar" id="search-bar" style="display:none;">
+      <input type="text" class="search-input" id="busca" placeholder="Buscar por demanda, cidade, CRP..." oninput="render()">
+      <button class="btn-action" onclick="carregar()">🔄 Atualizar</button>
+    </div>
     <div id="grid" class="grid"></div>
+    <div id="hist-section" style="display:none;"></div>
     <div id="empty" class="empty" style="display:none;">
       <div class="empty-icon">📋</div>
       <p>Nenhum paciente aqui</p>
@@ -274,137 +198,174 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 </div>
 
 <script>
-const SB = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
-const AP = 'conexaopsi2026', PP = 'redepsi2026';
-const MAX_INTERESSE = 3;
-let perfil = null, psiNome = '', aba = 'disponivel', todos = [];
+const SB       = 'https://tjtrdfbckgdgvcegdsbz.supabase.co';
+const KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdHJkZmJja2dkZ3ZjZWdkc2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM1ODcsImV4cCI6MjA4OTg1OTU4N30.zNHugdW2a2hYrY43hdqS8TkSM9uCYognU_UyzJZ2Los';
+const ADMIN_PW = 'conexaopsi2026';
+const ADMIN_WA = '5511947388423';
+const MAX_INT  = 3;
 const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
 
-async function api(method, path, body) {
-  const opts = {method, headers: H};
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(SB+'/rest/v1/'+path, opts);
-  const text = await r.text();
-  if (!r.ok) throw new Error(text);
-  if (!text || text === '') return null;
-  return JSON.parse(text);
+let perfil='', psiNome='', psiCRP='', psiWA='', psiEmail='';
+let aba='disponivel', todos=[];
+
+async function api(m,p,b){
+  const o={method:m,headers:H};
+  if(b) o.body=JSON.stringify(b);
+  const r=await fetch(SB+'/rest/v1/'+p,o);
+  const t=await r.text();
+  if(!r.ok) throw new Error(t);
+  return t?JSON.parse(t):null;
 }
 
-function entrar() {
-  const s = document.getElementById('senha').value.trim();
-  if (s === AP) { perfil='admin'; psiNome='Admin'; iniciar(); }
-  else if (s === PP) {
-    const nome = prompt('Seu nome (como aparecerá no sistema):');
-    if (!nome) return;
-    psiNome = nome.trim();
+function switchTab(tipo,btn){
+  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.login-section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ls-'+tipo).classList.add('active');
+  document.getElementById('lerr').textContent='';
+}
+
+async function entrarEmail(){
+  const email=document.getElementById('email-input').value.trim().toLowerCase();
+  if(!email){document.getElementById('lerr').textContent='Digite seu e-mail.';return;}
+  document.getElementById('lerr').textContent='Verificando...';
+  try{
+    const d=await api('GET',`psis?email=eq.${encodeURIComponent(email)}&select=nome,crp,whatsapp,status&limit=1`);
+    if(!d||!d[0]){document.getElementById('lerr').textContent='E-mail não encontrado na rede.';return;}
+    const psi=d[0];
+    if(psi.status!=='aprovado'){document.getElementById('lerr').textContent='Cadastro ainda não aprovado.';return;}
+    psiNome=psi.nome||''; psiCRP=psi.crp||''; psiWA=psi.whatsapp||''; psiEmail=email;
     perfil='psi'; iniciar();
-  }
-  else { document.getElementById('lerr').textContent = 'Senha incorreta.'; }
+  }catch(e){document.getElementById('lerr').textContent='Erro de conexão.';}
 }
 
-function sair() {
-  perfil=null; psiNome='';
+function entrarSenha(){
+  const s=document.getElementById('senha-input').value.trim();
+  if(s===ADMIN_PW){perfil='admin';psiNome='Admin';psiCRP='Admin';iniciar();}
+  else{document.getElementById('lerr').textContent='Senha incorreta.';}
+}
+
+function sair(){
+  perfil='';psiNome='';psiCRP='';psiWA='';psiEmail='';
   document.getElementById('app').style.display='none';
   document.getElementById('login').style.display='flex';
-  document.getElementById('senha').value='';
+  document.getElementById('email-input').value='';
+  document.getElementById('senha-input').value='';
 }
 
-function iniciar() {
+function iniciar(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('chip').textContent = perfil==='admin' ? '⚙️ Admin' : '🧠 '+psiNome;
+  document.getElementById('chip').textContent=perfil==='admin'?'⚙️ Admin':`🧠 ${psiNome.split(' ')[0]} · ${psiCRP}`;
+  if(perfil==='admin') document.getElementById('search-bar').style.display='flex';
   carregar();
 }
 
-function mudarAba(a, btn) {
+function mudarAba(a,btn){
   aba=a;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  render();
+  const g=document.getElementById('grid');
+  const h=document.getElementById('hist-section');
+  if(a==='historico'){g.style.display='none';h.style.display='block';renderHistorico();}
+  else{g.style.display='grid';h.style.display='none';render();}
 }
 
-function badges() {
+function badges(){
   ['disponivel','interessados','em_atendimento','concluido','declinou'].forEach(s=>{
     const el=document.getElementById('n-'+s);
-    if(el) el.textContent=todos.filter(p=>p.status===s).length;
+    if(el){const n=todos.filter(p=>p.status===s).length;el.textContent=n||'';}
   });
 }
 
-async function carregar() {
+async function carregar(){
   document.getElementById('loading').style.display='block';
   document.getElementById('grid').innerHTML='';
   document.getElementById('empty').style.display='none';
-  try {
-    todos = await api('GET','pacientes?select=*&order=created_at.desc') || [];
-    badges(); render();
-  } catch(e) {
-    document.getElementById('loading').textContent='Erro ao carregar.';
-  }
+  try{
+    todos=await api('GET','pacientes?select=*&order=created_at.desc')||[];
+    badges();
+    if(aba==='historico') renderHistorico(); else render();
+  }catch(e){document.getElementById('loading').textContent='Erro ao carregar.';}
   document.getElementById('loading').style.display='none';
 }
 
-const SL = {
-  disponivel:'🟢 Disponível', interessados:'🟡 Com interesse',
-  em_atendimento:'🔵 Em atendimento', concluido:'✅ Concluído', declinou:'⚫ Declinou'
-};
+const SL={disponivel:'🟢 Disponível',interessados:'🟡 Com interesse',em_atendimento:'🔵 Em atendimento',concluido:'✅ Concluído',declinou:'⚫ Declinou'};
 
-function render() {
-  const f = todos.filter(p=>p.status===aba);
-  const g=document.getElementById('grid'), e=document.getElementById('empty');
-  if(!f.length){g.innerHTML='';e.style.display='block';return;}
+function render(){
+  const busca=(document.getElementById('busca')?.value||'').toLowerCase();
+  let lista=todos.filter(p=>p.status===aba);
+  if(busca) lista=lista.filter(p=>[(p.demanda||''),(p.cidade||''),(p.crp_indicou||''),(p.nome||'')].join(' ').toLowerCase().includes(busca));
+  const g=document.getElementById('grid'),e=document.getElementById('empty');
+  if(!lista.length){g.innerHTML='';e.style.display='block';return;}
   e.style.display='none';
 
-  g.innerHTML = f.map((p,i)=>{
-    const interessados = p.interessados ? JSON.parse(p.interessados) : [];
-    const jaInteressou = interessados.some(x=>x.nome===psiNome);
-    const cheio = interessados.length >= MAX_INTERESSE;
-    const del = perfil==='admin' ? `<button class="bdel" onclick="excluir('${p.id}')">✕</button>` : '';
+  g.innerHTML=lista.map((p,i)=>{
+    const ints=p.interessados?JSON.parse(p.interessados):[];
+    const jaInt=ints.some(x=>x.crp===psiCRP);
+    const cheio=ints.length>=MAX_INT;
+    const del=perfil==='admin'?`<button class="bdel" onclick="excluir('${p.id}')">✕</button>`:'';
 
-    const statusEl = perfil==='admin'
-      ? `<select class="ssel" onchange="mudarStatus('${p.id}',this.value)">
+    const statusEl=perfil==='admin'
+      ?`<select class="ssel" onchange="mudarStatus('${p.id}',this.value)">
           <option value="disponivel"${p.status==='disponivel'?' selected':''}>🟢 Disponível</option>
           <option value="interessados"${p.status==='interessados'?' selected':''}>🟡 Com interesse</option>
           <option value="em_atendimento"${p.status==='em_atendimento'?' selected':''}>🔵 Em atendimento</option>
           <option value="concluido"${p.status==='concluido'?' selected':''}>✅ Concluído</option>
           <option value="declinou"${p.status==='declinou'?' selected':''}>⚫ Declinou</option>
         </select>`
-      : `<span class="pill p-${p.status}">${SL[p.status]||p.status}</span>`;
+      :`<span class="pill p-${p.status}">${SL[p.status]||p.status}</span>`;
 
-    let interBox = '';
-    if(interessados.length > 0) {
-      const items = interessados.map(x=>`
-        <div class="psi-item">
-          <div><div class="psi-nome">${x.nome}</div><div class="psi-crp">CRP: ${x.crp||'—'}</div></div>
-        </div>`).join('');
-      interBox = `<div class="interessados-box">
-        <div class="interessados-title">Psis interessados (${interessados.length}/${MAX_INTERESSE})</div>
-        ${items}
-      </div>`;
+    let intBox='';
+    if(ints.length>0){
+      const items=ints.map(x=>{
+        const wa=(x.wa||'').replace(/\D/g,'');
+        const waBtn=wa?`<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`:'';
+        return`<div class="psi-item"><div><div class="psi-nome">${x.nome||'—'}</div><div class="psi-reg">${x.crp||'—'}</div></div>${waBtn}</div>`;
+      }).join('');
+      intBox=`<div class="int-box"><div class="int-title">Psis interessados (${ints.length}/${MAX_INT})</div>${items}</div>`;
     }
 
-    let acts = '';
-    if(perfil==='psi') {
-      if(p.status==='disponivel' || p.status==='interessados') {
-        if(jaInteressou) {
-          acts = `<button class="bint" disabled>✅ Interesse registrado</button>
-                  <button class="bdec" onclick="cancelarInteresse('${p.id}')">Cancelar interesse</button>`;
-        } else if(cheio) {
-          acts = `<button class="bint" disabled>Vagas esgotadas (${MAX_INTERESSE}/${MAX_INTERESSE})</button>`;
-        } else {
-          acts = `<button class="bint" onclick="registrarInteresse('${p.id}')">Tenho interesse</button>`;
-        }
+    const extra=`
+      ${p.psi_atendeu?`<div style="color:#8e44ad;font-size:12px;">👤 ${p.psi_atendeu}</div>`:''}
+      ${p.valor_final?`<div style="color:#27ae60;font-size:12px;font-weight:600;">💰 ${p.valor_final}</div>`:''}
+      ${p.desfecho_obs?`<div style="font-size:11px;color:var(--muted);font-style:italic;">${p.desfecho_obs}</div>`:''}`;
+
+    const cfForm=perfil==='admin'?`
+      <div class="cf-form" id="cf-${p.id}" style="display:none;">
+        <label>Psi que atendeu</label>
+        <input id="cf-psi-${p.id}" placeholder="Nome do profissional">
+        <label>CRP</label>
+        <input id="cf-crp-${p.id}" placeholder="CRP">
+        <label>Valor da sessão</label>
+        <input id="cf-valor-${p.id}" placeholder="Ex: R$ 150">
+        <label>Desfecho</label>
+        <select id="cf-des-${p.id}">
+          <option value="concluido">✅ Concluído com sucesso</option>
+          <option value="declinou">❌ Paciente declinou</option>
+        </select>
+        <label>Observação (opcional)</label>
+        <input id="cf-obs-${p.id}" placeholder="Como foi o encaminhamento?">
+        <div class="cf-actions">
+          <button class="cf-ok" onclick="confirmarConclusao('${p.id}')">✅ Confirmar</button>
+          <button class="cf-cancel" onclick="document.getElementById('cf-${p.id}').style.display='none'">Cancelar</button>
+        </div>
+      </div>`:'';
+
+    let acts='';
+    if(perfil==='psi'){
+      if(p.status==='disponivel'||p.status==='interessados'){
+        if(jaInt) acts=`<button class="bint" disabled>✅ Interesse registrado</button><button class="bdec-btn" onclick="cancelarInt('${p.id}')">Cancelar interesse</button>`;
+        else if(cheio) acts=`<button class="bint" disabled>Vagas esgotadas</button>`;
+        else acts=`<button class="bint" onclick="registrarInt('${p.id}')">Tenho interesse</button>`;
       }
-    } else if(perfil==='admin') {
-      const waBtn = interessados.length > 0 ? `<button class="bwa" onclick="enviarWhatsApp('${p.id}')">📲 Enviar para psis</button>` : '';
-      const fimBtn = p.status==='em_atendimento' ? `<button class="bfim" onclick="concluir('${p.id}')">✅ Concluir</button>` : '';
-      acts = `<div class="brow">${waBtn}${fimBtn}</div>`;
+    } else if(perfil==='admin'){
+      const waBtn=ints.length>0?`<button class="bwa" onclick="waParaTodos('${p.id}')">📲 Notificar todos</button>`:'';
+      const fimBtn=p.status==='em_atendimento'||p.status==='interessados'?`<button class="bfim" onclick="abrirCF('${p.id}')">📋 Registrar desfecho</button>`:'';
+      acts=`<div class="brow">${waBtn}${fimBtn}</div>`;
     }
 
-    const valorFinal = p.valor_final ? `<div style="color:#27ae60;font-size:12px;font-weight:600;">💰 Valor final: ${p.valor_final}</div>` : '';
-    const psiAtendeu = p.psi_atendeu ? `<div style="color:#8e44ad;font-size:12px;">👤 Atendido por: ${p.psi_atendeu}</div>` : '';
-
-    return `<div class="card s-${p.status}" style="animation-delay:${Math.min(i,10)*0.04}s">
+    return`<div class="card s-${p.status}" style="animation-delay:${Math.min(i,10)*0.04}s">
       <div class="chead">${statusEl}${del}</div>
       <div class="info">
         ${p.nome?`<div>👤 <strong>${p.nome}</strong></div>`:''}
@@ -416,89 +377,147 @@ function render() {
         ${p.horario?`<div>🕐 ${p.horario}</div>`:''}
       </div>
       ${p.crp_indicou?`<div class="crp-tag">Indicado por CRP: ${p.crp_indicou}</div>`:''}
-      ${interBox}
-      ${valorFinal}${psiAtendeu}
+      ${intBox}${extra}${cfForm}
       ${acts?`<div class="acts">${acts}</div>`:''}
     </div>`;
   }).join('');
 }
 
-async function registrarInteresse(id) {
-  const crp = prompt('Digite seu CRP (ex: 06/93008):');
-  if(!crp) return;
-  try {
-    const p = todos.find(x=>x.id===id);
-    const interessados = p.interessados ? JSON.parse(p.interessados) : [];
-    if(interessados.length >= MAX_INTERESSE) { toast('Já há 3 psis interessados.'); return; }
-    if(interessados.some(x=>x.nome===psiNome)) { toast('Você já registrou interesse!'); return; }
-    interessados.push({ nome: psiNome, crp: crp.trim() });
-    await api('PATCH',`pacientes?id=eq.${id}`,{ interessados: JSON.stringify(interessados), status: 'interessados' });
-    p.interessados = JSON.stringify(interessados); p.status = 'interessados';
-    badges(); render();
-    toast('✅ Interesse registrado! Aguarde contato.');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function cancelarInteresse(id) {
-  try {
-    const p = todos.find(x=>x.id===id);
-    let interessados = p.interessados ? JSON.parse(p.interessados) : [];
-    interessados = interessados.filter(x=>x.nome!==psiNome);
-    const novoStatus = interessados.length > 0 ? 'interessados' : 'disponivel';
-    await api('PATCH',`pacientes?id=eq.${id}`,{ interessados: JSON.stringify(interessados), status: novoStatus });
-    p.interessados = JSON.stringify(interessados); p.status = novoStatus;
-    badges(); render();
-    toast('Interesse cancelado.');
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-function enviarWhatsApp(id) {
-  const p = todos.find(x=>x.id===id);
-  if(!p) return;
-  const interessados = p.interessados ? JSON.parse(p.interessados) : [];
-  const nomes = interessados.map((x,i)=>`${i+1}. ${x.nome} (CRP: ${x.crp||'—'})`).join('\n');
-  const msg = `*📋 Conexão Psi — Indicação de Paciente*\n\n` +
-    `👥 Público: ${p.publico||'—'}\n🧠 Demanda: ${p.demanda||'—'}\n` +
-    `📋 Formato: ${p.formato||'—'}\n📍 Cidade: ${p.cidade||'—'}\n` +
-    `💰 Valor: ${p.valor||'—'}\n🕐 Disponibilidade: ${p.horario||'—'}\n\n` +
-    `*Psis interessados:*\n${nomes}\n\n` +
-    `_Confirme o atendimento e registre no sistema._`;
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
-}
-
-async function mudarStatus(id, novoStatus) {
-  try {
-    await api('PATCH',`pacientes?id=eq.${id}`,{status:novoStatus});
-    const p=todos.find(x=>x.id===id); if(p) p.status=novoStatus;
-    badges(); render();
-  } catch(e) { alert('Erro: '+e.message); }
-}
-
-async function concluir(id) {
-  const valor = prompt('Valor da sessão fechado (ex: R$ 100):');
-  const psiAtendeu = prompt('Nome do psi que atendeu:');
-  try {
-    await api('PATCH',`pacientes?id=eq.${id}`,{status:'concluido',valor_final:valor||'',psi_atendeu:psiAtendeu||''});
+async function registrarInt(id){
+  if(!psiCRP){toast('Login inválido.');return;}
+  try{
     const p=todos.find(x=>x.id===id);
-    if(p){p.status='concluido';p.valor_final=valor||'';p.psi_atendeu=psiAtendeu||'';}
-    badges(); render();
-    toast('✅ Encaminhamento concluído!');
-  } catch(e) { alert('Erro: '+e.message); }
+    const ints=p.interessados?JSON.parse(p.interessados):[];
+    if(ints.length>=MAX_INT){toast('Vagas esgotadas.');return;}
+    if(ints.some(x=>x.crp===psiCRP)){toast('Já registrado!');return;}
+    ints.push({nome:psiNome,crp:psiCRP,wa:psiWA,email:psiEmail});
+    await api('PATCH',`pacientes?id=eq.${id}`,{interessados:JSON.stringify(ints),status:'interessados'});
+    p.interessados=JSON.stringify(ints);p.status='interessados';
+    badges();render();
+    // Notifica admin
+    const msg=encodeURIComponent(`🔔 *Novo interesse — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar.`);
+    window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`,'_blank');
+    toast('✅ Interesse registrado! Admin notificada.');
+  }catch(e){toast('Erro: '+e.message);}
 }
 
-async function excluir(id) {
-  if(!confirm('Excluir este paciente?')) return;
-  try {
+async function cancelarInt(id){
+  try{
+    const p=todos.find(x=>x.id===id);
+    let ints=p.interessados?JSON.parse(p.interessados):[];
+    ints=ints.filter(x=>x.crp!==psiCRP);
+    const s=ints.length>0?'interessados':'disponivel';
+    await api('PATCH',`pacientes?id=eq.${id}`,{interessados:JSON.stringify(ints),status:s});
+    p.interessados=JSON.stringify(ints);p.status=s;
+    badges();render();toast('Interesse cancelado.');
+  }catch(e){toast('Erro: '+e.message);}
+}
+
+function waParaTodos(id){
+  const p=todos.find(x=>x.id===id);
+  if(!p) return;
+  const ints=p.interessados?JSON.parse(p.interessados):[];
+  if(!ints.length){toast('Nenhum psi interessado ainda.');return;}
+  const nomes=ints.map((x,i)=>`${i+1}. ${x.nome} (${x.crp||'—'})`).join('\n');
+  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente disponível*\n\n🧠 ${p.demanda||'—'}\n👥 ${p.publico||'—'}\n📋 ${p.formato||'—'}\n📍 ${p.cidade||'—'}\n💰 ${p.valor||'—'}\n\n*Psis interessados:*\n${nomes}\n\n_Entre em contato com o paciente e confirme no sistema._`);
+  ints.forEach((x,i)=>{
+    const wa=(x.wa||'').replace(/\D/g,'');
+    if(wa) setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),i*800);
+  });
+  toast(`📲 Notificando ${ints.length} psi(s)...`);
+}
+
+function waParaPsi(wa,id,nome){
+  const p=todos.find(x=>x.id===id);
+  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente para você*\n\nOlá ${nome?.split(' ')[0]}! A admin liberou este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
+  window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank');
+}
+
+function abrirCF(id){
+  const f=document.getElementById('cf-'+id);
+  if(f) f.style.display=f.style.display==='none'?'block':'none';
+}
+
+async function confirmarConclusao(id){
+  const psiAt=document.getElementById('cf-psi-'+id)?.value?.trim()||'';
+  const crpAt=document.getElementById('cf-crp-'+id)?.value?.trim()||'';
+  const valor=document.getElementById('cf-valor-'+id)?.value?.trim()||'';
+  const des  =document.getElementById('cf-des-'+id)?.value||'concluido';
+  const obs  =document.getElementById('cf-obs-'+id)?.value?.trim()||'';
+  try{
+    await api('PATCH',`pacientes?id=eq.${id}`,{
+      status:des,
+      psi_atendeu:psiAt?`${psiAt}${crpAt?' ('+crpAt+')':''}` :'',
+      valor_final:valor,
+      desfecho_obs:obs,
+      concluido_em:new Date().toISOString()
+    });
+    const p=todos.find(x=>x.id===id);
+    if(p){p.status=des;p.psi_atendeu=psiAt;p.valor_final=valor;p.desfecho_obs=obs;}
+    badges();render();
+    // Notifica indicador
+    if(p?.contato_indicador){
+      const wa=p.contato_indicador.replace(/\D/g,'');
+      if(wa){
+        const label=des==='concluido'?'✅ Concluído':'❌ Declínio';
+        const msg=encodeURIComponent(`📋 *Conexão Psi*\n\nSeu encaminhamento foi atualizado:\n\n*Status:* ${label}\n${psiAt?`*Psi:* ${psiAt}\n`:''}${obs?`*Obs:* ${obs}\n`:''}\nObrigada pela indicação! 💙`);
+        setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),500);
+      }
+    }
+    toast(des==='concluido'?'✅ Concluído!':'Declínio registrado.');
+  }catch(e){toast('Erro: '+e.message);}
+}
+
+async function mudarStatus(id,s){
+  try{
+    await api('PATCH',`pacientes?id=eq.${id}`,{status:s});
+    const p=todos.find(x=>x.id===id);if(p) p.status=s;
+    badges();render();
+  }catch(e){toast('Erro: '+e.message);}
+}
+
+async function excluir(id){
+  if(!confirm('Excluir?')) return;
+  try{
     await api('DELETE',`pacientes?id=eq.${id}`);
-    todos=todos.filter(x=>x.id!==id); badges(); render();
-  } catch(e) { alert('Erro: '+e.message); }
+    todos=todos.filter(x=>x.id!==id);badges();render();
+  }catch(e){toast('Erro: '+e.message);}
 }
 
-function toast(msg) {
+function renderHistorico(){
+  const el=document.getElementById('hist-section');
+  const hist=todos.filter(p=>['concluido','declinou'].includes(p.status));
+  const conc=hist.filter(p=>p.status==='concluido').length;
+  const dec =hist.filter(p=>p.status==='declinou').length;
+  const taxa=hist.length?Math.round(conc/hist.length*100):0;
+  const porPsi={};
+  hist.filter(p=>p.psi_atendeu).forEach(p=>{porPsi[p.psi_atendeu]=(porPsi[p.psi_atendeu]||0)+1;});
+  const top=Object.entries(porPsi).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  el.innerHTML=`
+    <div class="report-grid">
+      <div class="report-card"><span class="report-val" style="color:#27ae60">${conc}</span><span class="report-label">Concluídos</span></div>
+      <div class="report-card"><span class="report-val" style="color:#c0392b">${dec}</span><span class="report-label">Declínios</span></div>
+      <div class="report-card"><span class="report-val" style="color:var(--azul)">${taxa}%</span><span class="report-label">Taxa sucesso</span></div>
+      <div class="report-card"><span class="report-val" style="color:#8e44ad">${hist.length}</span><span class="report-label">Total</span></div>
+    </div>
+    ${top.length?`<div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">🏅 Psis com mais atendimentos</div>
+      ${top.map(([nome,qtd])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${nome}</span><span style="font-family:'IBM Plex Mono',monospace;color:var(--azul);font-weight:600;">${qtd} pac.</span></div>`).join('')}
+    </div>`:''}
+    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Histórico (${hist.length})</div>
+    ${hist.length?hist.map(p=>{
+      const dt=p.concluido_em?new Date(p.concluido_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}):new Date(p.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+      const sc=p.status==='concluido'?'background:#edf7f3;color:#1a7a4a;':'background:#fdecea;color:#c0392b;';
+      return`<div class="hist-item"><span class="hist-status" style="${sc}">${SL[p.status]||p.status}</span><div class="hist-info"><div class="hist-demanda">${p.demanda||'—'}</div><div class="hist-meta">${p.psi_atendeu?`👤 ${p.psi_atendeu}<br>`:''}${p.valor_final?`💰 ${p.valor_final}<br>`:''}${p.desfecho_obs?`📝 ${p.desfecho_obs}`:''}</div></div><span class="hist-date">${dt}</span></div>`;
+    }).join(''):`<div class="empty"><div class="empty-icon">📊</div><p>Nenhum histórico ainda</p></div>`}`;
+}
+
+function toast(msg){
   const t=document.createElement('div');
   t.className='toast';t.textContent=msg;
   document.body.appendChild(t);
-  setTimeout(()=>t.remove(),3000);
+  setTimeout(()=>t.remove(),3500);
 }
 </script>
 </body>
