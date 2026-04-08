@@ -387,11 +387,14 @@ function render(){
           ? isSel
             ? `<button class="btn-dessel-psi" onclick="deselecionarPsi('${p.id}')">✕</button>`
             : `<button class="btn-sel-psi" onclick="selecionarPsi('${p.id}','${(x.nome||'').replace(/'/g,'')}','${x.crp||''}','${wa}')">Selecionar</button>`
-          : waBtn;
+          : '';
         const selBadge = isSel ? `<span class="psi-sel-badge">✦ No Match</span>` : '';
+        const adminWaBtn = perfil==='admin' && !isMatch && wa
+          ? `<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`
+          : '';
         return`<div class="psi-item${isSel?' psi-selecionado':''}">
           <div><div class="psi-nome">${x.nome||'—'} ${selBadge}</div><div class="psi-reg">${x.crp||'—'}</div></div>
-          <div class="psi-actions-row">${perfil==='admin'&&!isMatch?waBtn:''}${selBtn}</div>
+          <div class="psi-actions-row">${adminWaBtn}${selBtn}</div>
         </div>`;
       }).join('');
       const matchLabel = isMatch && psiSelecionado
