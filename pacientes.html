@@ -381,7 +381,6 @@ function render(){
       const isMatch = p.status==='em_atendimento';
       const items=ints.map(x=>{
         const wa=(x.wa||'').replace(/\D/g,'');
-        const waBtn=wa?`<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`:'';
         const isSel = psiSelecionado && psiSelecionado === x.crp;
         const selBtn = perfil==='admin' && isMatch
           ? isSel
