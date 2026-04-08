@@ -4,653 +4,328 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guia do Sistema — Conexão Psi</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* ── fundo escuro ── */
-  --bg:#0d1117;
-  --bg2:#0a0e14;
-  --plum:#2D1B4E;
-  --met:#1a3d4f;
-  --teal:#1B5E6B;
-  --gold:#C8934A;
-  --gold-light:#E8C98A;
+  --roxo:#3B2E8A;--roxo-deep:#1E1040;--roxo-mid:#2D1B4E;
+  --gold:#C8934A;--gold-light:#E8C98A;
+  --verde:#1B5E6B;
   --azul:#1B5EA6;
-  --ciano:#29A8CC;
-  --roxo:#7B5EA7;
-  --green:#27ae60;
-  /* ── texto escuro ── */
-  --text-on-dark:#E8E4F0;
-  --dim-on-dark:#9B95B8;
-  --muted-on-dark:#5a5578;
-  /* ── cards BRANCOS ── */
-  --card:#ffffff;
-  --card-hover:#f8f6ff;
-  --card-text:#0f1a2e;
-  --card-dim:#4a5568;
-  --card-muted:#8a9bb0;
-  --card-border:rgba(27,94,107,0.13);
-  --card-border-hover:rgba(27,94,107,0.28);
-  --card-shadow:0 2px 12px rgba(0,0,0,0.18);
-  --card-shadow-hover:0 8px 28px rgba(0,0,0,0.28);
+  --body-bg:#F3F0FA;--body-bg2:#EDE8F8;
+  --card-bg:#FFFFFF;--card-border:rgba(59,46,138,0.1);
+  --text:#1A1030;--text-dim:#4A3F6B;--muted:#8A7FAA;
+  --border-subtle:rgba(59,46,138,0.08);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text-on-dark);min-height:100vh;}
+body{font-family:'Outfit',sans-serif;background:var(--body-bg);color:var(--text);min-height:100vh;}
 
-/* ── HEADER ── */
 .hub-header{
-  background:linear-gradient(145deg,#0d0a1e 0%,#1a1035 55%,#0d1a30 100%);
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  padding:1.4rem 1.4rem 0;
-  max-width:900px;margin:0 auto;
-  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#0F0820 0%,#1E1040 45%,#1a2a4a 100%);
+  padding:2rem 1.6rem 0;max-width:940px;margin:1.2rem auto 0;
+  border-radius:20px;position:relative;overflow:hidden;
+  box-shadow:0 12px 48px rgba(15,8,32,0.3);
 }
-.hub-header::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 50% 60% at 90% 30%,rgba(200,147,74,0.1),transparent 60%),
-    radial-gradient(ellipse 40% 50% at 5% 85%,rgba(41,168,204,0.07),transparent 55%);
-}
-.hub-top{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:.2rem;}
-.hub-title-row{display:flex;align-items:center;gap:10px;}
-.hub-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:#fff;}
+.hub-header::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 55% 60% at 88% 25%,rgba(200,147,74,0.14),transparent 60%),
+             radial-gradient(ellipse 40% 40% at 8% 80%,rgba(41,168,204,0.08),transparent 55%);}
+.hub-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:.4rem;}
+.hub-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#fff;}
 .hub-title em{color:var(--gold-light);font-style:italic;}
-.hub-sub{font-size:.61rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted-on-dark);margin-bottom:1.1rem;position:relative;z-index:1;}
-.hub-btns{display:flex;gap:7px;flex-wrap:wrap;position:relative;z-index:1;}
-.hub-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  border-radius:10px;padding:7px 14px;
-  font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;
-  text-decoration:none;transition:all .15s;white-space:nowrap;cursor:pointer;border:none;
-}
-.hub-btn-ghost{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);}
-.hub-btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff;border-color:rgba(255,255,255,.22);}
-.hub-btn-gold{background:rgba(200,147,74,.14);border:1.5px solid rgba(200,147,74,.35);color:var(--gold-light);}
-.hub-btn-gold:hover{background:rgba(200,147,74,.25);border-color:var(--gold);}
+.hub-sub{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);position:relative;z-index:1;margin-bottom:1.3rem;}
+.hub-btns{display:flex;gap:8px;position:relative;z-index:1;}
+.hub-btn{display:inline-flex;align-items:center;gap:6px;padding:.42rem 1rem;border-radius:9px;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;text-decoration:none;transition:all .18s;border:1.5px solid transparent;}
+.hub-btn-pub{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
+.hub-btn-pub:hover{background:rgba(255,255,255,.13);color:#fff;}
+.hub-btn-adm{background:rgba(200,147,74,.15);border-color:rgba(200,147,74,.3);color:var(--gold-light);}
+.hub-btn-adm:hover{background:rgba(200,147,74,.25);}
 
-/* TABS */
-.tabs{display:flex;gap:.35rem;flex-wrap:wrap;position:relative;z-index:1;padding-bottom:0;margin-top:.5rem;}
-.tab{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:.4rem .95rem;border-radius:8px 8px 0 0;
-  border:1px solid transparent;border-bottom:none;
-  background:transparent;
-  color:var(--muted-on-dark);
-  font-family:'Outfit',sans-serif;font-size:.73rem;font-weight:500;
-  cursor:pointer;transition:all .16s;white-space:nowrap;
-  margin-bottom:-1px;
-}
-.tab:hover{color:var(--dim-on-dark);background:rgba(255,255,255,.05);}
-.tab.active{
-  background:var(--bg);
-  border-color:rgba(255,255,255,0.08);
-  color:var(--gold-light);
-  font-weight:600;
-}
+.hub-tabs{display:flex;gap:.35rem;flex-wrap:wrap;position:relative;z-index:1;}
+.tab{display:inline-flex;align-items:center;gap:5px;padding:.4rem 1rem;border-radius:10px 10px 0 0;border:1.5px solid transparent;border-bottom:none;background:transparent;color:rgba(255,255,255,.45);font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;cursor:pointer;transition:all .16s;white-space:nowrap;margin-bottom:-1px;}
+.tab:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8);}
+.tab.active{background:var(--body-bg);border-color:rgba(255,255,255,.12);color:var(--text);font-weight:600;}
 
-/* WRAP */
-.wrap{max-width:900px;margin:0 auto;padding:0 1.4rem 4rem;}
+.wrap{max-width:940px;margin:0 auto;padding:0 1.4rem 5rem;}
 .section{display:none;}
-.section.active{display:block;animation:fi .2s ease;}
+.section.active{display:block;animation:fi .22s ease;}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* LABEL — separadores de seção no fundo escuro */
-.label{
-  font-size:.61rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-  color:var(--muted-on-dark);display:flex;align-items:center;gap:8px;margin:1.8rem 0 .9rem;
-}
-.label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
+.prod-hero{border-radius:14px;padding:1.4rem 1.6rem;margin:1.6rem 0 1.2rem;display:flex;align-items:center;gap:16px;}
+.prod-hero-roxo{background:linear-gradient(135deg,rgba(59,46,138,.07),rgba(30,16,64,.03));border:1.5px solid rgba(59,46,138,.18);}
+.prod-hero-verde{background:linear-gradient(135deg,rgba(27,94,107,.07),rgba(41,168,204,.03));border:1.5px solid rgba(27,94,107,.18);}
+.prod-hero-azul{background:linear-gradient(135deg,rgba(27,94,166,.07),rgba(74,143,212,.03));border:1.5px solid rgba(27,94,166,.18);}
+.prod-hero-gold{background:linear-gradient(135deg,rgba(200,147,74,.07),rgba(232,200,138,.03));border:1.5px solid rgba(200,147,74,.18);}
+.prod-icon{font-size:2rem;flex-shrink:0;}
+.prod-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;}
+.prod-desc{font-size:.8rem;color:var(--text-dim);line-height:1.6;margin-top:3px;}
+.prod-badge{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-top:6px;}
+.badge-free{background:rgba(39,174,96,.1);color:#1a7a4a;border:1px solid rgba(39,174,96,.2);}
+.badge-prem{background:rgba(200,147,74,.1);color:#b7600a;border:1px solid rgba(200,147,74,.2);}
 
-/* ══════════════════════════════
-   LINK CARDS — BRANCOS ELEGANTES
-══════════════════════════════ */
-.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.5rem;}
-@media(max-width:540px){.links-grid{grid-template-columns:1fr;}}
+.label{font-size:.6rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;margin:1.6rem 0 .9rem;}
+.label::after{content:'';flex:1;height:1px;background:var(--border-subtle);}
 
-.lcard{
-  background:var(--card);
-  border:1px solid var(--card-border);
-  border-radius:14px;padding:1rem 1.1rem;
-  display:flex;align-items:center;gap:12px;
-  text-decoration:none;color:var(--card-text);
-  transition:all .2s;cursor:pointer;
-  box-shadow:var(--card-shadow);
-}
-.lcard:hover{
-  border-color:var(--card-border-hover);
-  background:var(--card-hover);
-  transform:translateY(-2px);
-  box-shadow:var(--card-shadow-hover);
-}
-/* Accents por cor — borda esquerda colorida */
-.lcard.gold{border-left:3px solid var(--gold);}
-.lcard.teal{border-left:3px solid var(--teal);}
-.lcard.green{border-left:3px solid var(--green);}
-.lcard.wa{border-left:3px solid #25D366;}
-.lcard.azul{border-left:3px solid var(--azul);}
-.lcard.roxo{border-left:3px solid var(--roxo);}
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+@media(max-width:520px){.links-grid{grid-template-columns:1fr;}}
 
-.lcard-icon{
-  width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
-  background:#f0f4f8;
-}
-.lcard.gold  .lcard-icon{background:rgba(200,147,74,.1);}
-.lcard.teal  .lcard-icon{background:rgba(27,94,107,.1);}
-.lcard.green .lcard-icon{background:rgba(39,174,96,.1);}
-.lcard.wa    .lcard-icon{background:rgba(37,211,102,.1);}
-.lcard.azul  .lcard-icon{background:rgba(27,94,166,.1);}
-.lcard.roxo  .lcard-icon{background:rgba(123,94,167,.1);}
-
+.lcard{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:13px;padding:1rem 1.1rem;display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);transition:all .18s;cursor:pointer;box-shadow:0 1px 4px rgba(30,16,64,.04);}
+.lcard:hover{box-shadow:0 4px 16px rgba(30,16,64,.1);transform:translateY(-1px);}
+.lcard-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;background:var(--body-bg2);}
+.lcard-title{font-size:.83rem;font-weight:600;color:var(--text);line-height:1.3;}
+.lcard-desc{font-size:.71rem;color:var(--text-dim);margin-top:2px;line-height:1.4;}
 .lcard-info{flex:1;min-width:0;}
-.lcard-title{font-size:.83rem;font-weight:600;color:var(--card-text);line-height:1.3;}
-.lcard-desc{font-size:.71rem;color:var(--card-dim);margin-top:2px;line-height:1.4;}
-.lcard-arrow{color:var(--card-muted);font-size:.9rem;flex-shrink:0;transition:color .15s;}
-.lcard:hover .lcard-arrow{color:var(--teal);}
+.lcard-arrow{color:var(--muted);font-size:.9rem;flex-shrink:0;}
+.lcard.roxo{border-left:3px solid var(--roxo);}
+.lcard.verde{border-left:3px solid var(--verde);}
+.lcard.azul{border-left:3px solid var(--azul);}
+.lcard.gold{border-left:3px solid var(--gold);}
+.lcard.wa{border-left:3px solid #25D366;}
+.lcard.roxo .lcard-icon{background:rgba(59,46,138,.07);}
+.lcard.verde .lcard-icon{background:rgba(27,94,107,.07);}
+.lcard.azul .lcard-icon{background:rgba(27,94,166,.07);}
+.lcard.gold .lcard-icon{background:rgba(200,147,74,.07);}
+.lcard.wa .lcard-icon{background:rgba(37,211,102,.07);}
 
-/* BADGE */
-.badge{display:inline-flex;align-items:center;font-size:.62rem;font-weight:700;letter-spacing:.4px;padding:2px 7px;border-radius:5px;}
-.b-gold{background:rgba(200,147,74,.12);color:#9a6a1e;}
-.b-green{background:rgba(39,174,96,.12);color:#1a7a3a;}
-.b-teal{background:rgba(27,94,107,.12);color:var(--teal);}
-.b-azul{background:rgba(27,94,166,.12);color:var(--azul);}
+.info-card{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1rem;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--border-subtle);font-size:.82rem;flex-wrap:wrap;gap:6px;}
+.info-row:last-child{border:none;}
+.info-key{color:var(--text-dim);}
+.info-val{font-weight:600;color:var(--text);}
 
-/* ══════════════════════════════
-   INFO CARD — BRANCO
-══════════════════════════════ */
-.info-card{
-  background:var(--card);
-  border:1px solid var(--card-border);
-  border-radius:14px;padding:1.1rem 1.25rem;
-  margin-bottom:.75rem;
-  box-shadow:var(--card-shadow);
-}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(27,94,107,0.08);font-size:.8rem;flex-wrap:wrap;gap:6px;}
-.info-row:last-child{border-bottom:none;}
-.info-key{color:var(--card-dim);font-size:.76rem;}
-.info-val{font-weight:600;font-size:.78rem;color:var(--card-text);}
-code{font-family:'IBM Plex Mono',monospace;font-size:.72rem;background:rgba(27,94,107,.08);color:var(--met);padding:2px 8px;border-radius:5px;border:1px solid rgba(27,94,107,.12);}
+.step-card{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.8rem;display:flex;gap:14px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.step-roxo{background:var(--roxo);}
+.step-verde{background:var(--verde);}
+.step-azul{background:var(--azul);}
+.step-gold{background:var(--gold);}
+.step-title{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:3px;}
+.step-desc{font-size:.78rem;color:var(--text-dim);line-height:1.65;}
 
-/* ══════════════════════════════
-   STEPS — BRANCOS
-══════════════════════════════ */
-.steps{display:flex;flex-direction:column;gap:.6rem;}
-.step{
-  display:flex;gap:13px;align-items:flex-start;
-  background:var(--card);
-  border:1px solid var(--card-border);
-  border-radius:13px;padding:.95rem 1.1rem;
-  box-shadow:var(--card-shadow);
-  transition:box-shadow .2s, transform .2s;
-}
-.step:hover{box-shadow:var(--card-shadow-hover);transform:translateY(-1px);}
-.step-num{
-  width:26px;height:26px;border-radius:50%;flex-shrink:0;
-  background:rgba(200,147,74,.12);color:#9a6a1e;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.72rem;font-weight:700;margin-top:1px;
-  border:1.5px solid rgba(200,147,74,.25);
-}
-.step-title{font-size:.83rem;font-weight:600;color:var(--card-text);margin-bottom:3px;}
-.step-desc{font-size:.76rem;color:var(--card-dim);line-height:1.55;}
+.senha-val{font-family:monospace;font-size:.82rem;color:var(--muted);cursor:pointer;user-select:none;}
+.senha-val:hover{color:var(--roxo);}
 
-/* ALERT */
-.alert{
-  border-left:3px solid var(--gold);
-  background:var(--card);
-  padding:.8rem 1.1rem;
-  border-radius:0 12px 12px 0;
-  font-size:.78rem;color:var(--card-dim);
-  margin:.85rem 0;line-height:1.65;
-  box-shadow:var(--card-shadow);
-}
-.alert strong{color:#9a6a1e;}
+.flow-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
+.ftab{padding:5px 14px;border-radius:999px;border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;background:var(--card-bg);}
+.flow-card{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:14px;padding:1.4rem 1.6rem;border-left:3px solid var(--roxo);}
+.flow-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--text);margin-bottom:.4rem;}
+.flow-desc{font-size:.8rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.2rem;}
+.flow-steps{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.flow-steps::-webkit-scrollbar{display:none;}
+.flow-step{background:var(--body-bg2);border:1.5px solid var(--card-border);border-radius:10px;padding:12px 14px;min-width:120px;flex:1;text-align:center;}
+.flow-step.last{background:var(--card-bg);}
+.fse{font-size:1.3rem;margin-bottom:5px;}
+.fst{font-size:.77rem;font-weight:600;color:var(--text);line-height:1.3;}
+.fss{font-size:.66rem;color:var(--muted);margin-top:3px;line-height:1.3;}
+.flow-arrow{display:flex;align-items:center;padding:0 6px;color:var(--muted);font-size:1rem;flex-shrink:0;}
 
-/* ══════════════════════════════
-   WELCOME CARD — BRANCO PREMIUM
-══════════════════════════════ */
-.welcome-card{
-  background:var(--card);
-  border:1px solid var(--card-border);
-  border-top:3px solid var(--gold);
-  border-radius:16px;padding:1.25rem 1.4rem;margin-bottom:1.2rem;margin-top:1.4rem;
-  box-shadow:0 4px 24px rgba(0,0,0,0.14);
-}
-.welcome-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--card-text);margin-bottom:.4rem;}
-.welcome-title em{color:var(--gold);font-style:italic;}
-.welcome-desc{font-size:.8rem;color:var(--card-dim);line-height:1.7;}
-.welcome-desc strong{color:var(--card-text);}
+.highlight{background:linear-gradient(135deg,rgba(200,147,74,.05),rgba(59,46,138,.03));border:1.5px solid rgba(200,147,74,.18);border-radius:12px;padding:14px 16px;margin:12px 0;font-size:.8rem;color:var(--text-dim);line-height:1.7;}
+.highlight strong{color:var(--text);}
 
-/* DIRETÓRIO LINK — BRANCO com accent azul */
-.dir-link{
-  display:flex;align-items:center;gap:13px;
-  background:var(--card);
-  border:1px solid var(--card-border);
-  border-left:3px solid var(--azul);
-  border-radius:14px;padding:1rem 1.15rem;margin-bottom:.7rem;
-  text-decoration:none;transition:all .2s;
-  box-shadow:var(--card-shadow);
-}
-.dir-link:hover{
-  border-color:rgba(27,94,166,.3);
-  border-left-color:var(--azul);
-  transform:translateY(-2px);
-  box-shadow:var(--card-shadow-hover);
-}
-.dir-link-icon{width:42px;height:42px;border-radius:11px;background:rgba(27,94,166,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
-.dir-link-text .title{font-size:.85rem;font-weight:700;color:var(--azul);}
-.dir-link-text .desc{font-size:.72rem;color:var(--card-dim);margin-top:2px;}
-
-/* FLUXO SVG — nodes brancos sobre fundo escuro */
-#fsvg text{fill:var(--card-text);}
-
-/* FOOTER */
-.footer{text-align:center;padding:2rem 1rem;border-top:1px solid rgba(255,255,255,0.07);margin-top:2rem;}
-.footer-brand{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--dim-on-dark);font-weight:600;}
-.footer-brand em{color:var(--gold);font-style:italic;}
-.footer-links{margin-top:.5rem;display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;}
-.footer-links a{font-size:.73rem;color:var(--muted-on-dark);text-decoration:none;transition:color .15s;}
-.footer-links a:hover{color:var(--dim-on-dark);}
-.footer-copy{font-size:.68rem;color:var(--muted-on-dark);margin-top:.6rem;opacity:.6;}
+.footer{background:var(--roxo-deep,#1E1040);padding:2rem 1.6rem;margin-top:3rem;text-align:center;}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:.4rem;}
+.footer-brand em{color:var(--gold-light);font-style:italic;}
+.footer-links{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;margin-bottom:.6rem;}
+.footer-links a{font-size:.75rem;color:rgba(255,255,255,.4);text-decoration:none;}
+.footer-links a:hover{color:rgba(255,255,255,.8);}
+.footer-copy{font-size:.65rem;color:rgba(255,255,255,.2);letter-spacing:1px;}
+@media(max-width:600px){.hub-header{margin:.8rem .8rem 0;border-radius:16px;}.wrap{padding:0 .9rem 4rem;}}
 </style>
 </head>
 <body>
 
+<div style="max-width:940px;margin:0 auto;padding:0 1.4rem;">
 <div class="hub-header">
   <div class="hub-top">
-    <div class="hub-title-row">
-      <span style="font-size:1.35rem;">📋</span>
+    <div>
       <div class="hub-title">Guia do <em>Sistema</em></div>
+      <div class="hub-sub">Conexão Psi · Central de Links · 2026</div>
     </div>
     <div class="hub-btns">
-      <a href="divulgacao.html" target="_blank" class="hub-btn hub-btn-ghost">🌐 Página pública</a>
-      <a href="admin.html" target="_blank" class="hub-btn hub-btn-gold">👑 Painel Admin</a>
+      <a href="divulgacao.html" target="_blank" class="hub-btn hub-btn-pub">🌐 Página pública</a>
+      <a href="admin.html" target="_blank" class="hub-btn hub-btn-adm">👑 Painel Admin</a>
     </div>
   </div>
-  <div class="hub-sub">Conexão Psi · Central de Links · 2026</div>
-  <div class="tabs">
-    <button class="tab active" onclick="show('links',this)">🔗 Meus Links</button>
-    <button class="tab" onclick="show('perfil',this)">✏️ Meu Perfil</button>
+  <div class="hub-tabs">
+    <button class="tab active" onclick="show('diretorio',this)">🔍 Diretório Psi</button>
+    <button class="tab" onclick="show('psimed',this)">🤝 PsiMed</button>
+    <button class="tab" onclick="show('pacientes',this)">👥 Pacientes</button>
     <button class="tab" onclick="show('premium',this)">✨ Premium</button>
-    <button class="tab" onclick="show('rede',this)">🤝 PsiMed</button>
-    <button class="tab" onclick="show('senhas',this)">🔐 Acessos</button>
+    <button class="tab" onclick="show('comunidade',this)">💬 Comunidade</button>
+    <button class="tab" onclick="show('acessos',this)">🔐 Acessos</button>
     <button class="tab" onclick="show('fluxos',this)">🗺️ Como funciona</button>
   </div>
+</div>
 </div>
 
 <div class="wrap">
 
-<!-- ══ LINKS ══ -->
-<div class="section active" id="s-links">
-
-  <div class="welcome-card" style="margin-top:1.4rem;">
-    <div class="welcome-title">Seja bem-vinda à <em>Conexão Psi</em> 💜</div>
-    <div class="welcome-desc">Seu cadastro foi <strong style="color:var(--text);">aprovado</strong>. Use este guia para acessar tudo da rede — links, perfil, premium e dúvidas — tudo em um só lugar.</div>
-  </div>
-
-  <!-- Diretório público em destaque -->
-  <a href="divulgacao.html" target="_blank" class="dir-link">
-    <div class="dir-link-icon">🔍</div>
-    <div class="dir-link-text">
-      <div class="title">Diretório de Psicólogos</div>
-      <div class="desc">Página pública onde pacientes encontram psis da rede — acesse para ver como seu perfil aparece</div>
+<!-- DIRETÓRIO PSI -->
+<div class="section active" id="s-diretorio">
+  <div class="prod-hero prod-hero-roxo">
+    <div class="prod-icon">🔍</div>
+    <div>
+      <div class="prod-title" style="color:var(--roxo)">Diretório Psi</div>
+      <div class="prod-desc">Sua vitrine profissional na rede. Psis aprovados aparecem internamente. Psis premium aparecem também para pacientes.</div>
+      <span class="prod-badge badge-free">Gratuito para psis aprovados</span>
     </div>
-    <div style="color:var(--text-muted);font-size:.9rem;">↗</div>
-  </a>
-
-  <div class="label">Páginas da rede</div>
+  </div>
+  <div class="label">Páginas do diretório</div>
   <div class="links-grid">
-    <a href="divulgacao.html" target="_blank" class="lcard roxo">
-      <div class="lcard-icon">⭐</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Diretório Premium</div>
-        <div class="lcard-desc">Só psis premium — visível para <strong>pacientes</strong></div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="index.html" target="_blank" class="lcard azul">
-      <div class="lcard-icon">🧠</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Área interna da rede</div>
-        <div class="lcard-desc">Para <strong>psis</strong> — editar perfil e ver a rede</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="met.html" target="_blank" class="lcard green">
-      <div class="lcard-icon">🤝</div>
-      <div class="lcard-info">
-        <div class="lcard-title">PsiMed Rede Colaborativa</div>
-        <div class="lcard-desc">Encaminhamentos cruzados <span class="badge b-gold">Premium</span></div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="cadastro_med.html" target="_blank" class="lcard teal">
-      <div class="lcard-icon">🏥</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Cadastro para médicos</div>
-        <div class="lcard-desc">Indique um colega de saúde para a rede</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="planos.html" target="_blank" class="lcard gold">
-      <div class="lcard-icon">✨</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Planos e preços</div>
-        <div class="lcard-desc">Ver benefícios do plano premium</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
+    <a href="divulgacao.html" target="_blank" class="lcard roxo"><div class="lcard-icon">⭐</div><div class="lcard-info"><div class="lcard-title">Diretório Premium</div><div class="lcard-desc">Página pública — pacientes encontram psis aqui</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="index.html" target="_blank" class="lcard roxo"><div class="lcard-icon">🧠</div><div class="lcard-info"><div class="lcard-title">Área interna da rede</div><div class="lcard-desc">Para psis — ver a rede e editar perfil</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="perfil.html" target="_blank" class="lcard roxo"><div class="lcard-icon">✏️</div><div class="lcard-info"><div class="lcard-title">Editar meu perfil</div><div class="lcard-desc">Atualizar foto, WhatsApp, bio e especialidades</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://tally.so/r/b5OGYZ" target="_blank" class="lcard roxo"><div class="lcard-icon">📝</div><div class="lcard-info"><div class="lcard-title">Cadastro na rede</div><div class="lcard-desc">Formulário para novos membros</div></div><span class="lcard-arrow">↗</span></a>
   </div>
-
-  <div class="label">Formulários e cadastros</div>
-  <div class="links-grid">
-    <a href="https://tally.so/r/b5OGYZ" target="_blank" class="lcard green">
-      <div class="lcard-icon">📋</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Cadastro na rede</div>
-        <div class="lcard-desc">Formulário de cadastro para novos membros</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard green">
-      <div class="lcard-icon">➕</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Indicar paciente</div>
-        <div class="lcard-desc">Formulário de encaminhamento de paciente</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="perfil.html" target="_blank" class="lcard">
-      <div class="lcard-icon">✏️</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Editar meu perfil</div>
-        <div class="lcard-desc">Atualizar foto, WhatsApp, bio e especialidades</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="pacientes.html" target="_blank" class="lcard">
-      <div class="lcard-icon">🔐</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Pacientes disponíveis</div>
-        <div class="lcard-desc">Área psi de gestão de pacientes</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-  </div>
-
-  <div class="label">Comunidade</div>
-  <div class="links-grid">
-    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
-      <div class="lcard-icon">💬</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Grupo WhatsApp da rede</div>
-        <div class="lcard-desc">Encaminhamentos, parcerias e trocas entre colegas</div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
-      <div class="lcard-icon">💳</div>
-      <div class="lcard-info">
-        <div class="lcard-title">Assinar plano premium</div>
-        <div class="lcard-desc">Cupom fundadora: <code>FUNDADORA</code></div>
-      </div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-  </div>
-</div>
-
-<!-- ══ PERFIL ══ -->
-<div class="section" id="s-perfil">
-  <div class="label" style="margin-top:1.4rem;">Como atualizar seu perfil</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Acesse a área Psi</div><div class="step-desc">Vá em <code>perfil.html</code> e entre com seu e-mail de cadastro.</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Digite seu e-mail de cadastro</div><div class="step-desc">O mesmo e-mail que você usou no formulário de cadastro. Isso confirma sua identidade.</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Edite e salve</div><div class="step-desc">Você pode atualizar: foto, WhatsApp, valor da sessão, especialidades, bio e disponibilidade.</div></div></div>
-  </div>
-
-  <div class="label">O que aparece para os pacientes</div>
+  <div class="label">O que aparece para pacientes</div>
   <div class="info-card">
     <div class="info-row"><span class="info-key">📸 Foto de perfil</span><span class="info-val">Aparece no diretório público</span></div>
-    <div class="info-row"><span class="info-key">💬 WhatsApp</span><span class="info-val">Botão direto no seu card</span></div>
+    <div class="info-row"><span class="info-key">📱 WhatsApp</span><span class="info-val">Botão direto no card</span></div>
     <div class="info-row"><span class="info-key">💰 Valor da sessão</span><span class="info-val">Visível no card público</span></div>
     <div class="info-row"><span class="info-key">🎯 Especialidades</span><span class="info-val">Tags no card</span></div>
-    <div class="info-row"><span class="info-key">📝 Bio</span><span class="info-val">Texto em destaque no card</span></div>
-    <div class="info-row"><span class="info-key">🕐 Disponibilidade</span><span class="info-val">Visível no card</span></div>
+    <div class="info-row"><span class="info-key">📖 Bio</span><span class="info-val">Texto em destaque</span></div>
+    <div class="info-row"><span class="info-key">✅ Badge verificado</span><span class="info-val" style="color:#1a7a4a">Credibilidade na rede</span></div>
   </div>
-  <div class="alert"><strong>Dica:</strong> preencha WhatsApp + valor da sessão para ter um card completo e aparecer melhor para os pacientes.</div>
-
-  <div class="label">Acesso direto</div>
-  <div class="links-grid">
-    <a href="perfil.html" target="_blank" class="lcard teal">
-      <div class="lcard-icon">✏️</div>
-      <div class="lcard-info"><div class="lcard-title">Editar meu perfil</div><div class="lcard-desc">Área Psi — login por e-mail</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="divulgacao.html" target="_blank" class="lcard roxo">
-      <div class="lcard-icon">👁️</div>
-      <div class="lcard-info"><div class="lcard-title">Ver como apareço</div><div class="lcard-desc">Diretório público — visão do paciente</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-  </div>
+  <div class="label">Como atualizar seu perfil</div>
+  <div class="step-card"><div class="step-num step-roxo">1</div><div><div class="step-title">Acesse perfil.html</div><div class="step-desc">Entre com o e-mail que você usou no cadastro.</div></div></div>
+  <div class="step-card"><div class="step-num step-roxo">2</div><div><div class="step-title">Edite seus dados</div><div class="step-desc">Foto, WhatsApp, valor, bio, especialidades e disponibilidade.</div></div></div>
+  <div class="step-card"><div class="step-num step-roxo">3</div><div><div class="step-title">Salve</div><div class="step-desc">As mudanças aparecem imediatamente no diretório.</div></div></div>
 </div>
 
-<!-- ══ PREMIUM ══ -->
+<!-- PSIMED -->
+<div class="section" id="s-psimed">
+  <div class="prod-hero prod-hero-verde">
+    <div class="prod-icon">🤝</div>
+    <div>
+      <div class="prod-title" style="color:var(--verde)">PsiMed — Rede Colaborativa</div>
+      <div class="prod-desc">Área exclusiva para psis e profissionais de saúde indicarem pacientes entre si, solicitarem meets e colaborarem clinicamente.</div>
+      <span class="prod-badge badge-prem">Exclusivo para Premium</span>
+    </div>
+  </div>
+  <div class="links-grid" style="margin-bottom:1.2rem">
+    <a href="met.html" target="_blank" class="lcard verde"><div class="lcard-icon">🤝</div><div class="lcard-info"><div class="lcard-title">PsiMed — Rede Colaborativa</div><div class="lcard-desc">Encaminhamentos cruzados + meets</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="cadastro_med.html" target="_blank" class="lcard verde"><div class="lcard-icon">🏥</div><div class="lcard-info"><div class="lcard-title">Cadastro para médicos</div><div class="lcard-desc">Convide um colega de saúde</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard verde"><div class="lcard-icon">➕</div><div class="lcard-info"><div class="lcard-title">Indicar paciente</div><div class="lcard-desc">Formulário de encaminhamento</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="pacientes.html" target="_blank" class="lcard azul"><div class="lcard-icon">🔒</div><div class="lcard-info"><div class="lcard-title">Pacientes disponíveis</div><div class="lcard-desc">Área psi de gestão de pacientes</div></div><span class="lcard-arrow">↗</span></a>
+  </div>
+  <div class="label">Para acessar a PsiMed</div>
+  <div class="step-card"><div class="step-num step-verde">1</div><div><div class="step-title">Acesse met.html</div><div class="step-desc">Use o e-mail do seu cadastro. Não precisa de senha.</div></div></div>
+  <div class="step-card"><div class="step-num step-verde">2</div><div><div class="step-title">Indique um paciente</div><div class="step-desc">Na aba "Indicar paciente", descreva o perfil clínico sem dados pessoais.</div></div></div>
+  <div class="step-card"><div class="step-num step-verde">3</div><div><div class="step-title">Solicite um meet</div><div class="step-desc">Na aba "Profissionais da rede", encontre um colega e peça uma conversa clínica.</div></div></div>
+</div>
+
+<!-- PACIENTES -->
+<div class="section" id="s-pacientes">
+  <div class="prod-hero prod-hero-azul">
+    <div class="prod-icon">👥</div>
+    <div>
+      <div class="prod-title" style="color:var(--azul)">Gestão de Pacientes</div>
+      <div class="prod-desc">Painel para acompanhar pacientes indicados pela rede — registrar interesse, acompanhar status e registrar desfechos.</div>
+      <span class="prod-badge" style="background:rgba(27,94,166,.1);color:#1B5EA6;border:1px solid rgba(27,94,166,.2);">Acesso por e-mail da rede</span>
+    </div>
+  </div>
+  <div class="links-grid" style="margin-bottom:1.2rem">
+    <a href="pacientes.html" target="_blank" class="lcard azul"><div class="lcard-icon">👥</div><div class="lcard-info"><div class="lcard-title">Área Psi — Pacientes</div><div class="lcard-desc">Entre com seu e-mail da rede</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard azul"><div class="lcard-icon">➕</div><div class="lcard-info"><div class="lcard-title">Indicar paciente</div><div class="lcard-desc">Encaminhar um paciente para a rede</div></div><span class="lcard-arrow">↗</span></a>
+  </div>
+  <div class="label">Fluxo do paciente na rede</div>
+  <div class="step-card"><div class="step-num step-azul">1</div><div><div class="step-title">Psi indica o caso</div><div class="step-desc">Preenche dados clínicos básicos — sem nome ou dados pessoais do paciente.</div></div></div>
+  <div class="step-card"><div class="step-num step-azul">2</div><div><div class="step-title">Psis demonstram interesse</div><div class="step-desc">Qualquer psi da rede pode clicar "Tenho interesse" no painel de pacientes.</div></div></div>
+  <div class="step-card"><div class="step-num step-azul">3</div><div><div class="step-title">Admin conecta as partes</div><div class="step-desc">A admin escolhe o profissional ideal e envia as informações por WhatsApp.</div></div></div>
+  <div class="step-card"><div class="step-num step-azul">4</div><div><div class="step-title">Desfecho registrado</div><div class="step-desc">O resultado é registrado no sistema para histórico e relatório.</div></div></div>
+</div>
+
+<!-- PREMIUM -->
 <div class="section" id="s-premium">
-  <div class="label" style="margin-top:1.4rem;">O que o premium inclui</div>
+  <div class="prod-hero prod-hero-gold">
+    <div class="prod-icon">✨</div>
+    <div>
+      <div class="prod-title" style="color:var(--gold)">Plano Premium</div>
+      <div class="prod-desc">Com o Premium você aparece no diretório público, recebe contatos de pacientes e acessa a PsiMed.</div>
+      <span class="prod-badge badge-prem">R$ 27,90/mês</span>
+    </div>
+  </div>
+  <div class="links-grid" style="margin-bottom:1.2rem">
+    <a href="planos.html" target="_blank" class="lcard gold"><div class="lcard-icon">✨</div><div class="lcard-info"><div class="lcard-title">Planos e preços</div><div class="lcard-desc">Ver benefícios e assinar</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold"><div class="lcard-icon">💳</div><div class="lcard-info"><div class="lcard-title">Assinar agora</div><div class="lcard-desc">Cupom fundadora: <strong>FUNDADORA</strong></div></div><span class="lcard-arrow">↗</span></a>
+  </div>
+  <div class="label">Benefícios Premium</div>
   <div class="info-card">
-    <div class="info-row"><span class="info-key">🌐 Diretório público</span><span class="info-val" style="color:#4ecca3;">Aparece para pacientes ✓</span></div>
-    <div class="info-row"><span class="info-key">🤝 PsiMed Rede Colaborativa</span><span class="info-val" style="color:#4ecca3;">Acesso liberado ✓</span></div>
-    <div class="info-row"><span class="info-key">📊 Destaque no diretório</span><span class="info-val" style="color:#4ecca3;">Badge verificado ✓</span></div>
-    <div class="info-row"><span class="info-key">🔄 Encaminhamentos cruzados</span><span class="info-val" style="color:#4ecca3;">Indicar e receber ✓</span></div>
-    <div class="info-row"><span class="info-key">👥 Rede de profissionais</span><span class="info-val" style="color:#4ecca3;">Contato direto ✓</span></div>
+    <div class="info-row"><span class="info-key">🔍 Diretório público</span><span class="info-val" style="color:#1a7a4a">✓ Visível para pacientes</span></div>
+    <div class="info-row"><span class="info-key">📱 Contato direto</span><span class="info-val" style="color:#1a7a4a">✓ WhatsApp visível</span></div>
+    <div class="info-row"><span class="info-key">🤝 PsiMed</span><span class="info-val" style="color:#1a7a4a">✓ Encaminhamentos + meets</span></div>
+    <div class="info-row"><span class="info-key">✅ Badge verificado</span><span class="info-val" style="color:#1a7a4a">✓ Credibilidade na rede</span></div>
+    <div class="info-row"><span class="info-key">📖 Bio completa</span><span class="info-val" style="color:#1a7a4a">✓ Apresentação detalhada</span></div>
   </div>
+  <div class="highlight"><strong>Cancelamento:</strong> a qualquer momento, sem multa. O acesso se mantém até o fim do período pago.</div>
+</div>
 
-  <div class="label">Como assinar</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Acesse o checkout</div><div class="step-desc">Clique no link abaixo. Use o cupom <code>FUNDADORA</code> para o valor de fundadora.</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Conclua o pagamento no Kiwify</div><div class="step-desc">Cartão de crédito ou Pix disponíveis.</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Aguarde a ativação</div><div class="step-desc">A equipe ativa seu premium em até 24h após a confirmação do pagamento.</div></div></div>
+<!-- COMUNIDADE -->
+<div class="section" id="s-comunidade">
+  <div class="prod-hero prod-hero-roxo">
+    <div class="prod-icon">💬</div>
+    <div>
+      <div class="prod-title" style="color:var(--roxo)">Comunidade</div>
+      <div class="prod-desc">O coração da rede — troca entre psis, avisos, indicações e suporte da admin.</div>
+      <span class="prod-badge badge-free">Gratuito para membros</span>
+    </div>
   </div>
-
-  <div class="label">Link de assinatura</div>
-  <div class="links-grid">
-    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
-      <div class="lcard-icon">✨</div>
-      <div class="lcard-info"><div class="lcard-title">Assinar agora — Kiwify</div><div class="lcard-desc">Cupom fundadora: <code>FUNDADORA</code></div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="planos.html" target="_blank" class="lcard">
-      <div class="lcard-icon">📄</div>
-      <div class="lcard-info"><div class="lcard-title">Ver planos e benefícios</div><div class="lcard-desc">Detalhes de cada plano disponível</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
+  <div class="links-grid" style="margin-bottom:1.2rem">
+    <a href="https://wa.me/5511947388423?text=Olá!%20Quero%20entrar%20no%20grupo%20da%20Conexão%20Psi" target="_blank" class="lcard wa"><div class="lcard-icon">💬</div><div class="lcard-info"><div class="lcard-title">Grupo WhatsApp da rede</div><div class="lcard-desc">Encaminhamentos, parcerias e trocas entre colegas</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://wa.me/5511947388423" target="_blank" class="lcard wa"><div class="lcard-icon">🛟</div><div class="lcard-info"><div class="lcard-title">Falar com a admin</div><div class="lcard-desc">Michelle Donegá · CRP 06/93008</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="https://www.instagram.com/psimichelledonega" target="_blank" class="lcard roxo"><div class="lcard-icon">📸</div><div class="lcard-info"><div class="lcard-title">Instagram</div><div class="lcard-desc">@psimichelledonega</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="politica_privacidade.html" target="_blank" class="lcard roxo"><div class="lcard-icon">📋</div><div class="lcard-info"><div class="lcard-title">Política de Privacidade</div><div class="lcard-desc">LGPD · Como seus dados são usados</div></div><span class="lcard-arrow">↗</span></a>
+  </div>
+  <div class="info-card">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--roxo);margin-bottom:.5rem;">Seja bem-vinda à <em style="color:var(--gold)">Conexão Psi</em> 💜</div>
+    <div style="font-size:.82rem;color:var(--text-dim);line-height:1.75;">Seu cadastro foi <strong>aprovado</strong>. Você agora faz parte de uma rede colaborativa de psis verificados.<br><br>Use este guia para navegar — links, perfil, premium e dúvidas em um só lugar.</div>
   </div>
 </div>
 
-<!-- ══ REDE / PSIMED ══ -->
-<div class="section" id="s-rede">
-  <div class="label" style="margin-top:1.4rem;">O que é a PsiMed Rede Colaborativa</div>
+<!-- ACESSOS -->
+<div class="section" id="s-acessos">
+  <div class="prod-hero prod-hero-roxo">
+    <div class="prod-icon">🔐</div>
+    <div>
+      <div class="prod-title" style="color:var(--roxo)">Acessos e Senhas</div>
+      <div class="prod-desc">Como entrar em cada área do sistema.</div>
+    </div>
+  </div>
+  <div class="label">Modo de acesso por área</div>
   <div class="info-card">
-    <div class="info-row"><span class="info-key">Acesso</span><span class="info-val"><span class="badge b-gold">Premium + aprovada</span></span></div>
-    <div class="info-row"><span class="info-key">Login</span><span class="info-val">E-mail cadastrado na rede</span></div>
-    <div class="info-row"><span class="info-key">Quem participa</span><span class="info-val">Psis + profissionais de saúde</span></div>
-    <div class="info-row"><span class="info-key">O que acontece lá</span><span class="info-val">Encaminhamentos cruzados anônimos</span></div>
+    <div class="info-row"><span class="info-key">✏️ Editar perfil</span><span class="info-val">E-mail do cadastro</span></div>
+    <div class="info-row"><span class="info-key">🤝 PsiMed</span><span class="info-val">E-mail do cadastro</span></div>
+    <div class="info-row"><span class="info-key">👥 Pacientes (psi)</span><span class="info-val">E-mail do cadastro</span></div>
+    <div class="info-row"><span class="info-key">👥 Pacientes (admin)</span><span class="info-val"><span class="senha-val" onclick="toggleSenha(this,'conexaopsi2026')">clique para ver</span></span></div>
+    <div class="info-row"><span class="info-key">👑 Painel Admin</span><span class="info-val"><span class="senha-val" onclick="toggleSenha(this,'hub2026')">clique para ver</span></span></div>
+    <div class="info-row"><span class="info-key">📊 Planejamento</span><span class="info-val"><span class="senha-val" onclick="toggleSenha(this,'plano2026')">clique para ver</span></span></div>
   </div>
-
-  <div class="label">Como funciona um encaminhamento</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Você indica um paciente</div><div class="step-desc">Descreve a demanda clínica sem dados pessoais identificáveis. A ética vem primeiro.</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Colegas veem a indicação</div><div class="step-desc">Profissionais da rede com o perfil adequado clicam "Tenho interesse".</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">A admin conecta</div><div class="step-desc">Você recebe o contato dos interessados via WhatsApp para combinar o encaminhamento.</div></div></div>
-  </div>
-
-  <div class="label">Acessar e indicar</div>
+  <div class="highlight"><strong>Dica:</strong> Psis entram em todas as áreas com o e-mail do cadastro — sem memorizar senhas.</div>
+  <div class="label">Links rápidos</div>
   <div class="links-grid">
-    <a href="met.html" target="_blank" class="lcard teal">
-      <div class="lcard-icon">🤝</div>
-      <div class="lcard-info"><div class="lcard-title">Entrar na PsiMed</div><div class="lcard-desc">Login com seu e-mail da rede</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="https://tally.so/r/gD46z1" target="_blank" class="lcard green">
-      <div class="lcard-icon">➕</div>
-      <div class="lcard-info"><div class="lcard-title">Indicar paciente</div><div class="lcard-desc">Formulário de encaminhamento</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
-      <div class="lcard-icon">💬</div>
-      <div class="lcard-info"><div class="lcard-title">Grupo da rede</div><div class="lcard-desc">WhatsApp — encaminhamentos e parcerias</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="planos.html" target="_blank" class="lcard gold">
-      <div class="lcard-icon">✨</div>
-      <div class="lcard-info"><div class="lcard-title">Não tem premium ainda?</div><div class="lcard-desc">Assinar para acessar a PsiMed</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
+    <a href="admin.html" target="_blank" class="lcard roxo"><div class="lcard-icon">👑</div><div class="lcard-info"><div class="lcard-title">Painel Admin</div><div class="lcard-desc">Aprovar cadastros e gerenciar membros</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="planejamento.html" target="_blank" class="lcard gold"><div class="lcard-icon">📊</div><div class="lcard-info"><div class="lcard-title">Planejamento estratégico</div><div class="lcard-desc">Visão de negócio e roadmap</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="documentacao_tecnica.html" target="_blank" class="lcard roxo"><div class="lcard-icon">📖</div><div class="lcard-info"><div class="lcard-title">Documentação técnica</div><div class="lcard-desc">Stack, banco e arquitetura</div></div><span class="lcard-arrow">↗</span></a>
+    <a href="termos_conexaopsi.html" target="_blank" class="lcard roxo"><div class="lcard-icon">📋</div><div class="lcard-info"><div class="lcard-title">Termos de uso</div><div class="lcard-desc">LGPD e termos para psis e médicos</div></div><span class="lcard-arrow">↗</span></a>
   </div>
 </div>
 
-<!-- ══ SENHAS ══ -->
-<div class="section" id="s-senhas">
-  <div class="label" style="margin-top:1.4rem;">Acessos e senhas da plataforma</div>
-  <div class="info-card">
-    <div class="info-row"><span class="info-key">🌐 Área interna (index.html)</span><span class="info-val"><span class="badge b-green">Acesso livre</span></span></div>
-    <div class="info-row"><span class="info-key">✏️ Editar perfil (perfil.html)</span><span class="info-val">E-mail do seu cadastro</span></div>
-    <div class="info-row"><span class="info-key">🤝 PsiMed (met.html)</span><span class="info-val">E-mail cadastrado + premium</span></div>
-    <div class="info-row"><span class="info-key">🔐 Área de pacientes</span><span class="info-val">E-mail do seu cadastro</span></div>
+<!-- COMO FUNCIONA -->
+<div class="section" id="s-fluxos">
+  <div class="prod-hero prod-hero-roxo">
+    <div class="prod-icon">🗺️</div>
+    <div>
+      <div class="prod-title" style="color:var(--roxo)">Como funciona</div>
+      <div class="prod-desc">Selecione um processo para ver o passo a passo em linguagem simples.</div>
+    </div>
   </div>
-
-  <div class="label">Acesso ao PsiMed não funciona?</div>
-  <div class="steps">
-    <div class="step"><div class="step-num">✓</div><div class="step-body"><div class="step-title">Verifique o e-mail</div><div class="step-desc">Use exatamente o mesmo e-mail que preencheu no formulário de cadastro. Sem espaços.</div></div></div>
-    <div class="step"><div class="step-num">✓</div><div class="step-body"><div class="step-title">Verifique se está aprovada</div><div class="step-desc">Seu cadastro precisa estar aprovado pela admin antes de acessar.</div></div></div>
-    <div class="step"><div class="step-num">✓</div><div class="step-body"><div class="step-title">Verifique se tem premium</div><div class="step-desc">A PsiMed é exclusiva para membros premium. Se ainda não assinou, use o link abaixo.</div></div></div>
-  </div>
-
-  <div class="links-grid" style="margin-top:1rem;">
-    <a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="lcard wa">
-      <div class="lcard-icon">💬</div>
-      <div class="lcard-info"><div class="lcard-title">Falar com a admin</div><div class="lcard-desc">Grupo WhatsApp da rede</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="lcard gold">
-      <div class="lcard-icon">✨</div>
-      <div class="lcard-info"><div class="lcard-title">Assinar premium</div><div class="lcard-desc">Cupom: <code>FUNDADORA</code></div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
-    <a href="politica_privacidade.html" target="_blank" class="lcard">
-      <div class="lcard-icon">🔒</div>
-      <div class="lcard-info"><div class="lcard-title">Política de Privacidade</div><div class="lcard-desc">LGPD · seus dados e direitos</div></div>
-      <div class="lcard-arrow">↗</div>
-    </a>
+  <div class="flow-tabs" id="ftabs"></div>
+  <div class="flow-card" id="flow-card">
+    <div class="flow-title" id="ftitle">—</div>
+    <div class="flow-desc" id="fdesc">—</div>
+    <div class="flow-steps" id="fsteps"></div>
   </div>
 </div>
 
 </div><!-- /wrap -->
-
-<!-- FLUXOS -->
-<div class="section" id="s-fluxos" style="display:none;">
-<div class="wrap" style="padding-top:1.4rem;">
-  <div class="info-card" style="margin-bottom:1.2rem;">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text);margin-bottom:.3rem;">Como funciona a rede</div>
-    <div style="font-size:.8rem;color:var(--text-dim);line-height:1.65;">Selecione um fluxo para ver o passo a passo de cada processo do sistema.</div>
-  </div>
-  <div id="ftabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;"></div>
-  <div class="info-card">
-    <div id="ftitle" style="font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:.3rem;"></div>
-    <div id="fdesc" style="font-size:.78rem;color:var(--text-dim);line-height:1.65;margin-bottom:1.1rem;"></div>
-    <svg id="fsvg" width="100%" style="overflow:visible;display:block;"></svg>
-  </div>
-</div>
-</div>
-
-<script>
-
-function show(id, btn) {
-  document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const el = document.getElementById('s-' + id);
-  if (el) { el.classList.add('active'); el.style.display='block'; }
-  btn.classList.add('active');
-  window.scrollTo({top: 0, behavior: 'smooth'});
-  if (id === 'fluxos') { setTimeout(()=>{ if(!window._fInit){ initFluxos(); window._fInit=true; } drawFluxo(window._fCur||0); }, 50); }
-}
-
-const FLUXOS = [
-  {label:'Cadastro psi', c:'#1B5E6B',
-   title:'1 — Cadastro e aprovação de psicóloga',
-   desc:'A psi preenche o formulário Tally → entra como pendente no banco → admin revisa no painel e aprova → aparece no diretório da rede.',
-   steps:[{t:'Tally b5OGYZ',s:'formulário público'},{t:'status: pendente',s:'INSERT em psis'},{t:'Admin aprova',s:'admin.html'},{t:'Aparece na rede',s:'index.html'}]},
-  {label:'Cadastro médico', c:'#2971B8',
-   title:'2 — Cadastro de profissional de saúde',
-   desc:'Admin envia o link cadastro_med.html via WhatsApp → prof. preenche o formulário nativo → INSERT em profissionais_saude com premium=true → admin aprova → acessa met.html.',
-   steps:[{t:'cadastro_med.html',s:'link via WhatsApp'},{t:'INSERT prof_saude',s:'premium=true'},{t:'Admin aprova',s:'admin.html'},{t:'Acessa met.html',s:'login por e-mail'}]},
-  {label:'Login PsiMed', c:'#5B3FA0',
-   title:'3 — Login no met.html',
-   desc:'Profissional digita o e-mail → sistema busca nas duas tabelas → verifica status=aprovado e premium=true → acesso liberado com nome e dados pré-preenchidos.',
-   steps:[{t:'Digita e-mail',s:'tela de login'},{t:'Busca no banco',s:'psis + prof_saude'},{t:'Aprovado + premium?',s:'verificação'},{t:'Acesso liberado',s:'app completo'}]},
-  {label:'Encaminhamento', c:'#C8934A',
-   title:'4 — Encaminhamento cruzado de paciente',
-   desc:'Profissional indica um paciente com perfil clínico anonimizado → outros registram interesse → admin libera contato entre as partes.',
-   steps:[{t:'Indica paciente',s:'met.html ou Tally'},{t:'Caso publicado',s:'enc_cruzados'},{t:'Registra interesse',s:'outro profissional'},{t:'Admin libera',s:'contato via WA'}]},
-  {label:'Solicitar meet', c:'#27ae60',
-   title:'5 — Solicitar meet entre profissionais',
-   desc:'Na aba Profissionais da rede, clica em Solicitar meet → preenche tipo e contexto clínico → INSERT em meet_requests → abre WhatsApp da receptora com mensagem estruturada.',
-   steps:[{t:'Profissionais da rede',s:'aba met.html'},{t:'Preenche modal',s:'tipo + contexto'},{t:'INSERT meet_requests',s:'status: pendente'},{t:'Abre WA receptora',s:'mensagem pronta'}]},
-  {label:'Receber meet', c:'#E8652A',
-   title:'6 — Receber e responder solicitação de meet',
-   desc:'Psi receptora vê as solicitações na aba Meets com badge contador → aceita (abre WA do solicitante) ou recusa → status atualizado no banco.',
-   steps:[{t:'Aba Meets',s:'badge contador'},{t:'Lê solicitação',s:'tipo + contexto'},{t:'Aceitar / recusar',s:'decisão'},{t:'Status atualizado',s:'banco de dados'}]},
-];
-
-window._fCur = 0;
-
-function initFluxos() {
-  const tabs = document.getElementById('ftabs');
-  tabs.innerHTML = FLUXOS.map((f,i) =>
-    `<button onclick="drawFluxo(${i})" id="ftab${i}" style="
-      padding:5px 13px;border-radius:999px;border:1.5px solid ${f.c};
-      background:transparent;color:${f.c};font-family:'Outfit',sans-serif;
-      font-size:0.72rem;font-weight:600;cursor:pointer;transition:all .15s;
-    ">${f.label}</button>`
-  ).join('');
-}
-
-function drawFluxo(i) {
-  window._fCur = i;
-  const f = FLUXOS[i];
-  document.querySelectorAll('#ftabs button').forEach((b,j) => {
-    b.style.background = j===i ? FLUXOS[j].c : 'transparent';
-    b.style.color = j===i ? '#fff' : FLUXOS[j].c;
-  });
-  document.getElementById('ftitle').textContent = f.title;
-  document.getElementById('fdesc').textContent = f.desc;
-  const svg = document.getElementById('fsvg');
-  const n = f.steps.length;
-  const bw = 128, bh = 52, pad = 8;
-  const W = 560;
-  const gap = Math.floor((W - pad*2 - n*bw) / (n-1));
-  const H = bh + 20;
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  let out = `<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
-  f.steps.forEach((step, j) => {
-    const x = pad + j*(bw+gap), y = 8;
-    const cx = x+bw/2;
-    const last = j===n-1;
-    const fill = last ? f.c+'25' : '#faf8f5';
-    const sw = last ? 2 : 1;
-    out += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="${last ? f.c+'20' : '#ffffff'}" stroke="${f.c}" stroke-width="${last ? 2 : 1.5}"/>`;
-    out += `<text x="${cx}" y="${y+17}" text-anchor="middle" dominant-baseline="central" font-family="Outfit,sans-serif" font-size="11.5" font-weight="600" fill="${f.c}">${step.t}</text>`;
-    out += `<text x="${cx}" y="${y+35}" text-anchor="middle" dominant-baseline="central" font-family="Outfit,sans-serif" font-size="10.5" fill="#6b7280">${step.s}</text>`;
-    if (j < n-1) {
-      const ax1=x+bw+2, ax2=x+bw+gap-2, ay=y+bh/2;
-      out += `<line x1="${ax1}" y1="${ay}" x2="${ax2}" y2="${ay}" stroke="${f.c}" stroke-width="1.5" marker-end="url(#ar2)"/>`;
-    }
-  });
-  svg.innerHTML = out;
-}
-
-
-</script>
 
 <div class="footer">
   <div class="footer-brand">Conexão <em>Psi</em></div>
@@ -659,8 +334,67 @@ function drawFluxo(i) {
     <a href="divulgacao.html" target="_blank">Diretório Premium</a>
     <a href="https://wa.me/5511947388423" target="_blank">Falar com a admin</a>
   </div>
-  <div class="footer-copy">Rede colaborativa de psicólogos · 2026 · LGPD Lei nº 13.709/2018</div>
+  <div class="footer-copy">Rede colaborativa de profissionais de saúde · 2026 · LGPD Lei nº 13.709/2018</div>
 </div>
 
+<script>
+function show(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('s-'+id);
+  if(el) el.classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='fluxos') setTimeout(initFluxos,50);
+}
+
+function toggleSenha(el,val){
+  el.dataset.shown=el.dataset.shown==='1'?'0':'1';
+  el.textContent=el.dataset.shown==='1'?val:'clique para ver';
+  el.style.color=el.dataset.shown==='1'?'var(--roxo)':'';
+  el.style.fontWeight=el.dataset.shown==='1'?'600':'';
+}
+
+const FLUXOS=[
+  {label:'Entrar na rede',cor:'#3B2E8A',
+   title:'Como uma psi entra na Conexão Psi',
+   desc:'Você preenche o formulário de cadastro. A admin analisa seu perfil, verifica o CRP e aprova. Só então você aparece no diretório da rede.',
+   steps:[{e:'📝',t:'Preenche o cadastro',s:'formulário online'},{e:'⏳',t:'Aguarda aprovação',s:'admin verifica CRP'},{e:'✅',t:'Cadastro aprovado',s:'perfil ativo'},{e:'🔍',t:'Aparece na rede',s:'visível para colegas'}]},
+  {label:'Acessar PsiMed',cor:'#1B5E6B',
+   title:'Como acessar a PsiMed',
+   desc:'A PsiMed é exclusiva para psis e profissionais de saúde com plano premium. O acesso é feito pelo e-mail — sem senha para memorizar.',
+   steps:[{e:'🌐',t:'Abre met.html',s:'no navegador'},{e:'📧',t:'Digita seu e-mail',s:'o mesmo do cadastro'},{e:'🔑',t:'Sistema reconhece você',s:'verifica aprovação'},{e:'🤝',t:'Acesso liberado',s:'todas as funcionalidades'}]},
+  {label:'Indicar paciente',cor:'#1B5E6B',
+   title:'Como encaminhar um paciente',
+   desc:'Quando você tem um paciente que precisa de outro profissional, pode indicá-lo na PsiMed de forma anônima. A admin coordena o encaminhamento.',
+   steps:[{e:'👤',t:'Você descreve o caso',s:'sem dados pessoais'},{e:'👀',t:'Colegas demonstram interesse',s:'na área de pacientes'},{e:'🔄',t:'Admin coordena',s:'escolhe o melhor psi'},{e:'📲',t:'Contato liberado',s:'via WhatsApp'}]},
+  {label:'Solicitar meet',cor:'#1B5E6B',
+   title:'Como conversar com um colega da rede',
+   desc:'Na lista de profissionais da PsiMed, você encontra colegas e pode pedir uma conversa clínica para troca de caso ou parceria.',
+   steps:[{e:'👥',t:'Abre lista de colegas',s:'aba Profissionais'},{e:'✉️',t:'Solicita um meet',s:'descreve o contexto'},{e:'🔔',t:'Colega recebe',s:'notificação no sistema'},{e:'💬',t:'Conversa por WA',s:'se aceitar'}]},
+  {label:'Virar Premium',cor:'#C8934A',
+   title:'Como ativar o plano Premium',
+   desc:'O Premium aparece seu perfil para pacientes no diretório público e dá acesso à PsiMed. A ativação é feita pela admin após confirmação do pagamento.',
+   steps:[{e:'💳',t:'Assina pelo link',s:'checkout online'},{e:'📩',t:'Avisa a admin',s:'confirma o pagamento'},{e:'⚙️',t:'Admin ativa',s:'premium liberado'},{e:'✨',t:'Perfil em destaque',s:'visível para pacientes'}]},
+];
+
+let fInit=false;
+function initFluxos(){
+  if(fInit) return; fInit=true;
+  const tabs=document.getElementById('ftabs');
+  tabs.innerHTML=FLUXOS.map((f,i)=>`<button class="ftab" id="ftab${i}" onclick="drawFluxo(${i})" style="border-color:${f.cor};color:${f.cor};">${f.label}</button>`).join('');
+  drawFluxo(0);
+}
+function drawFluxo(i){
+  const f=FLUXOS[i];
+  document.querySelectorAll('.ftab').forEach((b,j)=>{b.style.background=j===i?FLUXOS[j].cor:'var(--card-bg)';b.style.color=j===i?'#fff':FLUXOS[j].cor;});
+  document.getElementById('ftitle').textContent=f.title;
+  document.getElementById('fdesc').textContent=f.desc;
+  document.getElementById('flow-card').style.borderLeftColor=f.cor;
+  document.getElementById('fsteps').innerHTML=f.steps.map((s,j)=>`
+    <div class="flow-step${j===f.steps.length-1?' last':''}"><div class="fse">${s.e}</div><div class="fst">${s.t}</div><div class="fss">${s.s}</div></div>
+    ${j<f.steps.length-1?`<div class="flow-arrow" style="color:${f.cor}">›</div>`:''}`).join('');
+}
+</script>
 </body>
 </html>
