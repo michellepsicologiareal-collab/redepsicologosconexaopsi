@@ -714,7 +714,7 @@ function renderPsis() {
   const todos = [...todosPsis, ...todosMeds];
   renderPsiGrid('pend',  todos.filter(p => (p.status||'').toLowerCase() === 'pendente'));
   renderPsiGrid('aprov', todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
-  renderPsiGrid('prem',  todos.filter(p => p.premium === true));
+  renderPsiGrid('prem',  todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
   renderPsiGrid('todos', todos);
 }
 
@@ -737,7 +737,7 @@ function filtrarAba(sufixo) {
   const todos = [...todosPsis, ...todosMeds];
   const mapaFiltro = {
     aprov: p => (p.status||'').toLowerCase() === 'aprovado',
-    prem:  p => p.premium === true,
+    prem:  p => (p.status||'').toLowerCase() === 'aprovado',
     pend:  p => (p.status||'').toLowerCase() === 'pendente',
   };
   const lista = todos.filter(p => {
@@ -758,7 +758,7 @@ function buscarGlobal() {
   const mapaFiltro = {
     pendentes: p => (p.status||'').toLowerCase() === 'pendente',
     aprovados: p => (p.status||'').toLowerCase() === 'aprovado',
-    premium:   p => p.premium === true,
+    premium:   p => (p.status||'').toLowerCase() === 'aprovado',
     todos:     ()=> true
   };
   const filtroBase = mapaFiltro[abaAtiva] || (()=>true);

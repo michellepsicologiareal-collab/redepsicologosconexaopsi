@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conexão Psi — Rede de Encaminhamentos</title>
+<title>Conexão Psi — Pacientes</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -77,7 +77,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
 .p-disponivel{background:#e9f7ef;color:#27ae60;}
 .p-interessados{background:#fef6ec;color:#b7600a;}
-.p-em_atendimento{background:linear-gradient(135deg,#fff8ee,#fffaf0);color:#b8730a;border:1px solid rgba(200,147,74,.3);}
+.p-em_atendimento{background:#eaf2fc;color:#2980b9;}
 .p-concluido{background:#f3eefa;color:#8e44ad;}
 .p-declinou{background:#f4f4f5;color:#7f8c8d;}
 .bdel{background:none;border:none;cursor:pointer;color:#ddd;font-size:13px;padding:2px;}
@@ -86,42 +86,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .info div{display:flex;align-items:flex-start;gap:6px;}
 .crp-tag{font-size:11px;color:var(--muted);}
 
-/* ── Match Clínico ── */
-.match-box{background:linear-gradient(135deg,rgba(27,94,166,.06) 0%,rgba(200,147,74,.06) 100%);border:1.5px solid rgba(27,94,166,.18);border-radius:11px;padding:11px 13px;position:relative;overflow:hidden;}
-.match-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--azul),var(--gold));}
-.match-header{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-.match-icon{width:22px;height:22px;background:linear-gradient(135deg,var(--azul),var(--gold));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
-.match-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--azul);}
-.match-count{font-size:10px;color:var(--muted);margin-left:auto;}
-.match-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(27,94,166,.1),rgba(200,147,74,.1));border:1px solid rgba(27,94,166,.2);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700;color:var(--azul);letter-spacing:.5px;}
-
-/* Substitui int-box para psis interessados */
 .int-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
 .int-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
-/* Seleção manual de psi no Match Clínico */
-.psi-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
+.psi-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
 .psi-item:last-child{border:none;}
 .psi-nome{font-size:12px;color:var(--azul);font-weight:600;}
 .psi-reg{font-size:11px;color:var(--muted);}
 .btn-wa-psi{padding:3px 8px;background:#128C7E;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
-
-.psi-item.psi-selecionado{background:linear-gradient(135deg,rgba(200,147,74,.08),rgba(27,94,166,.05));border-radius:8px;padding:6px 8px;margin:0 -8px;border-bottom:none;}
-.psi-item.psi-selecionado + .psi-item{border-top:1px solid var(--border);}
-.psi-sel-badge{font-size:10px;font-weight:700;color:#b8730a;background:rgba(200,147,74,.15);border:1px solid rgba(200,147,74,.3);border-radius:999px;padding:2px 8px;white-space:nowrap;}
-.btn-sel-psi{padding:3px 9px;background:var(--azul);color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
-.btn-sel-psi:hover{background:var(--azul-mid);}
-.btn-dessel-psi{padding:3px 9px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
-.psi-actions-row{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-
-/* Card com match confirmado */
-.card.s-em_atendimento{border-top-color:var(--gold);}
-.match-confirmed-tag{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#fff8ee,#fffaf0);border:1.5px solid var(--gold);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#b8730a;margin-bottom:2px;}
-
-/* Botão Match Clínico (substitui "Tenho interesse") */
-.bint-match{width:100%;padding:10px;background:linear-gradient(135deg,var(--azul),var(--azul-mid));color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
-.bint-match:hover{background:linear-gradient(135deg,var(--azul-mid),var(--azul-deep));transform:translateY(-1px);box-shadow:0 4px 14px rgba(27,94,166,.25);}
-.bint-match:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
-.bint-match-ok{width:100%;padding:9px;background:linear-gradient(135deg,#e8f7ee,#d4f0e0);color:#1a7a4a;border:1.5px solid rgba(27,174,96,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:default;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
 
 .cf-form{background:#f0f4ff;border:1px solid rgba(27,94,166,.2);border-radius:10px;padding:12px 14px;margin-top:4px;}
 .cf-form label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px;}
@@ -165,7 +136,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 <div id="login">
   <div class="login-wrap">
     <div class="login-title">Conexão <em>Psi</em></div>
-    <div class="login-sub">Rede de Encaminhamentos</div>
+    <div class="login-sub">Gestão de Pacientes</div>
     <div class="login-card">
       <h2>Área Psi</h2>
       <p>Psis entram com e-mail da rede. Admin usa a senha do painel.</p>
@@ -194,7 +165,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
     <div class="topbar-inner">
       <div>
         <div class="topbar-brand">Conexão <em>Psi</em></div>
-        <div class="topbar-sub">Rede de Encaminhamentos</div>
+        <div class="topbar-sub">Gestão de Pacientes</div>
       </div>
       <div class="topbar-right">
         <span class="topbar-chip" id="chip">—</span>
@@ -203,8 +174,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
     </div>
     <div class="tabs-bar">
       <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel"></span></button>
-      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Candidatos <span class="badge" id="n-interessados" style="background:#e67e22;"></span></button>
-      <button class="tab" onclick="mudarAba('em_atendimento',this)">✦ Match Clínico <span class="badge" id="n-em_atendimento" style="background:var(--gold);color:#fff;"></span></button>
+      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados" style="background:#e67e22;"></span></button>
+      <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento" style="background:#2980b9;"></span></button>
       <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido" style="background:#8e44ad;"></span></button>
       <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou" style="background:#7f8c8d;"></span></button>
       <button class="tab" onclick="mudarAba('historico',this)">📊 Relatório</button>
@@ -288,12 +259,12 @@ async function carregarElegiveis(){
   if(profissionaisElegiveis.length) return;
   try{
     const [psis,meds] = await Promise.all([
-      api('GET','psis?select=nome,crp,whatsapp&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=200'),
-      api('GET','profissionais_saude?select=nome,registro,tipo,whatsapp&premium=is.true&status=ilike.aprovado&order=nome.asc&limit=200')
+      api('GET','psis?select=nome,crp,whatsapp,premium&status=ilike.aprovado&order=nome.asc&limit=200'),
+      api('GET','profissionais_saude?select=nome,registro,tipo,whatsapp,premium&status=ilike.aprovado&order=nome.asc&limit=200')
     ]);
     profissionaisElegiveis = [
-      ...(psis||[]).map(x=>({nome:x.nome,crp:x.crp,wa:x.whatsapp,tipo:'🧠'})),
-      ...(meds||[]).map(x=>({nome:x.nome,crp:x.registro,wa:x.whatsapp,tipo:'🏥'}))
+      ...(psis||[]).map(x=>({nome:x.nome,crp:x.crp,wa:x.whatsapp,tipo:x.premium?'🧠✨':'🧠'})),
+      ...(meds||[]).map(x=>({nome:x.nome,crp:x.registro,wa:x.whatsapp,tipo:x.premium?'🏥✨':'🏥'}))
     ].sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   }catch(e){console.warn('elegíveis:',e.message);}
 }
@@ -349,7 +320,7 @@ async function carregar(){
   document.getElementById('loading').style.display='none';
 }
 
-const SL={disponivel:'🟢 Disponível',interessados:'🟡 Candidatos',em_atendimento:'✦ Match Clínico',concluido:'✅ Concluído',declinou:'⚫ Declinou'};
+const SL={disponivel:'🟢 Disponível',interessados:'🟡 Com interesse',em_atendimento:'🔵 Em atendimento',concluido:'✅ Concluído',declinou:'⚫ Declinou'};
 
 function render(){
   const busca=(document.getElementById('busca')?.value||'').toLowerCase();
@@ -368,80 +339,21 @@ function render(){
     const statusEl=perfil==='admin'
       ?`<select class="ssel" onchange="mudarStatus('${p.id}',this.value)">
           <option value="disponivel"${p.status==='disponivel'?' selected':''}>🟢 Disponível</option>
-          <option value="interessados"${p.status==='interessados'?' selected':''}>🟡 Candidatos</option>
-          <option value="em_atendimento"${p.status==='em_atendimento'?' selected':''}>✦ Match Clínico</option>
+          <option value="interessados"${p.status==='interessados'?' selected':''}>🟡 Com interesse</option>
+          <option value="em_atendimento"${p.status==='em_atendimento'?' selected':''}>🔵 Em atendimento</option>
           <option value="concluido"${p.status==='concluido'?' selected':''}>✅ Concluído</option>
           <option value="declinou"${p.status==='declinou'?' selected':''}>⚫ Declinou</option>
         </select>`
       :`<span class="pill p-${p.status}">${SL[p.status]||p.status}</span>`;
 
     let intBox='';
-    const psiSelecionado = p.psi_match_selecionado || null;
-    const isMatch = p.status==='em_atendimento';
-
-    if(isMatch && perfil==='admin'){
-      // ── MODO MATCH CLÍNICO: sempre mostra o box para admin ──
-      const matchLabel = psiSelecionado
-        ? `<div class="match-confirmed-tag">✦ Match Clínico confirmado</div>`
-        : `<div style="font-size:11px;color:#b8730a;background:rgba(200,147,74,.08);border-radius:7px;padding:5px 9px;margin-bottom:6px;">⚠️ Selecione o psi para o match</div>`;
-
-      // Candidatos que se inscreveram
-      const candidatosHtml = ints.length>0 ? ints.map(x=>{
-        const wa=(x.wa||'').replace(/\D/g,'');
-        const isSel = psiSelecionado === x.crp;
-        const selBadge = isSel ? `<span class="psi-sel-badge">✦ No Match</span>` : '';
-        const btn = isSel
-          ? `<button class="btn-dessel-psi" onclick="deselecionarPsi('${p.id}')">✕</button>`
-          : `<button class="btn-sel-psi" onclick="selecionarPsi('${p.id}','${(x.nome||'').replace(/'/g,'')}','${x.crp||''}','${wa}')">Selecionar</button>`;
-        return`<div class="psi-item${isSel?' psi-selecionado':''}">
-          <div><div class="psi-nome">${x.nome||'—'} ${selBadge}</div><div class="psi-reg">${x.crp||'—'}</div></div>
-          <div class="psi-actions-row">${btn}</div>
-        </div>`;
-      }).join('') : `<div style="font-size:11px;color:var(--muted);padding:4px 0 8px;">Nenhum candidato — selecione manualmente abaixo</div>`;
-
-      // Seleção manual da base (sempre visível no match)
-      const manualHtml = `
-        <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Selecionar da base</div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <select id="match-sel-${p.id}" style="flex:1;font-size:12px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;outline:none;background:var(--white);">
-              <option value="">— Escolher profissional —</option>
-              ${profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp||''}|${(x.wa||'').replace(/\D/g,'')}">${x.tipo} ${x.nome}${x.crp?' ('+x.crp+')':''}</option>`).join('')}
-            </select>
-            <button class="btn-sel-psi" onclick="selecionarDaBase('${p.id}')">✦ Selecionar</button>
-          </div>
-        </div>`;
-
-      intBox=`<div class="match-box">
-        <div class="match-header">
-          <div class="match-icon">✦</div>
-          <div class="match-title">Match Clínico${ints.length>0?` · ${ints.length} candidato${ints.length>1?'s':''}`:''}  </div>
-        </div>
-        ${matchLabel}
-        ${candidatosHtml}
-        ${manualHtml}
-      </div>`;
-
-    } else if(ints.length>0){
-      // ── MODO CANDIDATOS (disponivel/interessados): lista simples ──
+    if(ints.length>0){
       const items=ints.map(x=>{
         const wa=(x.wa||'').replace(/\D/g,'');
-        const waBtn = perfil==='admin' && wa
-          ? `<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`
-          : '';
-        return`<div class="psi-item">
-          <div><div class="psi-nome">${x.nome||'—'}</div><div class="psi-reg">${x.crp||'—'}</div></div>
-          <div class="psi-actions-row">${waBtn}</div>
-        </div>`;
+        const waBtn=wa?`<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`:'';
+        return`<div class="psi-item"><div><div class="psi-nome">${x.nome||'—'}</div><div class="psi-reg">${x.crp||'—'}</div></div>${waBtn}</div>`;
       }).join('');
-      intBox=`<div class="match-box">
-        <div class="match-header">
-          <div class="match-icon">✦</div>
-          <div class="match-title">Candidatos ao Match</div>
-          <div class="match-count">${ints.length}/${MAX_INT}</div>
-        </div>
-        ${items}
-      </div>`;
+      intBox=`<div class="int-box"><div class="int-title">Psis interessados (${ints.length}/${MAX_INT})</div>${items}</div>`;
     }
 
     const extra=`
@@ -471,7 +383,7 @@ function render(){
 
     const cfForm=perfil==='admin'?`
       <div class="cf-form" id="cf-${p.id}" style="display:none;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:10px;">✦ Registrar desfecho do Match Clínico</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:10px;">📋 Registrar desfecho</div>
 
         <label>Indicar psi manualmente</label>
         <select id="cf-psi-sel-${p.id}" onchange="preencherPsiManual('${p.id}')">
@@ -480,9 +392,9 @@ function render(){
         </select>
 
         <label>Nome do psi (ou confirme o selecionado)</label>
-        <input id="cf-psi-${p.id}" placeholder="Nome do profissional" value="${p.psi_match_nome?p.psi_match_nome.replace(/"/g,'&quot;'):''}">
+        <input id="cf-psi-${p.id}" placeholder="Nome do profissional">
         <label>CRP</label>
-        <input id="cf-crp-${p.id}" placeholder="CRP" value="${p.psi_match_selecionado||''}">
+        <input id="cf-crp-${p.id}" placeholder="CRP">
         <label>Valor da sessão</label>
         <input id="cf-valor-${p.id}" placeholder="Ex: R$ 150">
         <label>Desfecho</label>
@@ -503,12 +415,12 @@ function render(){
     let acts='';
     if(perfil==='psi'){
       if(p.status==='disponivel'||p.status==='interessados'){
-        if(jaInt) acts=`<div class="bint-match-ok">✦ Match Clínico solicitado</div><button class="bdec-btn" onclick="cancelarInt('${p.id}')">Cancelar solicitação</button>`;
-        else if(cheio) acts=`<button class="bint-match" disabled>✦ Vagas esgotadas</button>`;
-        else acts=`<button class="bint-match" onclick="registrarInt('${p.id}')">✦ Solicitar Match Clínico</button>`;
+        if(jaInt) acts=`<button class="bint" disabled>✅ Interesse registrado</button><button class="bdec-btn" onclick="cancelarInt('${p.id}')">Cancelar interesse</button>`;
+        else if(cheio) acts=`<button class="bint" disabled>Vagas esgotadas</button>`;
+        else acts=`<button class="bint" onclick="registrarInt('${p.id}')">Tenho interesse</button>`;
       }
     } else if(perfil==='admin'){
-      const waBtn=ints.length>0?`<button class="bwa" onclick="waParaTodos('${p.id}')">📲 Notificar candidatos</button>`:'';
+      const waBtn=ints.length>0?`<button class="bwa" onclick="waParaTodos('${p.id}')">📲 Notificar todos</button>`:'';
       const fimBtn=p.status==='em_atendimento'||p.status==='interessados'?`<button class="bfim" onclick="abrirCF('${p.id}')">📋 Registrar desfecho</button>`:'';
       acts=`<div class="brow">${waBtn}${fimBtn}</div>`;
     }
@@ -547,9 +459,9 @@ async function registrarInt(id){
     if(ints.length===1) p.reservado_em=reservaPatch.reservado_em;
     badges();render();
     // Notifica admin
-    const msg=encodeURIComponent(`✦ *Novo Match Clínico — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total candidatos:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar o Match Clínico.`);
+    const msg=encodeURIComponent(`🔔 *Novo interesse — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar.`);
     window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`,'_blank');
-    toast('✦ Match Clínico solicitado! Admin notificada.');
+    toast('✅ Interesse registrado! Admin notificada.');
   }catch(e){toast('Erro: '+e.message);}
 }
 
@@ -561,7 +473,7 @@ async function cancelarInt(id){
     const s=ints.length>0?'interessados':'disponivel';
     await api('PATCH',`pacientes?id=eq.${id}`,{interessados:JSON.stringify(ints),status:s});
     p.interessados=JSON.stringify(ints);p.status=s;
-    badges();render();toast('Solicitação de Match Clínico cancelada.');
+    badges();render();toast('Interesse cancelado.');
   }catch(e){toast('Erro: '+e.message);}
 }
 
@@ -569,19 +481,19 @@ function waParaTodos(id){
   const p=todos.find(x=>x.id===id);
   if(!p) return;
   const ints=p.interessados?JSON.parse(p.interessados):[];
-  if(!ints.length){toast('Nenhum candidato ainda.');return;}
+  if(!ints.length){toast('Nenhum psi interessado ainda.');return;}
   const nomes=ints.map((x,i)=>`${i+1}. ${x.nome} (${x.crp||'—'})`).join('\n');
-  const msg=encodeURIComponent(`*✦ Conexão Psi — Match Clínico disponível*\n\n🧠 ${p.demanda||'—'}\n👥 ${p.publico||'—'}\n📋 ${p.formato||'—'}\n📍 ${p.cidade||'—'}\n💰 ${p.valor||'—'}\n\n*Candidatos ao Match:*\n${nomes}\n\n_Entre em contato com o paciente e confirme o Match Clínico no sistema._`);
+  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente disponível*\n\n🧠 ${p.demanda||'—'}\n👥 ${p.publico||'—'}\n📋 ${p.formato||'—'}\n📍 ${p.cidade||'—'}\n💰 ${p.valor||'—'}\n\n*Psis interessados:*\n${nomes}\n\n_Entre em contato com o paciente e confirme no sistema._`);
   ints.forEach((x,i)=>{
     const wa=(x.wa||'').replace(/\D/g,'');
     if(wa) setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),i*800);
   });
-  toast(`📲 Notificando ${ints.length} candidato(s)...`);
+  toast(`📲 Notificando ${ints.length} psi(s)...`);
 }
 
 function waParaPsi(wa,id,nome){
   const p=todos.find(x=>x.id===id);
-  const msg=encodeURIComponent(`*✦ Conexão Psi — Match Clínico para você*\n\nOlá ${nome?.split(' ')[0]}! A admin confirmou seu Match Clínico com este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
+  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente para você*\n\nOlá ${nome?.split(' ')[0]}! A admin liberou este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
   window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank');
 }
 
@@ -668,43 +580,6 @@ function renderHistorico(){
       const sc=p.status==='concluido'?'background:#edf7f3;color:#1a7a4a;':'background:#fdecea;color:#c0392b;';
       return`<div class="hist-item"><span class="hist-status" style="${sc}">${SL[p.status]||p.status}</span><div class="hist-info"><div class="hist-demanda">${p.demanda||'—'}</div><div class="hist-meta">${p.psi_atendeu?`👤 ${p.psi_atendeu}<br>`:''}${p.valor_final?`💰 ${p.valor_final}<br>`:''}${p.desfecho_obs?`📝 ${p.desfecho_obs}`:''}</div></div><span class="hist-date">${dt}</span></div>`;
     }).join(''):`<div class="empty"><div class="empty-icon">📊</div><p>Nenhum histórico ainda</p></div>`}`;
-}
-
-async function selecionarDaBase(id){
-  const sel = document.getElementById('match-sel-'+id);
-  const val = sel?.value||'';
-  if(!val){toast('Escolha um profissional primeiro.');return;}
-  const [nome,crp,wa] = val.split('|');
-  await selecionarPsi(id, nome, crp, wa);
-}
-
-async function selecionarPsi(id, nome, crp, wa){
-  try{
-    const r = await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:crp, psi_match_nome:nome, psi_match_wa:wa});
-    const p=todos.find(x=>x.id===id);
-    if(p){p.psi_match_selecionado=crp; p.psi_match_nome=nome; p.psi_match_wa=wa;}
-    render();
-    toast(`✦ ${nome.split(' ')[0]} selecionado(a) para o Match!`);
-    // Só abre WA depois de confirmar que salvou
-    if(wa){
-      const pac=todos.find(x=>x.id===id);
-      const msg=encodeURIComponent(`✦ *Conexão Psi — Você foi selecionado(a) para um Match Clínico!*\n\nOlá ${nome.split(' ')[0]}! A admin selecionou você para atender este paciente:\n\n🧠 ${pac?.demanda||'—'}\n📍 ${pac?.cidade||'—'}\n💰 ${pac?.valor||'—'}\n\n_Entre em contato com a admin para prosseguir._`);
-      setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),800);
-    }
-  }catch(e){
-    console.error('selecionarPsi erro:', e);
-    toast('❌ Erro ao salvar: '+e.message);
-  }
-}
-
-async function deselecionarPsi(id){
-  try{
-    await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:null, psi_match_nome:null, psi_match_wa:null});
-    const p=todos.find(x=>x.id===id);
-    if(p){delete p.psi_match_selecionado; delete p.psi_match_nome; delete p.psi_match_wa;}
-    render();
-    toast('Seleção removida.');
-  }catch(e){toast('Erro: '+e.message);}
 }
 
 function toast(msg){
