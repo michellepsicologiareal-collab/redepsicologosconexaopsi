@@ -98,11 +98,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 /* Substitui int-box para psis interessados */
 .int-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
 .int-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
-.psi-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
+/* Seleção manual de psi no Match Clínico */
+.psi-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
 .psi-item:last-child{border:none;}
 .psi-nome{font-size:12px;color:var(--azul);font-weight:600;}
 .psi-reg{font-size:11px;color:var(--muted);}
 .btn-wa-psi{padding:3px 8px;background:#128C7E;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+.psi-item.psi-selecionado{background:linear-gradient(135deg,rgba(200,147,74,.08),rgba(27,94,166,.05));border-radius:8px;padding:6px 8px;margin:0 -8px;border-bottom:none;}
+.psi-item.psi-selecionado + .psi-item{border-top:1px solid var(--border);}
+.psi-sel-badge{font-size:10px;font-weight:700;color:#b8730a;background:rgba(200,147,74,.15);border:1px solid rgba(200,147,74,.3);border-radius:999px;padding:2px 8px;white-space:nowrap;}
+.btn-sel-psi{padding:3px 9px;background:var(--azul);color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
+.btn-sel-psi:hover{background:var(--azul-mid);}
+.btn-dessel-psi{padding:3px 9px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.psi-actions-row{display:flex;align-items:center;gap:5px;flex-shrink:0;}
 
 /* Card com match confirmado */
 .card.s-em_atendimento{border-top-color:var(--gold);}
@@ -359,8 +368,8 @@ function render(){
     const statusEl=perfil==='admin'
       ?`<select class="ssel" onchange="mudarStatus('${p.id}',this.value)">
           <option value="disponivel"${p.status==='disponivel'?' selected':''}>🟢 Disponível</option>
-          <option value="interessados"${p.status==='interessados'?' selected':''}>🟡 Com interesse</option>
-          <option value="em_atendimento"${p.status==='em_atendimento'?' selected':''}>🔵 Em atendimento</option>
+          <option value="interessados"${p.status==='interessados'?' selected':''}>🟡 Candidatos</option>
+          <option value="em_atendimento"${p.status==='em_atendimento'?' selected':''}>✦ Match Clínico</option>
           <option value="concluido"${p.status==='concluido'?' selected':''}>✅ Concluído</option>
           <option value="declinou"${p.status==='declinou'?' selected':''}>⚫ Declinou</option>
         </select>`
@@ -368,18 +377,32 @@ function render(){
 
     let intBox='';
     if(ints.length>0){
+      const psiSelecionado = p.psi_match_selecionado || null;
+      const isMatch = p.status==='em_atendimento';
       const items=ints.map(x=>{
         const wa=(x.wa||'').replace(/\D/g,'');
         const waBtn=wa?`<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`:'';
-        return`<div class="psi-item"><div><div class="psi-nome">${x.nome||'—'}</div><div class="psi-reg">${x.crp||'—'}</div></div>${waBtn}</div>`;
+        const isSel = psiSelecionado && psiSelecionado === x.crp;
+        const selBtn = perfil==='admin' && isMatch
+          ? isSel
+            ? `<button class="btn-dessel-psi" onclick="deselecionarPsi('${p.id}')">✕</button>`
+            : `<button class="btn-sel-psi" onclick="selecionarPsi('${p.id}','${(x.nome||'').replace(/'/g,'')}','${x.crp||''}','${wa}')">Selecionar</button>`
+          : waBtn;
+        const selBadge = isSel ? `<span class="psi-sel-badge">✦ No Match</span>` : '';
+        return`<div class="psi-item${isSel?' psi-selecionado':''}">
+          <div><div class="psi-nome">${x.nome||'—'} ${selBadge}</div><div class="psi-reg">${x.crp||'—'}</div></div>
+          <div class="psi-actions-row">${perfil==='admin'&&!isMatch?waBtn:''}${selBtn}</div>
+        </div>`;
       }).join('');
-      const matchLabel = p.status==='em_atendimento'
+      const matchLabel = isMatch && psiSelecionado
         ? `<div class="match-confirmed-tag">✦ Match Clínico confirmado</div>`
+        : isMatch && !psiSelecionado
+        ? `<div style="font-size:11px;color:#b8730a;background:rgba(200,147,74,.08);border-radius:7px;padding:5px 9px;margin-bottom:4px;">⚠️ Selecione o psi para o match</div>`
         : '';
       intBox=`<div class="match-box">
         <div class="match-header">
           <div class="match-icon">✦</div>
-          <div class="match-title">Candidatos ao Match</div>
+          <div class="match-title">${isMatch?'Match Clínico':'Candidatos ao Match'}</div>
           <div class="match-count">${ints.length}/${MAX_INT}</div>
         </div>
         ${matchLabel}
@@ -423,9 +446,9 @@ function render(){
         </select>
 
         <label>Nome do psi (ou confirme o selecionado)</label>
-        <input id="cf-psi-${p.id}" placeholder="Nome do profissional">
+        <input id="cf-psi-${p.id}" placeholder="Nome do profissional" value="${p.psi_match_nome?p.psi_match_nome.replace(/"/g,'&quot;'):''}">
         <label>CRP</label>
-        <input id="cf-crp-${p.id}" placeholder="CRP">
+        <input id="cf-crp-${p.id}" placeholder="CRP" value="${p.psi_match_selecionado||''}">
         <label>Valor da sessão</label>
         <input id="cf-valor-${p.id}" placeholder="Ex: R$ 150">
         <label>Desfecho</label>
@@ -611,6 +634,32 @@ function renderHistorico(){
       const sc=p.status==='concluido'?'background:#edf7f3;color:#1a7a4a;':'background:#fdecea;color:#c0392b;';
       return`<div class="hist-item"><span class="hist-status" style="${sc}">${SL[p.status]||p.status}</span><div class="hist-info"><div class="hist-demanda">${p.demanda||'—'}</div><div class="hist-meta">${p.psi_atendeu?`👤 ${p.psi_atendeu}<br>`:''}${p.valor_final?`💰 ${p.valor_final}<br>`:''}${p.desfecho_obs?`📝 ${p.desfecho_obs}`:''}</div></div><span class="hist-date">${dt}</span></div>`;
     }).join(''):`<div class="empty"><div class="empty-icon">📊</div><p>Nenhum histórico ainda</p></div>`}`;
+}
+
+async function selecionarPsi(id, nome, crp, wa){
+  try{
+    await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:crp, psi_match_nome:nome, psi_match_wa:wa});
+    const p=todos.find(x=>x.id===id);
+    if(p){p.psi_match_selecionado=crp; p.psi_match_nome=nome; p.psi_match_wa=wa;}
+    render();
+    // Notifica psi selecionado via WA
+    const pac=todos.find(x=>x.id===id);
+    if(wa){
+      const msg=encodeURIComponent(`✦ *Conexão Psi — Você foi selecionado(a) para um Match Clínico!*\n\nOlá ${nome.split(' ')[0]}! A admin selecionou você para atender este paciente:\n\n🧠 ${pac?.demanda||'—'}\n📍 ${pac?.cidade||'—'}\n💰 ${pac?.valor||'—'}\n\n_Entre em contato com a admin para prosseguir._`);
+      setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),300);
+    }
+    toast(`✦ ${nome.split(' ')[0]} selecionado(a) para o Match!`);
+  }catch(e){toast('Erro: '+e.message);}
+}
+
+async function deselecionarPsi(id){
+  try{
+    await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:null, psi_match_nome:null, psi_match_wa:null});
+    const p=todos.find(x=>x.id===id);
+    if(p){delete p.psi_match_selecionado; delete p.psi_match_nome; delete p.psi_match_wa;}
+    render();
+    toast('Seleção removida.');
+  }catch(e){toast('Erro: '+e.message);}
 }
 
 function toast(msg){
