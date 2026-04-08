@@ -256,7 +256,7 @@ function sair(){
 let profissionaisElegiveis = [];
 
 async function carregarElegiveis(){
-  if(profissionaisElegiveis.length) return;
+  if(profissionaisElegiveis.length > 0) return;
   try{
     const [psis,meds] = await Promise.all([
       api('GET','psis?select=nome,crp,whatsapp,premium&status=ilike.aprovado&order=nome.asc&limit=200'),
@@ -387,8 +387,7 @@ function render(){
 
         <label>Indicar psi manualmente</label>
         <select id="cf-psi-sel-${p.id}" onchange="preencherPsiManual('${p.id}')">
-          <option value="">— Selecionar da base —</option>
-          ${profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp}|${x.wa}">${x.tipo} ${x.nome} (${x.crp})</option>`).join('')}
+          <option value="">— carregando... —</option>
         </select>
 
         <label>Nome do psi (ou confirme o selecionado)</label>
@@ -497,9 +496,18 @@ function waParaPsi(wa,id,nome){
   window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank');
 }
 
-function abrirCF(id){
+async function abrirCF(id){
   const f=document.getElementById('cf-'+id);
-  if(f) f.style.display=f.style.display==='none'?'block':'none';
+  if(!f) return;
+  const opening = f.style.display==='none';
+  f.style.display = opening ? 'block' : 'none';
+  if(!opening) return;
+  // Populate dropdown with all approved psis
+  await carregarElegiveis();
+  const sel=document.getElementById('cf-psi-sel-'+id);
+  if(!sel) return;
+  sel.innerHTML='<option value="">— Selecionar da base —</option>'
+    + profissionaisElegiveis.map(x=>`<option value="${x.nome}|${x.crp}|${x.wa}">${x.tipo} ${x.nome} (${x.crp})</option>`).join('');
 }
 
 async function confirmarConclusao(id){
