@@ -285,7 +285,36 @@ async function enviar() {
   const obs       = g('f-obs') || '';
   const urg       = urgencia || 'Não informado';
 
+  // Salvar no Supabase
+  try {
+    await fetch(`${SB}/rest/v1/pacientes_externos`, {
+      method: 'POST',
+      headers: {
+        'apikey': KEY,
+        'Authorization': 'Bearer ' + KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        nome: nome,
+        whatsapp: wa,
+        abordagem: abordagem,
+        foco: foco,
+        formato: formato,
+        cidade: cidade,
+        urgencia: urg,
+        obs: obs,
+        status: 'aguardando',
+        origem: 'formulario'
+      })
+    });
+  } catch(e) {
+    console.warn('Erro ao salvar no banco:', e);
+    // Não bloqueia o fluxo — WA abre mesmo assim
+  }
+
   // Monta mensagem WhatsApp para admin
+  const urgEmoji = { baixa:'🌱', media:'🕐', alta:'🔴' }[urgencia] || '❓';
   const msg = encodeURIComponent(
     `💜 *Nova solicitação de indicação — Conexão Psi*\n\n` +
     `*Nome:* ${nome}\n` +
@@ -294,7 +323,7 @@ async function enviar() {
     `*Foco:* ${foco}\n` +
     `*Formato:* ${formato}\n` +
     `*Cidade:* ${cidade}\n` +
-    `*Urgência:* ${urg}\n` +
+    `*Urgência:* ${urgEmoji} ${urg}\n` +
     `${obs ? `*Observações:* ${obs}` : ''}`
   );
 

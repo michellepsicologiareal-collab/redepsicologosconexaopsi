@@ -560,6 +560,28 @@ header {
   border-radius:8px; padding:8px 12px; margin-top:8px;
   border-left:2px solid #B85C1A; line-height:1.6;
 }
+
+/* ─── PACIENTES EXTERNOS ─── */
+.pac-card{background:var(--white);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:0.8rem;box-shadow:0 2px 12px rgba(45,27,78,0.07);border-left:4px solid #8e44ad;}
+.pac-card.aguardando{border-left-color:#f39c12;}
+.pac-card.em_contato{border-left-color:#2980b9;}
+.pac-card.encaminhado{border-left-color:#27ae60;}
+.pac-card.desistiu{border-left-color:#95a5a6;}
+.pac-nome{font-weight:700;font-size:1rem;color:var(--plum);margin-bottom:4px;}
+.pac-meta{font-size:0.78rem;color:var(--muted);margin-bottom:0.6rem;line-height:1.6;}
+.pac-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:0.7rem;}
+.pac-badge.aguardando{background:#fef5e7;color:#f39c12;}
+.pac-badge.em_contato{background:#eaf4fc;color:#2980b9;}
+.pac-badge.encaminhado{background:#eafaf1;color:#27ae60;}
+.pac-badge.desistiu{background:#f2f3f4;color:#95a5a6;}
+.pac-actions{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.7rem;}
+.pac-btn{padding:6px 14px;border-radius:8px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.pac-btn:hover{opacity:0.85;}
+.pac-btn-wa{background:#25D366;color:white;}
+.pac-btn-enc{background:var(--plum);color:white;}
+.pac-btn-status{background:var(--cream);color:var(--ink);border:1.5px solid var(--border);}
+.pac-enc-info{font-size:0.78rem;color:#27ae60;font-weight:600;margin-top:4px;}
+.pac-select{padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:0.78rem;background:var(--cream);color:var(--ink);cursor:pointer;}
 </style>
 <script src="termos.js"></script>
 </head>
@@ -600,6 +622,7 @@ header {
     <button class="tab" onclick="mudarAba('indicar',this)">➕ Indicar paciente</button>
     <button class="tab" onclick="mudarAba('profissionais',this)">👥 Profissionais da rede</button>
     <button class="tab" onclick="mudarAba('meets',this)">🤝 Meets <span class="badge" id="badge-meets" style="background:var(--teal);">0</span></button>
+    <button class="tab" id="tab-pacientes-btn" onclick="mudarAba('pacientes_ext',this)" style="display:none;">🧑‍⚕️ Pacientes <span class="badge" id="badge-pacientes" style="background:#8e44ad;">0</span></button>
     <button class="tab" id="tab-diag-btn" onclick="mudarAba('diagnostico',this)" style="display:none;">🩺 Diagnóstico</button>
   </div>
 
@@ -797,6 +820,24 @@ header {
     </div>
   </div>
 
+  <!-- ─── ABA: PACIENTES EXTERNOS (admin) ─── -->
+  <div id="aba-pacientes_ext" class="content" style="display:none;">
+    <div class="section-header">
+      <div class="section-title">Pacientes externos — solicitações</div>
+      <button class="btn-refresh" onclick="carregarPacientesExt()">🔄 Atualizar</button>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="fb active" data-status="todos" onclick="filtrarPacExt(this)">Todos</button>
+      <button class="fb" data-status="aguardando" onclick="filtrarPacExt(this)">⏳ Aguardando</button>
+      <button class="fb" data-status="em_contato" onclick="filtrarPacExt(this)">💬 Em contato</button>
+      <button class="fb" data-status="encaminhado" onclick="filtrarPacExt(this)">✅ Encaminhado</button>
+      <button class="fb" data-status="desistiu" onclick="filtrarPacExt(this)">❌ Desistiu</button>
+    </div>
+    <div id="pacientes-ext-grid">
+      <div class="empty"><div class="empty-icon">🧑‍⚕️</div>Carregando...</div>
+    </div>
+  </div>
+
 </div><!-- /app -->
 
 <!-- MODAL: SOLICITAR MEET -->
@@ -959,7 +1000,11 @@ function acessarMet() {
   const contatoEl = document.getElementById('f-contato');
   if (contatoEl && usuarioWA) contatoEl.value = usuarioWA;
   // Aba diagnóstico visível apenas para admin
-  if (isAdmin) document.getElementById('tab-diag-btn').style.display = 'inline-block';
+  if (isAdmin) {
+    document.getElementById('tab-diag-btn').style.display = 'inline-block';
+    document.getElementById('tab-pacientes-btn').style.display = 'inline-block';
+    carregarProfissionaisElegiveis();
+  }
   carregarCasos();
 }
 
@@ -974,7 +1019,7 @@ function sair() {
 function mudarAba(aba, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  ['casos','indicar','profissionais','diagnostico','meets'].forEach(id => {
+  ['casos','indicar','profissionais','diagnostico','meets','pacientes_ext'].forEach(id => {
     const el = document.getElementById('aba-'+id);
     if (el) el.style.display = 'none';
   });
@@ -982,6 +1027,7 @@ function mudarAba(aba, btn) {
   if (aba === 'profissionais') carregarProfissionais();
   if (aba === 'diagnostico') rodarDiagMet();
   if (aba === 'meets') carregarMeets();
+  if (aba === 'pacientes_ext') carregarPacientesExt();
 }
 
 function setFiltro(btn) {
@@ -1948,6 +1994,144 @@ async function recusarMeet(id) {
 document.getElementById('modal-meet').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-meet')) fecharModalMeet();
 });
+
+
+// ─── PACIENTES EXTERNOS ───────────────────────────────────────────
+let profissionaisElegiveis = [];
+let pacientesExtData = [];
+let filtroStatusPac = 'todos';
+
+async function carregarProfissionaisElegiveis() {
+  try {
+    const r = await api('GET', 'psis?aprovada=eq.true&select=nome,registro,whatsapp,tipo&order=nome', null);
+    profissionaisElegiveis = r || [];
+  } catch(e) {
+    profissionaisElegiveis = [];
+  }
+}
+
+async function carregarPacientesExt() {
+  const grid = document.getElementById('pacientes-ext-grid');
+  grid.innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
+  try {
+    const r = await api('GET', 'pacientes_externos?order=created_at.desc&select=*', null);
+    pacientesExtData = r || [];
+    // Atualiza badge
+    const aguardando = pacientesExtData.filter(p => p.status === 'aguardando').length;
+    const badge = document.getElementById('badge-pacientes');
+    if (badge) badge.textContent = aguardando || pacientesExtData.length;
+    renderPacExt();
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar.</div>';
+  }
+}
+
+function filtrarPacExt(btn) {
+  document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtroStatusPac = btn.dataset.status;
+  renderPacExt();
+}
+
+function renderPacExt() {
+  const grid = document.getElementById('pacientes-ext-grid');
+  const lista = filtroStatusPac === 'todos'
+    ? pacientesExtData
+    : pacientesExtData.filter(p => p.status === filtroStatusPac);
+
+  if (!lista.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">✨</div>Nenhum paciente neste status.</div>';
+    return;
+  }
+
+  const urgLabel = { baixa:'🌱 Sem pressa', media:'🕐 Breve', alta:'🔴 Urgente' };
+  const statusLabel = { aguardando:'⏳ Aguardando', em_contato:'💬 Em contato', encaminhado:'✅ Encaminhado', desistiu:'❌ Desistiu' };
+
+  const psiOptions = profissionaisElegiveis.length
+    ? profissionaisElegiveis.map(p => `<option value="${p.registro}">${p.nome} (${p.registro})</option>`).join('')
+    : '<option value="">Nenhum profissional carregado</option>';
+
+  grid.innerHTML = lista.map(p => {
+    const st = p.status || 'aguardando';
+    const dt = new Date(p.created_at).toLocaleDateString('pt-BR');
+    const encInfo = p.psi_encaminhado
+      ? `<div class="pac-enc-info">✅ Encaminhado: ${p.psi_encaminhado} ${p.psi_encaminhado_crp ? '· CRP '+p.psi_encaminhado_crp : ''}</div>`
+      : '';
+    const waNum = (p.whatsapp||'').replace(/\D/g,'');
+    const msgWA = encodeURIComponent(
+      `Olá ${p.nome}! 💜 Sou da Conexão Psi.\n\nRecebi sua solicitação de indicação de psicólogo e gostaria de conversar para entender melhor o que você está buscando.\n\nPodemos falar agora?`
+    );
+    return `
+    <div class="pac-card ${st}" id="pac-${p.id}">
+      <div class="pac-nome">👤 ${p.nome||'—'}</div>
+      <div class="pac-meta">
+        📱 ${p.whatsapp||'—'} &nbsp;·&nbsp; 📅 ${dt}<br>
+        🧠 ${p.abordagem||'—'} &nbsp;·&nbsp; 🎯 ${p.foco||'—'}<br>
+        🖥️ ${p.formato||'—'} &nbsp;·&nbsp; 📍 ${p.cidade||'—'} &nbsp;·&nbsp; ${urgLabel[p.urgencia]||p.urgencia||'—'}
+        ${p.obs ? `<br>📝 ${p.obs}` : ''}
+      </div>
+      <span class="pac-badge ${st}">${statusLabel[st]||st}</span>
+      ${encInfo}
+      ${st !== 'encaminhado' && st !== 'desistiu' ? `
+      <div style="margin-top:0.6rem;">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Encaminhar para:</div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <select class="pac-select" id="sel-psi-${p.id}">
+            <option value="">— Selecionar profissional —</option>
+            ${psiOptions}
+          </select>
+          <button class="pac-btn pac-btn-enc" onclick="encaminharPaciente('${p.id}')">✦ Encaminhar</button>
+        </div>
+      </div>` : ''}
+      <div class="pac-actions">
+        ${waNum ? `<a href="https://wa.me/55${waNum}?text=${msgWA}" target="_blank" class="pac-btn pac-btn-wa">💬 WhatsApp</a>` : ''}
+        ${st === 'aguardando' ? `<button class="pac-btn pac-btn-status" onclick="atualizarStatusPac('${p.id}','em_contato')">💬 Marcar em contato</button>` : ''}
+        ${st !== 'desistiu' && st !== 'encaminhado' ? `<button class="pac-btn pac-btn-status" onclick="atualizarStatusPac('${p.id}','desistiu')">❌ Desistiu</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function encaminharPaciente(id) {
+  const sel = document.getElementById('sel-psi-'+id);
+  const reg = sel?.value;
+  if (!reg) { toast('Selecione um profissional primeiro.', 'err'); return; }
+  const psi = profissionaisElegiveis.find(p => p.registro === reg);
+  if (!psi) { toast('Profissional não encontrado.', 'err'); return; }
+
+  try {
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, {
+      status: 'encaminhado',
+      psi_encaminhado: psi.nome,
+      psi_encaminhado_crp: psi.registro
+    });
+    // Atualiza local
+    const idx = pacientesExtData.findIndex(p => p.id === id);
+    if (idx >= 0) {
+      pacientesExtData[idx].status = 'encaminhado';
+      pacientesExtData[idx].psi_encaminhado = psi.nome;
+      pacientesExtData[idx].psi_encaminhado_crp = psi.registro;
+    }
+    toast(`✅ Encaminhado para ${psi.nome}!`, 'ok');
+    renderPacExt();
+  } catch(e) {
+    toast('Erro ao encaminhar.', 'err');
+  }
+}
+
+async function atualizarStatusPac(id, novoStatus) {
+  try {
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, { status: novoStatus });
+    const idx = pacientesExtData.findIndex(p => p.id === id);
+    if (idx >= 0) pacientesExtData[idx].status = novoStatus;
+    const labels = { em_contato:'💬 Em contato', desistiu:'❌ Desistiu' };
+    toast(labels[novoStatus] || 'Atualizado!', 'ok');
+    renderPacExt();
+  } catch(e) {
+    toast('Erro ao atualizar status.', 'err');
+  }
+}
+// ─────────────────────────────────────────────────────────────────
 
 function toast(msg, tipo) {
   const t = document.createElement('div');
