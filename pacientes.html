@@ -638,18 +638,21 @@ function renderHistorico(){
 
 async function selecionarPsi(id, nome, crp, wa){
   try{
-    await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:crp, psi_match_nome:nome, psi_match_wa:wa});
+    const r = await api('PATCH',`pacientes?id=eq.${id}`,{psi_match_selecionado:crp, psi_match_nome:nome, psi_match_wa:wa});
     const p=todos.find(x=>x.id===id);
     if(p){p.psi_match_selecionado=crp; p.psi_match_nome=nome; p.psi_match_wa=wa;}
     render();
-    // Notifica psi selecionado via WA
-    const pac=todos.find(x=>x.id===id);
-    if(wa){
-      const msg=encodeURIComponent(`✦ *Conexão Psi — Você foi selecionado(a) para um Match Clínico!*\n\nOlá ${nome.split(' ')[0]}! A admin selecionou você para atender este paciente:\n\n🧠 ${pac?.demanda||'—'}\n📍 ${pac?.cidade||'—'}\n💰 ${pac?.valor||'—'}\n\n_Entre em contato com a admin para prosseguir._`);
-      setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),300);
-    }
     toast(`✦ ${nome.split(' ')[0]} selecionado(a) para o Match!`);
-  }catch(e){toast('Erro: '+e.message);}
+    // Só abre WA depois de confirmar que salvou
+    if(wa){
+      const pac=todos.find(x=>x.id===id);
+      const msg=encodeURIComponent(`✦ *Conexão Psi — Você foi selecionado(a) para um Match Clínico!*\n\nOlá ${nome.split(' ')[0]}! A admin selecionou você para atender este paciente:\n\n🧠 ${pac?.demanda||'—'}\n📍 ${pac?.cidade||'—'}\n💰 ${pac?.valor||'—'}\n\n_Entre em contato com a admin para prosseguir._`);
+      setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),800);
+    }
+  }catch(e){
+    console.error('selecionarPsi erro:', e);
+    toast('❌ Erro ao salvar: '+e.message);
+  }
 }
 
 async function deselecionarPsi(id){
