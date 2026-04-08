@@ -77,7 +77,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
 .p-disponivel{background:#e9f7ef;color:#27ae60;}
 .p-interessados{background:#fef6ec;color:#b7600a;}
-.p-em_atendimento{background:#eaf2fc;color:#2980b9;}
+.p-em_atendimento{background:linear-gradient(135deg,#fff8ee,#fffaf0);color:#b8730a;border:1px solid rgba(200,147,74,.3);}
 .p-concluido{background:#f3eefa;color:#8e44ad;}
 .p-declinou{background:#f4f4f5;color:#7f8c8d;}
 .bdel{background:none;border:none;cursor:pointer;color:#ddd;font-size:13px;padding:2px;}
@@ -86,6 +86,16 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .info div{display:flex;align-items:flex-start;gap:6px;}
 .crp-tag{font-size:11px;color:var(--muted);}
 
+/* ── Match Clínico ── */
+.match-box{background:linear-gradient(135deg,rgba(27,94,166,.06) 0%,rgba(200,147,74,.06) 100%);border:1.5px solid rgba(27,94,166,.18);border-radius:11px;padding:11px 13px;position:relative;overflow:hidden;}
+.match-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--azul),var(--gold));}
+.match-header{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.match-icon{width:22px;height:22px;background:linear-gradient(135deg,var(--azul),var(--gold));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.match-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--azul);}
+.match-count{font-size:10px;color:var(--muted);margin-left:auto;}
+.match-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(27,94,166,.1),rgba(200,147,74,.1));border:1px solid rgba(27,94,166,.2);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700;color:var(--azul);letter-spacing:.5px;}
+
+/* Substitui int-box para psis interessados */
 .int-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
 .int-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
 .psi-item{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
@@ -93,6 +103,16 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
 .psi-nome{font-size:12px;color:var(--azul);font-weight:600;}
 .psi-reg{font-size:11px;color:var(--muted);}
 .btn-wa-psi{padding:3px 8px;background:#128C7E;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+/* Card com match confirmado */
+.card.s-em_atendimento{border-top-color:var(--gold);}
+.match-confirmed-tag{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#fff8ee,#fffaf0);border:1.5px solid var(--gold);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#b8730a;margin-bottom:2px;}
+
+/* Botão Match Clínico (substitui "Tenho interesse") */
+.bint-match{width:100%;padding:10px;background:linear-gradient(135deg,var(--azul),var(--azul-mid));color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.bint-match:hover{background:linear-gradient(135deg,var(--azul-mid),var(--azul-deep));transform:translateY(-1px);box-shadow:0 4px 14px rgba(27,94,166,.25);}
+.bint-match:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+.bint-match-ok{width:100%;padding:9px;background:linear-gradient(135deg,#e8f7ee,#d4f0e0);color:#1a7a4a;border:1.5px solid rgba(27,174,96,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:default;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
 
 .cf-form{background:#f0f4ff;border:1px solid rgba(27,94,166,.2);border-radius:10px;padding:12px 14px;margin-top:4px;}
 .cf-form label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px;}
@@ -174,8 +194,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);m
     </div>
     <div class="tabs-bar">
       <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel"></span></button>
-      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados" style="background:#e67e22;"></span></button>
-      <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento" style="background:#2980b9;"></span></button>
+      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Candidatos <span class="badge" id="n-interessados" style="background:#e67e22;"></span></button>
+      <button class="tab" onclick="mudarAba('em_atendimento',this)">✦ Match Clínico <span class="badge" id="n-em_atendimento" style="background:var(--gold);color:#fff;"></span></button>
       <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido" style="background:#8e44ad;"></span></button>
       <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou" style="background:#7f8c8d;"></span></button>
       <button class="tab" onclick="mudarAba('historico',this)">📊 Relatório</button>
@@ -320,7 +340,7 @@ async function carregar(){
   document.getElementById('loading').style.display='none';
 }
 
-const SL={disponivel:'🟢 Disponível',interessados:'🟡 Com interesse',em_atendimento:'🔵 Em atendimento',concluido:'✅ Concluído',declinou:'⚫ Declinou'};
+const SL={disponivel:'🟢 Disponível',interessados:'🟡 Candidatos',em_atendimento:'✦ Match Clínico',concluido:'✅ Concluído',declinou:'⚫ Declinou'};
 
 function render(){
   const busca=(document.getElementById('busca')?.value||'').toLowerCase();
@@ -353,7 +373,18 @@ function render(){
         const waBtn=wa?`<button class="btn-wa-psi" onclick="waParaPsi('${wa}','${p.id}','${(x.nome||'').replace(/'/g,'')}')">📲</button>`:'';
         return`<div class="psi-item"><div><div class="psi-nome">${x.nome||'—'}</div><div class="psi-reg">${x.crp||'—'}</div></div>${waBtn}</div>`;
       }).join('');
-      intBox=`<div class="int-box"><div class="int-title">Psis interessados (${ints.length}/${MAX_INT})</div>${items}</div>`;
+      const matchLabel = p.status==='em_atendimento'
+        ? `<div class="match-confirmed-tag">✦ Match Clínico confirmado</div>`
+        : '';
+      intBox=`<div class="match-box">
+        <div class="match-header">
+          <div class="match-icon">✦</div>
+          <div class="match-title">Candidatos ao Match</div>
+          <div class="match-count">${ints.length}/${MAX_INT}</div>
+        </div>
+        ${matchLabel}
+        ${items}
+      </div>`;
     }
 
     const extra=`
@@ -383,7 +414,7 @@ function render(){
 
     const cfForm=perfil==='admin'?`
       <div class="cf-form" id="cf-${p.id}" style="display:none;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:10px;">📋 Registrar desfecho</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--azul);margin-bottom:10px;">✦ Registrar desfecho do Match Clínico</div>
 
         <label>Indicar psi manualmente</label>
         <select id="cf-psi-sel-${p.id}" onchange="preencherPsiManual('${p.id}')">
@@ -415,12 +446,12 @@ function render(){
     let acts='';
     if(perfil==='psi'){
       if(p.status==='disponivel'||p.status==='interessados'){
-        if(jaInt) acts=`<button class="bint" disabled>✅ Interesse registrado</button><button class="bdec-btn" onclick="cancelarInt('${p.id}')">Cancelar interesse</button>`;
-        else if(cheio) acts=`<button class="bint" disabled>Vagas esgotadas</button>`;
-        else acts=`<button class="bint" onclick="registrarInt('${p.id}')">Tenho interesse</button>`;
+        if(jaInt) acts=`<div class="bint-match-ok">✦ Match Clínico solicitado</div><button class="bdec-btn" onclick="cancelarInt('${p.id}')">Cancelar solicitação</button>`;
+        else if(cheio) acts=`<button class="bint-match" disabled>✦ Vagas esgotadas</button>`;
+        else acts=`<button class="bint-match" onclick="registrarInt('${p.id}')">✦ Solicitar Match Clínico</button>`;
       }
     } else if(perfil==='admin'){
-      const waBtn=ints.length>0?`<button class="bwa" onclick="waParaTodos('${p.id}')">📲 Notificar todos</button>`:'';
+      const waBtn=ints.length>0?`<button class="bwa" onclick="waParaTodos('${p.id}')">📲 Notificar candidatos</button>`:'';
       const fimBtn=p.status==='em_atendimento'||p.status==='interessados'?`<button class="bfim" onclick="abrirCF('${p.id}')">📋 Registrar desfecho</button>`:'';
       acts=`<div class="brow">${waBtn}${fimBtn}</div>`;
     }
@@ -459,9 +490,9 @@ async function registrarInt(id){
     if(ints.length===1) p.reservado_em=reservaPatch.reservado_em;
     badges();render();
     // Notifica admin
-    const msg=encodeURIComponent(`🔔 *Novo interesse — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar.`);
+    const msg=encodeURIComponent(`✦ *Novo Match Clínico — Conexão Psi*\n\n*Psi:* ${psiNome} (${psiCRP})\n*Demanda:* ${p.demanda?.substring(0,80)||'—'}\n*Total candidatos:* ${ints.length}/${MAX_INT}\n\nAcesse o painel para gerenciar o Match Clínico.`);
     window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`,'_blank');
-    toast('✅ Interesse registrado! Admin notificada.');
+    toast('✦ Match Clínico solicitado! Admin notificada.');
   }catch(e){toast('Erro: '+e.message);}
 }
 
@@ -473,7 +504,7 @@ async function cancelarInt(id){
     const s=ints.length>0?'interessados':'disponivel';
     await api('PATCH',`pacientes?id=eq.${id}`,{interessados:JSON.stringify(ints),status:s});
     p.interessados=JSON.stringify(ints);p.status=s;
-    badges();render();toast('Interesse cancelado.');
+    badges();render();toast('Solicitação de Match Clínico cancelada.');
   }catch(e){toast('Erro: '+e.message);}
 }
 
@@ -481,19 +512,19 @@ function waParaTodos(id){
   const p=todos.find(x=>x.id===id);
   if(!p) return;
   const ints=p.interessados?JSON.parse(p.interessados):[];
-  if(!ints.length){toast('Nenhum psi interessado ainda.');return;}
+  if(!ints.length){toast('Nenhum candidato ainda.');return;}
   const nomes=ints.map((x,i)=>`${i+1}. ${x.nome} (${x.crp||'—'})`).join('\n');
-  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente disponível*\n\n🧠 ${p.demanda||'—'}\n👥 ${p.publico||'—'}\n📋 ${p.formato||'—'}\n📍 ${p.cidade||'—'}\n💰 ${p.valor||'—'}\n\n*Psis interessados:*\n${nomes}\n\n_Entre em contato com o paciente e confirme no sistema._`);
+  const msg=encodeURIComponent(`*✦ Conexão Psi — Match Clínico disponível*\n\n🧠 ${p.demanda||'—'}\n👥 ${p.publico||'—'}\n📋 ${p.formato||'—'}\n📍 ${p.cidade||'—'}\n💰 ${p.valor||'—'}\n\n*Candidatos ao Match:*\n${nomes}\n\n_Entre em contato com o paciente e confirme o Match Clínico no sistema._`);
   ints.forEach((x,i)=>{
     const wa=(x.wa||'').replace(/\D/g,'');
     if(wa) setTimeout(()=>window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank'),i*800);
   });
-  toast(`📲 Notificando ${ints.length} psi(s)...`);
+  toast(`📲 Notificando ${ints.length} candidato(s)...`);
 }
 
 function waParaPsi(wa,id,nome){
   const p=todos.find(x=>x.id===id);
-  const msg=encodeURIComponent(`*📋 Conexão Psi — Paciente para você*\n\nOlá ${nome?.split(' ')[0]}! A admin liberou este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
+  const msg=encodeURIComponent(`*✦ Conexão Psi — Match Clínico para você*\n\nOlá ${nome?.split(' ')[0]}! A admin confirmou seu Match Clínico com este paciente:\n\n🧠 ${p?.demanda||'—'}\n📍 ${p?.cidade||'—'}\n💰 ${p?.valor||'—'}\n\n_Entre em contato e confirme no sistema._`);
   window.open(`https://wa.me/55${wa}?text=${msg}`,'_blank');
 }
 
