@@ -582,12 +582,52 @@ header {
 .pac-btn-status{background:var(--cream);color:var(--ink);border:1.5px solid var(--border);}
 .pac-enc-info{font-size:0.78rem;color:#27ae60;font-weight:600;margin-top:4px;}
 .pac-select{padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:0.78rem;background:var(--cream);color:var(--ink);cursor:pointer;}
+
+/* ─── ALERTA TEMPO REAL ─── */
+#alerta-bar {
+  display:none; position:fixed; top:0; left:0; right:0; z-index:500;
+  background:linear-gradient(90deg,#1a5e3a,#27ae60);
+  color:white; padding:10px 20px;
+  display:none; align-items:center; justify-content:space-between; gap:12px;
+  font-size:13px; font-weight:600; box-shadow:0 2px 12px rgba(0,0,0,0.2);
+  animation: slideDown .4s ease;
+}
+@keyframes slideDown { from{transform:translateY(-100%)} to{transform:translateY(0)} }
+#alerta-bar .alerta-msgs { display:flex; gap:14px; flex-wrap:wrap; }
+#alerta-bar .alerta-item { display:flex; align-items:center; gap:6px; }
+#alerta-bar .alerta-close { cursor:pointer; opacity:0.7; font-size:18px; padding:0 4px; }
+#alerta-bar .alerta-close:hover { opacity:1; }
+
+@keyframes pulse-badge {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.35); }
+}
+.badge-pulse { animation: pulse-badge 0.8s ease 3; }
+
+/* ─── MEETS: ENVIADOS VS RECEBIDOS ─── */
+.meets-secao-titulo {
+  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted); margin:16px 0 10px; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.meet-req-card.enviado { border-left:3px solid var(--teal); }
+.meet-req-card.recebido { border-left:3px solid var(--met); }
+.meet-status-enviou { font-size:12px; color:var(--muted); font-style:italic; }
+.meet-status-aceitou { font-size:12px; font-weight:700; color:var(--green); }
+.meet-status-recusou { font-size:12px; font-weight:700; color:var(--red); }
 </style>
 <script src="termos.js"></script>
 </head>
 <body>
 
 <!-- ─── LOGIN ─── -->
+
+<!-- BARRA DE ALERTAS TEMPO REAL -->
+<div id="alerta-bar">
+  <div class="alerta-msgs" id="alerta-msgs"></div>
+  <span class="alerta-close" onclick="fecharAlerta()">✕</span>
+</div>
+
 <div id="login">
   <div class="lbox">
     <div class="lbadge">✦ PsiMed — Área Premium</div>
@@ -828,10 +868,10 @@ header {
     </div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
       <button class="fb active" data-status="todos" onclick="filtrarPacExt(this)">Todos</button>
-      <button class="fb" data-status="disponivel" onclick="filtrarPacExt(this)">⏳ Aguardando</button>
-      <button class="fb" data-status="interessados" onclick="filtrarPacExt(this)">💬 Em contato</button>
-      <button class="fb" data-status="em_atendimento" onclick="filtrarPacExt(this)">✅ Encaminhado</button>
-      <button class="fb" data-status="declinou" onclick="filtrarPacExt(this)">❌ Desistiu</button>
+      <button class="fb" data-status="aguardando" onclick="filtrarPacExt(this)">⏳ Aguardando</button>
+      <button class="fb" data-status="em_contato" onclick="filtrarPacExt(this)">💬 Em contato</button>
+      <button class="fb" data-status="encaminhado" onclick="filtrarPacExt(this)">✅ Encaminhado</button>
+      <button class="fb" data-status="desistiu" onclick="filtrarPacExt(this)">❌ Desistiu</button>
     </div>
     <div id="pacientes-ext-grid">
       <div class="empty"><div class="empty-icon">🧑‍⚕️</div>Carregando...</div>
@@ -1006,9 +1046,11 @@ function acessarMet() {
     carregarProfissionaisElegiveis();
   }
   carregarCasos();
+  iniciarPolling();
 }
 
 function sair() {
+  pararPolling();
   document.getElementById('app').style.display = 'none';
   document.getElementById('login').style.display = 'flex';
   document.getElementById('email-login').value = '';
@@ -1928,7 +1970,7 @@ async function carregarMeets() {
     const r = await api('GET',
       isAdmin
       ? `meet_requests?select=*&order=created_at.desc&limit=200`
-      : `meet_requests?select=*&destinatario_registro=eq.${encodeURIComponent(usuarioRegistro)}&order=created_at.desc&limit=50`
+      : `meet_requests?select=*&or=(destinatario_registro.eq.${encodeURIComponent(usuarioRegistro)},solicitante_registro.eq.${encodeURIComponent(usuarioRegistro)})&order=created_at.desc&limit=100`
     );
     const pendentes = (r||[]).filter(m => m.status === 'pendente').length;
     const badge = document.getElementById('badge-meets');
@@ -1939,30 +1981,87 @@ async function carregarMeets() {
       return;
     }
 
-    grid.innerHTML = r.map(m => {
-      const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-      const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo;
-      const waMsg = encodeURIComponent(`Olá ${m.solicitante_nome?.split(' ')[0]}! Vi sua solicitação de meet na PsiMed e aceito conversar. Quando posso te chamar?`);
-      const wa = (m.solicitante_wa||'').replace(/\D/g,'');
-      return `<div class="meet-req-card">
-        <div class="meet-req-top">
-          <div class="meet-req-de">De: <strong>${m.solicitante_nome||'—'}</strong> · ${m.solicitante_registro||'—'}${isAdmin ? ` → <strong>${m.destinatario_nome||'—'}</strong> · ${m.destinatario_registro||'—'}` : ''}</div>
-          <div class="meet-req-data">${dt}</div>
-        </div>
-        <div class="meet-req-tipo">${tipoLabel}</div>
-        <div class="meet-req-msg">${m.mensagem||'—'}</div>
-        ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
-        <div class="meet-req-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${m.status==='pendente' ? `
-              ${wa ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar">✅ Aceitar pelo WhatsApp</a>` : `<button class="btn-aceitar" onclick="aceitarMeet('${m.id}')">✅ Aceitar</button>`}
-              <button class="btn-recusar" onclick="recusarMeet('${m.id}')">❌ Recusar</button>
-            ` : `<span class="meet-status-${m.status==='aceito'?'aceitou':'recusou'}">${m.status==='aceito'?'✅ Aceito':'❌ Recusado'}</span>`}
+    if (isAdmin) {
+      // Admin: visão completa, agrupado
+      grid.innerHTML = r.map(m => {
+        const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo;
+        const waMsg = encodeURIComponent(`Olá ${m.solicitante_nome?.split(' ')[0]}! Vi sua solicitação de meet na PsiMed e aceito conversar. Quando posso te chamar?`);
+        const wa = (m.solicitante_wa||'').replace(/\D/g,'');
+        const stLabel = {pendente:'⏳ Pendente', aceito:'✅ Aceito', recusado:'❌ Recusado'};
+        return `<div class="meet-req-card">
+          <div class="meet-req-top">
+            <div class="meet-req-de"><strong>${m.solicitante_nome||'—'}</strong> (${m.solicitante_registro||'—'}) → <strong>${m.destinatario_nome||'—'}</strong> (${m.destinatario_registro||'—'})</div>
+            <div class="meet-req-data">${dt}</div>
           </div>
-          ${isAdmin ? `<button onclick="excluirMeet('${m.id}')" title="Excluir" style="padding:5px 9px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;">🗑 Excluir</button>` : ''}
-        </div>
-      </div>`;
-    }).join('');
+          <div class="meet-req-tipo">${tipoLabel}</div>
+          <div class="meet-req-msg">${m.mensagem||'—'}</div>
+          ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
+          <div class="meet-req-actions">
+            <span class="meet-status-${m.status==='aceito'?'aceitou':m.status==='recusado'?'recusou':'enviou'}">${stLabel[m.status]||m.status}</span>
+            ${wa && m.status==='pendente' ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar" style="margin-left:8px;">📲 Abrir WA</a>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      // Psi/médico: separar recebidos (eu sou destinatário) e enviados (eu sou solicitante)
+      const recebidos = r.filter(m => m.destinatario_registro === usuarioRegistro);
+      const enviados  = r.filter(m => m.solicitante_registro === usuarioRegistro);
+
+      let html = '';
+
+      if (recebidos.length) {
+        html += `<div class="meets-secao-titulo">📥 Solicitações recebidas (${recebidos.length})</div>`;
+        html += recebidos.map(m => {
+          const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+          const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo;
+          const waMsg = encodeURIComponent(`Olá ${m.solicitante_nome?.split(' ')[0]}! Vi sua solicitação de meet na Conexão Psi e aceito conversar. Quando posso te chamar?`);
+          const wa = (m.solicitante_wa||'').replace(/\D/g,'');
+          return `<div class="meet-req-card recebido">
+            <div class="meet-req-top">
+              <div class="meet-req-de">De: <strong>${m.solicitante_nome||'—'}</strong> · ${m.solicitante_registro||'—'}</div>
+              <div class="meet-req-data">${dt}</div>
+            </div>
+            <div class="meet-req-tipo">${tipoLabel}</div>
+            <div class="meet-req-msg">${m.mensagem||'—'}</div>
+            ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
+            <div class="meet-req-actions">
+              ${m.status==='pendente' ? `
+                ${wa ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar">✅ Aceitar pelo WhatsApp</a>` : `<button class="btn-aceitar" onclick="aceitarMeet('${m.id}')">✅ Aceitar</button>`}
+                <button class="btn-recusar" onclick="recusarMeet('${m.id}')">❌ Recusar</button>
+              ` : `<span class="meet-status-${m.status==='aceito'?'aceitou':'recusou'}">${m.status==='aceito'?'✅ Aceito':'❌ Recusado'}</span>`}
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      if (enviados.length) {
+        html += `<div class="meets-secao-titulo">📤 Solicitações enviadas (${enviados.length})</div>`;
+        html += enviados.map(m => {
+          const dt = new Date(m.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+          const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo;
+          const stLabel = {pendente:'⏳ Aguardando resposta', aceito:'✅ Aceito', recusado:'❌ Recusado'};
+          const wa = (m.destinatario_wa||'').replace(/\D/g,'');
+          const waMsg = encodeURIComponent(`Olá ${m.destinatario_nome?.split(' ')[0]}! Enviei uma solicitação de meet na Conexão Psi. Você teve chance de ver?`);
+          return `<div class="meet-req-card enviado">
+            <div class="meet-req-top">
+              <div class="meet-req-de">Para: <strong>${m.destinatario_nome||'—'}</strong> · ${m.destinatario_registro||'—'}</div>
+              <div class="meet-req-data">${dt}</div>
+            </div>
+            <div class="meet-req-tipo">${tipoLabel}</div>
+            <div class="meet-req-msg">${m.mensagem||'—'}</div>
+            ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
+            <div class="meet-req-actions">
+              <span class="meet-status-${m.status==='aceito'?'aceitou':m.status==='recusado'?'recusou':'enviou'}">${stLabel[m.status]||m.status}</span>
+              ${wa && m.status==='aceito' ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar" style="margin-left:8px;">💬 Falar</a>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      if (!html) html = '<div class="empty"><div class="empty-icon">🤝</div>Nenhuma solicitação ainda.</div>';
+      grid.innerHTML = html;
+    }
   } catch(e) {
     // Tabela ainda não existe
     grid.innerHTML = `<div class="empty"><div class="empty-icon">🔧</div>
@@ -1994,15 +2093,6 @@ async function recusarMeet(id) {
   } catch(e) { toast('Erro: '+e.message, 'err'); }
 }
 
-async function excluirMeet(id) {
-  if (!confirm('Excluir este meet permanentemente?')) return;
-  try {
-    await api('DELETE', `meet_requests?id=eq.${id}`);
-    carregarMeets();
-    toast('Meet excluído.', 'ok');
-  } catch(e) { toast('Erro: '+e.message, 'err'); }
-}
-
 document.getElementById('modal-meet').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-meet')) fecharModalMeet();
 });
@@ -2015,14 +2105,8 @@ let filtroStatusPac = 'todos';
 
 async function carregarProfissionaisElegiveis() {
   try {
-    const [psis, meds] = await Promise.all([
-      api('GET', 'psis?status=ilike.aprovado&select=nome,crp,whatsapp&order=nome.asc&limit=200'),
-      api('GET', 'profissionais_saude?status=ilike.aprovado&premium=eq.true&select=nome,registro,tipo,whatsapp&order=nome.asc&limit=200')
-    ]);
-    profissionaisElegiveis = [
-      ...(psis||[]).map(p => ({nome:p.nome, registro:p.crp, whatsapp:p.whatsapp, tipo:'Psicóloga'})),
-      ...(meds||[]).map(p => ({nome:p.nome, registro:p.registro, whatsapp:p.whatsapp, tipo:p.tipo||'Prof. Saúde'}))
-    ].sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    const r = await api('GET', 'psis?aprovada=eq.true&select=nome,registro,whatsapp,tipo&order=nome', null);
+    profissionaisElegiveis = r || [];
   } catch(e) {
     profissionaisElegiveis = [];
   }
@@ -2032,10 +2116,10 @@ async function carregarPacientesExt() {
   const grid = document.getElementById('pacientes-ext-grid');
   grid.innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
   try {
-    const r = await api('GET', 'pacientes?select=*&order=created_at.desc&limit=200', null);
+    const r = await api('GET', 'pacientes_externos?order=created_at.desc&select=*', null);
     pacientesExtData = r || [];
     // Atualiza badge
-    const aguardando = pacientesExtData.filter(p => p.status === 'disponivel').length;
+    const aguardando = pacientesExtData.filter(p => p.status === 'aguardando').length;
     const badge = document.getElementById('badge-pacientes');
     if (badge) badge.textContent = aguardando || pacientesExtData.length;
     renderPacExt();
@@ -2063,7 +2147,7 @@ function renderPacExt() {
   }
 
   const urgLabel = { baixa:'🌱 Sem pressa', media:'🕐 Breve', alta:'🔴 Urgente' };
-  const statusLabel = { disponivel:'🟢 Disponível', interessados:'🟡 Com interesse', em_atendimento:'🔵 Em atendimento', concluido:'✅ Concluído', declinou:'⚫ Declinou' };
+  const statusLabel = { aguardando:'⏳ Aguardando', em_contato:'💬 Em contato', encaminhado:'✅ Encaminhado', desistiu:'❌ Desistiu' };
 
   const psiOptions = profissionaisElegiveis.length
     ? profissionaisElegiveis.map(p => `<option value="${p.registro}">${p.nome} (${p.registro})</option>`).join('')
@@ -2072,8 +2156,8 @@ function renderPacExt() {
   grid.innerHTML = lista.map(p => {
     const st = p.status || 'aguardando';
     const dt = new Date(p.created_at).toLocaleDateString('pt-BR');
-    const encInfo = p.psi_atendeu
-      ? `<div class="pac-enc-info">✅ Atendido por: ${p.psi_atendeu}</div>`
+    const encInfo = p.psi_encaminhado
+      ? `<div class="pac-enc-info">✅ Encaminhado: ${p.psi_encaminhado} ${p.psi_encaminhado_crp ? '· CRP '+p.psi_encaminhado_crp : ''}</div>`
       : '';
     const waNum = (p.whatsapp||'').replace(/\D/g,'');
     const msgWA = encodeURIComponent(
@@ -2118,7 +2202,7 @@ async function encaminharPaciente(id) {
   if (!psi) { toast('Profissional não encontrado.', 'err'); return; }
 
   try {
-    await api('PATCH', `pacientes?id=eq.${id}`, {
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, {
       status: 'encaminhado',
       psi_encaminhado: psi.nome,
       psi_encaminhado_crp: psi.registro
@@ -2139,7 +2223,7 @@ async function encaminharPaciente(id) {
 
 async function atualizarStatusPac(id, novoStatus) {
   try {
-    await api('PATCH', `pacientes?id=eq.${id}`, { status: novoStatus });
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, { status: novoStatus });
     const idx = pacientesExtData.findIndex(p => p.id === id);
     if (idx >= 0) pacientesExtData[idx].status = novoStatus;
     const labels = { em_contato:'💬 Em contato', desistiu:'❌ Desistiu' };
@@ -2148,6 +2232,98 @@ async function atualizarStatusPac(id, novoStatus) {
   } catch(e) {
     toast('Erro ao atualizar status.', 'err');
   }
+}
+// ─────────────────────────────────────────────────────────────────
+
+
+// ─── ALERTAS EM TEMPO REAL ────────────────────────────────────────
+let _alertaTimer = null;
+let _ultimoSnapshot = { casos:0, meets:0, pacientes:0 };
+let _primeiraVerificacao = true;
+
+async function verificarAlertas() {
+  if (!isAdmin && !usuarioRegistro) return;
+  try {
+    const agora = new Date();
+    // Janela: últimos 5 min para novidades
+    const desde = new Date(agora - 5 * 60 * 1000).toISOString();
+
+    const alertas = [];
+
+    if (isAdmin) {
+      // Novas indicações (disponivel) nos últimos 5 min
+      const casos = await api('GET',
+        `encaminhamentos?status=eq.disponivel&created_at=gte.${desde}&select=id`, null);
+      if (casos?.length) alertas.push({ emoji:'📋', txt:`${casos.length} nova${casos.length>1?'s':''} indicaç${casos.length>1?'ões':'ão'}`, badge:'badge-casos', aba:'casos' });
+
+      // Novos pacientes externos aguardando
+      const pacs = await api('GET',
+        `pacientes_externos?status=eq.aguardando&created_at=gte.${desde}&select=id`, null);
+      if (pacs?.length) alertas.push({ emoji:'🧑‍⚕️', txt:`${pacs.length} novo${pacs.length>1?'s':''} paciente${pacs.length>1?'s':''}`, badge:'badge-pacientes', aba:'pacientes_ext' });
+    }
+
+    // Meets pendentes para qualquer usuário
+    const meetQuery = isAdmin
+      ? `meet_requests?status=eq.pendente&created_at=gte.${desde}&select=id`
+      : `meet_requests?status=eq.pendente&destinatario_registro=eq.${encodeURIComponent(usuarioRegistro)}&created_at=gte.${desde}&select=id`;
+    const meets = await api('GET', meetQuery, null);
+    if (meets?.length) alertas.push({ emoji:'🤝', txt:`${meets.length} meet${meets.length>1?'s':''} pendente${meets.length>1?'s':''}`, badge:'badge-meets', aba:'meets' });
+
+    if (!_primeiraVerificacao && alertas.length) {
+      mostrarAlertaBar(alertas);
+      // Pulsar badges
+      alertas.forEach(a => {
+        const el = document.getElementById(a.badge);
+        if (el) { el.classList.remove('badge-pulse'); void el.offsetWidth; el.classList.add('badge-pulse'); }
+      });
+      // Som discreto (beep via AudioContext)
+      try {
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 520;
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+      } catch(e) {}
+    }
+    _primeiraVerificacao = false;
+  } catch(e) { /* silencioso */ }
+}
+
+function mostrarAlertaBar(alertas) {
+  const bar = document.getElementById('alerta-bar');
+  const msgs = document.getElementById('alerta-msgs');
+  msgs.innerHTML = alertas.map(a =>
+    `<span class="alerta-item" onclick="mudarAbaAlerta('${a.aba}')" style="cursor:pointer;">
+      ${a.emoji} <span>${a.txt}</span>
+    </span>`
+  ).join('<span style="opacity:0.4">|</span>');
+  bar.style.display = 'flex';
+  // Auto-fechar após 8s
+  clearTimeout(window._alertaAutoClose);
+  window._alertaAutoClose = setTimeout(fecharAlerta, 8000);
+}
+
+function fecharAlerta() {
+  document.getElementById('alerta-bar').style.display = 'none';
+}
+
+function mudarAbaAlerta(aba) {
+  fecharAlerta();
+  const btn = document.querySelector(`[onclick*="mudarAba('${aba}"`);
+  if (btn) mudarAba(aba, btn);
+}
+
+function iniciarPolling() {
+  verificarAlertas();
+  _alertaTimer = setInterval(verificarAlertas, 60000); // a cada 60s
+}
+
+function pararPolling() {
+  if (_alertaTimer) { clearInterval(_alertaTimer); _alertaTimer = null; }
+  _primeiraVerificacao = true;
 }
 // ─────────────────────────────────────────────────────────────────
 
