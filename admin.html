@@ -331,13 +331,31 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
       <div class="sec-title">Aceite de Termos 📋</div>
       <div style="font-size:12px;color:var(--muted);margin-top:2px;">Controle de conformidade LGPD e CFP</div>
     </div>
-    <button class="btn-action btn-refresh" onclick="carregarTermos()">🔄 Atualizar</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn-action btn-refresh" onclick="carregarTermos()">🔄 Atualizar</button>
+      <button class="btn-action" onclick="exportarTermosCSV()" style="background:#edf7f3;color:#1a7a4a;border:1px solid #c3e6d4;">⬇ CSV</button>
+    </div>
   </div>
-  <div id="termos-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
-  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⏳ Pendentes</div>
+
+  <input type="text" id="termos-busca" placeholder="🔍 Buscar por nome ou registro..." oninput="filtrarTermos()"
+    style="width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;outline:none;margin-bottom:14px;">
+
+  <div id="termos-stats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
+
+  <!-- Tabs internas -->
+  <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--border);">
+    <button id="ttab-pendentes" onclick="mostrarTabTermos('pendentes')"
+      style="padding:8px 18px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:700;color:#c0392b;border-bottom:3px solid #c0392b;margin-bottom:-2px;cursor:pointer;">
+      ⏳ Pendentes <span id="ttab-n-pend" style="background:#fdecea;color:#c0392b;border-radius:999px;padding:1px 8px;font-size:11px;margin-left:4px;">0</span>
+    </button>
+    <button id="ttab-aceitos" onclick="mostrarTabTermos('aceitos')"
+      style="padding:8px 18px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;">
+      ✅ Aceitaram <span id="ttab-n-aceit" style="background:#edf7f3;color:#1a7a4a;border-radius:999px;padding:1px 8px;font-size:11px;margin-left:4px;">0</span>
+    </button>
+  </div>
+
   <div id="termos-pendentes-lista"></div>
-  <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;">✅ Aceitos</div>
-  <div id="termos-aceitos-lista"></div>
+  <div id="termos-aceitos-lista" style="display:none;"></div>
 </div>
 
 <!-- ── SISTEMA ── -->
@@ -349,7 +367,6 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-t
     <div class="info-row"><span class="info-key">PsiMed Rede Colaborativa</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/met.html" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Área de pacientes</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/pacientes.html" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Edição de perfil</span><a href="https://michellepsicologiareal-collab.github.io/redepsicologosconexaopsi/perfil.html" target="_blank" class="chip-link">abrir ↗</a></div>
-    <div class="info-row"><span class="info-key">🗺️ Fluxo do sistema</span><a href="fluxo_sistema.html" target="_blank" class="chip-link" style="background:var(--gold);color:#0d0a1e;font-weight:700;">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">📖 Documentação técnica</span><a href="documentacao_tecnica.html" target="_blank" class="chip-link" style="background:var(--plum);color:white;">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Cadastro Tally (psis)</span><a href="https://tally.so/r/b5OGYZ" target="_blank" class="chip-link">abrir ↗</a></div>
     <div class="info-row"><span class="info-key">Grupo WhatsApp</span><a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="chip-link">abrir ↗</a></div>
@@ -644,13 +661,18 @@ function toggleSenha(tipo) {
 //           + RLS permite UPDATE/DELETE para anon
 // ═══════════════════════════════════════════════
 async function api(method, path, body) {
+  // DELETE usa Prefer: return=minimal para evitar erro com 204 sem body
+  const headers = method === 'DELETE'
+    ? {...H, 'Prefer': 'return=minimal'}
+    : H;
   const r = await fetch(`${SB}/rest/v1/${path}`, {
     method,
-    headers: H,
+    headers,
     body: body ? JSON.stringify(body) : undefined
   });
+  if (r.status === 204 || r.status === 200 && method === 'DELETE') return null;
   const text = await r.text();
-  if (!r.ok) throw new Error(text);
+  if (!r.ok) throw new Error(text || `HTTP ${r.status}`);
   return text ? JSON.parse(text) : null;
 }
 
@@ -715,7 +737,7 @@ function renderPsis() {
   const todos = [...todosPsis, ...todosMeds];
   renderPsiGrid('pend',  todos.filter(p => (p.status||'').toLowerCase() === 'pendente'));
   renderPsiGrid('aprov', todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
-  renderPsiGrid('prem',  todos.filter(p => (p.status||'').toLowerCase() === 'aprovado'));
+  renderPsiGrid('prem',  todos.filter(p => p.premium === true));
   renderPsiGrid('todos', todos);
 }
 
@@ -738,7 +760,7 @@ function filtrarAba(sufixo) {
   const todos = [...todosPsis, ...todosMeds];
   const mapaFiltro = {
     aprov: p => (p.status||'').toLowerCase() === 'aprovado',
-    prem:  p => (p.status||'').toLowerCase() === 'aprovado',
+    prem:  p => p.premium === true,
     pend:  p => (p.status||'').toLowerCase() === 'pendente',
   };
   const lista = todos.filter(p => {
@@ -759,7 +781,7 @@ function buscarGlobal() {
   const mapaFiltro = {
     pendentes: p => (p.status||'').toLowerCase() === 'pendente',
     aprovados: p => (p.status||'').toLowerCase() === 'aprovado',
-    premium:   p => (p.status||'').toLowerCase() === 'aprovado',
+    premium:   p => p.premium === true,
     todos:     ()=> true
   };
   const filtroBase = mapaFiltro[abaAtiva] || (()=>true);
@@ -1278,8 +1300,16 @@ async function salvarAtendendo(id) {
 }
 async function excluirEnc(id) {
   if(nivelAtual!=='master'){toast('Apenas o Master pode excluir.','err');return;}
-  if(!confirm('Excluir encaminhamento?'))return;
-  try { await api('DELETE',`encaminhamentos_cruzados?id=eq.${id}`); todosEnc=todosEnc.filter(x=>x.id!==id); renderEnc(); toast('Excluído.'); } catch(e){toast('Erro: '+e.message,'err');}
+  if(!confirm('Excluir este encaminhamento permanentemente?'))return;
+  try {
+    await api('DELETE',`encaminhamentos_cruzados?id=eq.${id}`);
+    todosEnc = todosEnc.filter(x => x.id !== id);
+    renderEnc();
+    toast('✅ Encaminhamento excluído.', 'ok');
+  } catch(e) {
+    console.error('excluirEnc error:', e);
+    toast('Erro ao excluir: ' + e.message, 'err');
+  }
 }
 
 
@@ -1502,46 +1532,125 @@ async function confirmarEncFromMeet(meetId, solNome, solReg) {
 // ═══════════════════════════════════════════════
 // TERMOS ADMIN
 // ═══════════════════════════════════════════════
+// ─── TERMOS ────────────────────────────────────────────────────
+let _termosData = { pendentes:[], aceitos:[] };
+let _termosTabAtiva = 'pendentes';
+
 async function carregarTermos() {
-  const el = document.getElementById('termos-pendentes-lista');
+  const el  = document.getElementById('termos-pendentes-lista');
   const el2 = document.getElementById('termos-aceitos-lista');
   if (!el || !el2) return;
   el.innerHTML = '<div class="loading">Carregando...</div>';
   try {
     const [psis, meds] = await Promise.all([
-      api('GET','psis?select=nome,crp,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200'),
-      api('GET','profissionais_saude?select=nome,registro,tipo,email,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=created_at.desc&limit=200')
+      api('GET','psis?select=id,nome,crp,email,whatsapp,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=nome.asc&limit=300'),
+      api('GET','profissionais_saude?select=id,nome,registro,tipo,email,whatsapp,status,premium,termos_aceitos,termos_aceitos_em&status=eq.aprovado&order=nome.asc&limit=300')
     ]);
     const todos = [
-      ...(psis||[]).map(p => ({...p, _reg: p.crp, _tipo: '🧠 Psi'})),
-      ...(meds||[]).map(m => ({...m, _reg: m.registro, _tipo: '🏥 Med'}))
-    ];
-    const pendentes = todos.filter(p => !p.termos_aceitos);
-    const aceitos   = todos.filter(p =>  p.termos_aceitos);
-    document.getElementById('n-termos').textContent = pendentes.length || '';
+      ...(psis||[]).map(p => ({...p, _reg: p.crp,       _tipo:'Psi', _tipoLabel:'🧠 Psi', _tabela:'psis'})),
+      ...(meds||[]).map(m => ({...m, _reg: m.registro,  _tipo:'Med', _tipoLabel:'🏥 Med', _tabela:'profissionais_saude'}))
+    ].sort((a,b) => (a.nome||'').localeCompare(b.nome||'', 'pt'));
+
+    _termosData.pendentes = todos.filter(p => !p.termos_aceitos);
+    _termosData.aceitos   = todos.filter(p =>  p.termos_aceitos)
+      .sort((a,b) => new Date(b.termos_aceitos_em) - new Date(a.termos_aceitos_em));
+
+    const np = _termosData.pendentes.length;
+    const na = _termosData.aceitos.length;
+    document.getElementById('n-termos').textContent = np || '';
+    document.getElementById('ttab-n-pend').textContent  = np;
+    document.getElementById('ttab-n-aceit').textContent = na;
     document.getElementById('termos-stats').innerHTML = `
       <span class="info-chip">${todos.length} aprovados total</span>
-      <span class="info-chip" style="background:#fdecea;color:#c0392b;">${pendentes.length} pendentes</span>
-      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${aceitos.length} aceitaram</span>
+      <span class="info-chip" style="background:#fdecea;color:#c0392b;">${np} pendentes (${Math.round(np/todos.length*100)||0}%)</span>
+      <span class="info-chip" style="background:#edf7f3;color:#1a7a4a;">${na} aceitaram</span>
     `;
-    const renderLinha = (p) => {
-      const dt = p.termos_aceitos_em
-        ? new Date(p.termos_aceitos_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})
-        : '—';
-      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
-        <span style="font-size:11px;background:#f0eff5;color:var(--muted);padding:2px 8px;border-radius:10px;">${p._tipo}</span>
-        <span style="flex:1;font-size:13px;font-weight:500;">${p.nome||'—'}</span>
-        <span style="font-size:12px;color:var(--muted);">${p._reg||'—'}</span>
-        ${p.premium ? '<span class="info-chip premium" style="font-size:11px;">⭐</span>' : ''}
-        <span style="font-size:11px;color:var(--muted);">${dt}</span>
-      </div>`;
-    };
-    el.innerHTML  = pendentes.length ? pendentes.map(renderLinha).join('') : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum pendente 🎉</div>';
-    el2.innerHTML = aceitos.length   ? aceitos.map(renderLinha).join('')   : '<div style="font-size:13px;color:var(--muted);padding:12px 0;">Nenhum aceite registrado ainda.</div>';
+    renderTermos();
   } catch(e) {
     el.innerHTML = '<div class="empty-state">Erro: '+e.message+'</div>';
   }
 }
+
+function mostrarTabTermos(tab) {
+  _termosTabAtiva = tab;
+  const isPend = tab === 'pendentes';
+  document.getElementById('termos-pendentes-lista').style.display = isPend ? 'block' : 'none';
+  document.getElementById('termos-aceitos-lista').style.display   = isPend ? 'none'  : 'block';
+  // Estilo das tabs
+  const btnP = document.getElementById('ttab-pendentes');
+  const btnA = document.getElementById('ttab-aceitos');
+  btnP.style.cssText = isPend
+    ? 'padding:8px 18px;border:none;background:none;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;color:#c0392b;border-bottom:2px solid #c0392b;margin-bottom:-2px;cursor:pointer;'
+    : 'padding:8px 18px;border:none;background:none;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;';
+  btnA.style.cssText = !isPend
+    ? 'padding:8px 18px;border:none;background:none;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;color:#1a7a4a;border-bottom:2px solid #1a7a4a;margin-bottom:-2px;cursor:pointer;'
+    : 'padding:8px 18px;border:none;background:none;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;';
+  renderTermos();
+}
+
+function filtrarTermos() {
+  renderTermos();
+}
+
+function renderTermos() {
+  const busca = (document.getElementById('termos-busca')?.value || '').toLowerCase().trim();
+  const lista = _termosData[_termosTabAtiva] || [];
+  const filtrada = busca
+    ? lista.filter(p => (p.nome||'').toLowerCase().includes(busca) || (p._reg||'').toLowerCase().includes(busca) || (p.email||'').toLowerCase().includes(busca))
+    : lista;
+
+  const el  = document.getElementById('termos-pendentes-lista');
+  const el2 = document.getElementById('termos-aceitos-lista');
+  const target = _termosTabAtiva === 'pendentes' ? el : el2;
+
+  if (!filtrada.length) {
+    target.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:16px 0;">${busca ? 'Nenhum resultado para "'+busca+'".' : (_termosTabAtiva==='pendentes' ? 'Nenhum pendente 🎉' : 'Nenhum aceite ainda.')}</div>`;
+    return;
+  }
+
+  const renderLinha = (p) => {
+    const dt = p.termos_aceitos_em
+      ? new Date(p.termos_aceitos_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})
+      : null;
+    const wa = (p.whatsapp||'').replace(/\D/g,'');
+    const msgWA = encodeURIComponent(
+      `Olá ${p.nome?.split(' ')[0]}! 👋\n\n` +
+      `Tudo bem? Passando para lembrar que seu acesso ao sistema da Conexão Psi está completo — só falta aceitar os Termos de Uso e a Política de Privacidade.\n\n` +
+      `Acesse o sistema e procure o aviso no topo da tela. Qualquer dúvida é só chamar! 💙`
+    );
+    const isPend = !p.termos_aceitos;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 10px;border-bottom:1px solid var(--border);border-radius:8px;transition:background .15s;flex-wrap:wrap;"
+      onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+      <span style="font-size:11px;background:#f0eff5;color:var(--muted);padding:2px 8px;border-radius:10px;flex-shrink:0;">${p._tipoLabel}</span>
+      <span style="flex:1;min-width:140px;font-size:13px;font-weight:500;">${p.nome||'—'}</span>
+      <span style="font-size:12px;color:var(--muted);min-width:90px;">${p._reg||'—'}</span>
+      ${p.premium ? '<span style="color:#C8934A;font-size:13px;" title="Premium">⭐</span>' : ''}
+      ${dt
+        ? `<span style="font-size:11px;color:#1a7a4a;background:#edf7f3;padding:2px 8px;border-radius:6px;">✅ ${dt}</span>`
+        : `<span style="font-size:11px;color:#c0392b;background:#fdecea;padding:2px 8px;border-radius:6px;">⏳ pendente</span>`
+      }
+      ${isPend && wa ? `<a href="https://wa.me/55${wa}?text=${msgWA}" target="_blank"
+        title="Lembrar pelo WhatsApp"
+        style="padding:4px 10px;background:#25D366;color:white;border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;flex-shrink:0;">💬 Lembrar</a>` : ''}
+    </div>`;
+  };
+  target.innerHTML = filtrada.map(renderLinha).join('');
+}
+
+function exportarTermosCSV() {
+  const todos = [..._termosData.pendentes, ..._termosData.aceitos];
+  if (!todos.length) { toast('Sem dados para exportar.', 'err'); return; }
+  const cols = ['nome','email','_reg','_tipo','premium','termos_aceitos','termos_aceitos_em'];
+  const header = ['Nome','Email','Registro','Tipo','Premium','Termos aceitos','Data aceite'];
+  const rows = todos.map(p => cols.map(c => `"${(p[c]||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv = '\uFEFF' + [header.join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `termos-conformidade-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('⬇ CSV exportado!', 'ok');
+}
+// ───────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════
 // EXPORT
