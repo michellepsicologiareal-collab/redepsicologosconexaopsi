@@ -3,146 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conexão Psi — Área Restrita</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Conexão Psi — Pacientes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0F0D1A;--cream:#FAF7F2;--warm:#F2EDE4;--card:#FFFFFF;--plum:#2D1B4E;--violet:#5B3FA0;--gold:#C8934A;--gold-light:#E8C98A;--sage:#3D7A5E;--muted:#7A7490;--border:#E8E2D8;}
+:root{
+  --plum:#1E1040; --azul:#1B5EA6; --azul-mid:#164880;
+  --gold:#C8934A; --gold-light:#E8C98A;
+  --cream:#F5F8F9; --cream-dark:#E8EFF0; --white:#fff;
+  --text:#0f2830; --muted:#5a7580; --border:rgba(27,94,166,0.1);
+  --green:#27ae60; --red:#c0392b;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
 
-/* LOGIN */
-#login{min-height:100vh;background:var(--plum);display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
-#login::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 20%,rgba(91,63,160,0.5) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(200,147,74,0.2) 0%,transparent 50%);}
-.lbox{position:relative;z-index:2;width:100%;max-width:400px;text-align:center;}
-.lbrand{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:#fff;margin-bottom:0.2rem;}
-.lbrand em{color:var(--gold-light);font-style:italic;}
-.ltag{font-size:0.68rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2.5rem;}
-.lcard{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;}
-.lcard h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:0.4rem;}
-.lcard p{font-size:0.8rem;color:rgba(255,255,255,0.45);margin-bottom:1.5rem;}
-.linput{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:0.95rem;margin-bottom:0.8rem;outline:none;}
+/* ── LOGIN ── */
+#login{
+  min-height:100vh;
+  background:linear-gradient(160deg, #0d2a33 0%, var(--azul) 60%, #1a2a4a 100%);
+  display:flex;align-items:center;justify-content:center;padding:2rem;
+  position:relative;overflow:hidden;
+}
+#login::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(200,147,74,0.15), transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 80%, rgba(255,255,255,0.05), transparent 55%);
+}
+.login-wrap{position:relative;z-index:1;width:100%;max-width:400px;text-align:center;}
+.login-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:700;color:#fff;margin-bottom:4px;
+}
+.login-title em{color:var(--gold-light);font-style:italic;}
+.login-sub{
+  font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:2rem;
+}
+.login-card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px;padding:2rem;
+  backdrop-filter:blur(10px);
+}
+.login-card h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;color:#fff;margin-bottom:6px;
+}
+.login-card p{font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:1.5rem;line-height:1.6;}
+.linput{
+  width:100%;padding:0.85rem 1rem;
+  background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:10px;color:#fff;
+  font-family:'Outfit',sans-serif;font-size:0.9rem;
+  margin-bottom:0.8rem;outline:none;transition:border-color .2s;
+}
 .linput:focus{border-color:var(--gold);}
 .linput::placeholder{color:rgba(255,255,255,0.3);}
-.lblogin{width:100%;padding:0.85rem;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;}
-.lerr{color:#ff8a80;font-size:0.8rem;margin-top:0.6rem;min-height:1.2rem;}
+.lbtn{
+  width:100%;padding:0.88rem;
+  background:linear-gradient(135deg, var(--gold), #E8A845);
+  color:#0f2830;border:none;border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.lbtn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,147,74,0.3);}
+.lerr{color:#ff8a80;font-size:0.8rem;margin-top:0.5rem;min-height:1.2rem;}
+.login-hint{
+  margin-top:1.2rem;font-size:0.75rem;color:rgba(255,255,255,0.25);
+  line-height:1.7;
+}
+.login-hint strong{color:rgba(255,255,255,0.4);}
 
-/* APP */
+/* ── APP ── */
 #app{display:none;}
-.header{background:var(--plum);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(15,13,26,0.3);}
-.hbrand{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#fff;}
-.hbrand em{color:var(--gold-light);font-style:italic;}
-.htag{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
-.chip{font-size:0.72rem;color:var(--gold-light);background:rgba(200,147,74,0.15);border:1px solid rgba(200,147,74,0.25);border-radius:999px;padding:4px 12px;}
-.bsair{padding:0.4rem 1rem;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+/* TOPBAR */
+.topbar{
+  background:linear-gradient(135deg, var(--azul) 0%, var(--azul-mid) 100%);
+  padding:0;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,0.15);
+}
+.topbar-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.9rem 1.6rem;flex-wrap:wrap;gap:0.6rem;
+}
+.topbar-brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;font-weight:700;color:#fff;
+}
+.topbar-brand em{color:var(--gold-light);font-style:italic;}
+.topbar-sub{
+  font-size:0.58rem;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.4);margin-top:1px;
+}
+.topbar-right{display:flex;align-items:center;gap:0.8rem;}
+.topbar-chip{
+  font-size:0.72rem;color:rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:999px;padding:4px 12px;
+}
+.topbar-sair{
+  padding:0.38rem 0.9rem;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.6);
+  border-radius:8px;font-size:0.77rem;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .2s;
+}
+.topbar-sair:hover{background:rgba(255,255,255,0.15);color:#fff;}
 
 /* TABS */
-.tabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;overflow-x:auto;}
-.tab{padding:1rem 1.2rem;font-size:0.82rem;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Outfit',sans-serif;transition:all 0.18s;}
-.tab.active{color:var(--plum);border-bottom-color:var(--violet);}
-.badge{display:inline-block;background:var(--violet);color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:999px;margin-left:5px;}
+.tabs-bar{
+  background:var(--white);border-bottom:1.5px solid var(--border);
+  display:flex;overflow-x:auto;scrollbar-width:none;
+}
+.tabs-bar::-webkit-scrollbar{display:none;}
+.tab{
+  padding:0 20px;height:48px;
+  background:none;border:none;border-bottom:2.5px solid transparent;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;white-space:nowrap;
+  transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.tab:hover{color:var(--azul);}
+.tab.active{color:var(--azul);border-bottom-color:var(--azul);font-weight:600;}
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 5px;
+  border-radius:999px;font-size:10px;font-weight:700;
+  background:var(--azul);color:#fff;
+}
 
-.content{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
+/* CONTENT */
+.content{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
 
 /* CARDS */
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.3rem;display:flex;flex-direction:column;gap:0.8rem;animation:su 0.3s ease both;transition:transform 0.2s,box-shadow 0.2s;position:relative;overflow:hidden;}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity 0.2s;}
-.card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(15,13,26,0.09);}
-.card:hover::before{opacity:1;}
-.s-disponivel::before{background:linear-gradient(90deg,#3D7A5E,#6db89a);}
-.s-interessados::before{background:linear-gradient(90deg,#C8934A,#E8C98A);}
-.s-em_atendimento::before{background:linear-gradient(90deg,#2A5FAC,#6b9fe0);}
-.s-concluido::before{background:linear-gradient(90deg,#5B3FA0,#9b75e0);}
-.s-declinou::before{background:linear-gradient(90deg,#7A7490,#b0abc0);}
-@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:14px;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  animation:fadeUp .3s ease both;
+  transition:box-shadow .2s;
+  border-top:3px solid transparent;
+}
+.card:hover{box-shadow:0 6px 20px rgba(27,94,166,0.1);}
+.card.s-disponivel{border-top-color:#27ae60;}
+.card.s-interessados{border-top-color:#f39c12;}
+.card.s-em_atendimento{border-top-color:#2980b9;}
+.card.s-concluido{border-top-color:#8e44ad;}
+.card.s-declinou{border-top-color:#95a5a6;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 .chead{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
-.ssel{font-size:0.72rem;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--cream);font-family:'Outfit',sans-serif;color:var(--ink);cursor:pointer;outline:none;}
-.pill{font-size:0.68rem;font-weight:600;padding:3px 10px;border-radius:999px;}
-.p-disponivel{background:#E3F4ED;color:#3D7A5E;}
-.p-interessados{background:#FEF3E8;color:#B85C1A;}
-.p-em_atendimento{background:#E3ECF8;color:#2A5FAC;}
-.p-concluido{background:#F0EDF8;color:#5B3FA0;}
-.p-declinou{background:#F0EFF4;color:#6B6480;}
-.bdel{background:none;border:none;cursor:pointer;color:#ddd;font-size:14px;}
-.bdel:hover{color:#c0392b;}
+.ssel{
+  font-size:12px;padding:4px 8px;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--cream);font-family:'Outfit',sans-serif;color:var(--text);
+  cursor:pointer;outline:none;
+}
+.pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
+.p-disponivel{background:#e9f7ef;color:#27ae60;}
+.p-interessados{background:#fef6ec;color:#b7600a;}
+.p-em_atendimento{background:#eaf2fc;color:#2980b9;}
+.p-concluido{background:#f3eefa;color:#8e44ad;}
+.p-declinou{background:#f4f4f5;color:#7f8c8d;}
+.bdel{background:none;border:none;cursor:pointer;color:#ddd;font-size:13px;padding:2px;}
+.bdel:hover{color:var(--red);}
 
-.info{font-size:0.82rem;color:var(--ink);line-height:1.85;}
+.info{font-size:13px;color:var(--text);line-height:1.9;}
 .info div{display:flex;align-items:flex-start;gap:6px;}
-.crp-tag{font-size:0.7rem;color:var(--muted);}
+.crp-tag{font-size:11px;color:var(--muted);margin-top:-4px;}
 
 /* INTERESSADOS */
-.interessados-box{background:var(--warm);border-radius:10px;padding:0.8rem;font-size:0.78rem;}
-.interessados-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:0.5rem;}
+.interessados-box{background:var(--cream);border-radius:9px;padding:10px 12px;}
+.interessados-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
 .psi-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);}
-.psi-item:last-child{border-bottom:none;}
-.psi-nome{font-size:0.8rem;color:var(--plum);font-weight:500;}
-.psi-crp{font-size:0.72rem;color:var(--muted);}
-.interesse-count{font-size:0.75rem;color:var(--gold);font-weight:600;}
+.psi-item:last-child{border:none;}
+.psi-nome{font-size:12px;color:var(--azul);font-weight:600;}
+.psi-crp{font-size:11px;color:var(--muted);}
 
 /* ACTIONS */
 .acts{margin-top:auto;display:flex;flex-direction:column;gap:6px;}
-.bint{width:100%;padding:0.55rem;background:var(--plum);color:#fff;border:none;border-radius:9px;font-size:0.8rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;}
-.bint:hover{background:var(--violet);}
+.bint{
+  width:100%;padding:9px;background:var(--azul);color:#fff;
+  border:none;border-radius:9px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;
+}
+.bint:hover{background:var(--azul-mid);}
 .bint:disabled{opacity:0.5;cursor:not-allowed;}
 .brow{display:flex;gap:6px;}
-.bwa{flex:1;padding:0.5rem;background:#128C7E;color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;}
-.bfim{flex:1;padding:0.5rem;background:var(--sage);color:#fff;border:none;border-radius:8px;font-size:0.77rem;cursor:pointer;font-family:'Outfit',sans-serif;}
-.bdec{width:100%;padding:0.45rem;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:0.75rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+.bwa{
+  flex:1;padding:8px;background:#128C7E;color:#fff;
+  border:none;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.bfim{flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.bdec{width:100%;padding:7px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;}
 
-/* STATUS SELECT ADMIN */
-.admin-actions{display:flex;flex-direction:column;gap:6px;}
+/* EMPTY / LOADING */
+.empty{text-align:center;padding:50px 20px;}
+.empty-icon{font-size:2.5rem;margin-bottom:10px;}
+.empty p{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--muted);margin-bottom:4px;}
+.empty span{font-size:13px;color:#a0b5bc;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
 
-.empty{text-align:center;padding:4rem 1rem;}
-.empty p{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--muted);margin-bottom:0.5rem;}
-.empty span{font-size:0.85rem;color:#C4B5E8;}
-.loading{text-align:center;padding:3rem;color:var(--muted);}
-.toast{position:fixed;bottom:2rem;right:2rem;background:var(--plum);color:#fff;padding:0.8rem 1.4rem;border-radius:12px;font-size:0.85rem;z-index:999;box-shadow:0 8px 24px rgba(15,13,26,0.3);animation:su 0.3s ease;}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--azul);color:#fff;padding:0.8rem 1.4rem;border-radius:12px;font-size:13px;z-index:999;box-shadow:0 8px 24px rgba(27,94,166,0.25);animation:fadeUp .25s ease;}
 
-@media(max-width:500px){.header{padding:0.8rem 1rem;}.content{padding:1.5rem 1rem;}.grid{grid-template-columns:1fr;}}
+@media(max-width:500px){.content{padding:16px 14px;}.grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login">
-  <div class="lbox">
-    <div class="lbrand">Conexão <em>Psi</em></div>
-    <div class="ltag">Rede Colaborativa de Psicólogos</div>
-    <div class="lcard">
+  <div class="login-wrap">
+    <div class="login-title">Conexão <em>Psi</em></div>
+    <div class="login-sub">Gestão de Pacientes</div>
+    <div class="login-card">
       <h2>Área Restrita</h2>
-      <p>Exclusivo para psicólogos da rede e administradores</p>
-      <input type="password" class="linput" id="senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()">
-      <button class="lblogin" onclick="entrar()">Entrar →</button>
+      <p>Acesso para psicólogos da rede e administradores.</p>
+      <input type="password" class="linput" id="senha" placeholder="Digite sua senha"
+        onkeydown="if(event.key==='Enter') entrar()">
+      <button class="lbtn" onclick="entrar()">Entrar →</button>
       <div class="lerr" id="lerr"></div>
+      <div class="login-hint">
+        <strong>Psis da rede:</strong> use a senha enviada pela admin<br>
+        <strong>Admin:</strong> senha do painel administrativo
+      </div>
     </div>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
-  <header class="header">
-    <div>
-      <div class="hbrand">Conexão <em>Psi</em></div>
-      <div class="htag">Rede Colaborativa de Psicólogos</div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="topbar-brand">Conexão <em>Psi</em></div>
+        <div class="topbar-sub">Gestão de Pacientes</div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-chip" id="chip">—</span>
+        <button class="topbar-sair" onclick="sair()">Sair</button>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
-      <span class="chip" id="chip">—</span>
-      <button class="bsair" onclick="sair()">Sair</button>
+    <div class="tabs-bar">
+      <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel">0</span></button>
+      <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados" style="background:#f39c12;">0</span></button>
+      <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento" style="background:#2980b9;">0</span></button>
+      <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido" style="background:#8e44ad;">0</span></button>
+      <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou" style="background:#7f8c8d;">0</span></button>
     </div>
   </header>
-
-  <div class="tabs">
-    <button class="tab active" onclick="mudarAba('disponivel',this)">🟢 Disponíveis <span class="badge" id="n-disponivel">0</span></button>
-    <button class="tab" onclick="mudarAba('interessados',this)">🟡 Com interesse <span class="badge" id="n-interessados">0</span></button>
-    <button class="tab" onclick="mudarAba('em_atendimento',this)">🔵 Em atendimento <span class="badge" id="n-em_atendimento">0</span></button>
-    <button class="tab" onclick="mudarAba('concluido',this)">✅ Concluídos <span class="badge" id="n-concluido">0</span></button>
-    <button class="tab" onclick="mudarAba('declinou',this)">⚫ Declinados <span class="badge" id="n-declinou">0</span></button>
-  </div>
 
   <div class="content">
     <div id="grid" class="grid"></div>
     <div id="empty" class="empty" style="display:none;">
-      <p>Nenhum paciente aqui ainda</p>
-      <span>Os pacientes aparecerão quando indicados pelo Tally 💜</span>
+      <div class="empty-icon">📋</div>
+      <p>Nenhum paciente aqui</p>
+      <span>Os pacientes aparecerão quando indicados pela rede 💙</span>
     </div>
     <div id="loading" class="loading">Carregando...</div>
   </div>
@@ -154,7 +279,6 @@ const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 const AP = 'conexaopsi2026', PP = 'redepsi2026';
 const MAX_INTERESSE = 3;
 let perfil = null, psiNome = '', aba = 'disponivel', todos = [];
-
 const H = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
 
 async function api(method, path, body) {
@@ -167,7 +291,6 @@ async function api(method, path, body) {
   return JSON.parse(text);
 }
 
-// AUTH
 function entrar() {
   const s = document.getElementById('senha').value.trim();
   if (s === AP) { perfil='admin'; psiNome='Admin'; iniciar(); }
@@ -194,7 +317,6 @@ function iniciar() {
   carregar();
 }
 
-// TABS
 function mudarAba(a, btn) {
   aba=a;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -209,7 +331,6 @@ function badges() {
   });
 }
 
-// LOAD
 async function carregar() {
   document.getElementById('loading').style.display='block';
   document.getElementById('grid').innerHTML='';
@@ -218,8 +339,7 @@ async function carregar() {
     todos = await api('GET','pacientes?select=*&order=created_at.desc') || [];
     badges(); render();
   } catch(e) {
-    document.getElementById('loading').textContent='Erro ao carregar. Verifique a conexão.';
-    console.error(e);
+    document.getElementById('loading').textContent='Erro ao carregar.';
   }
   document.getElementById('loading').style.display='none';
 }
@@ -229,7 +349,6 @@ const SL = {
   em_atendimento:'🔵 Em atendimento', concluido:'✅ Concluído', declinou:'⚫ Declinou'
 };
 
-// RENDER
 function render() {
   const f = todos.filter(p=>p.status===aba);
   const g=document.getElementById('grid'), e=document.getElementById('empty');
@@ -242,7 +361,6 @@ function render() {
     const cheio = interessados.length >= MAX_INTERESSE;
     const del = perfil==='admin' ? `<button class="bdel" onclick="excluir('${p.id}')">✕</button>` : '';
 
-    // Status element
     const statusEl = perfil==='admin'
       ? `<select class="ssel" onchange="mudarStatus('${p.id}',this.value)">
           <option value="disponivel"${p.status==='disponivel'?' selected':''}>🟢 Disponível</option>
@@ -253,7 +371,6 @@ function render() {
         </select>`
       : `<span class="pill p-${p.status}">${SL[p.status]||p.status}</span>`;
 
-    // Interessados box
     let interBox = '';
     if(interessados.length > 0) {
       const items = interessados.map(x=>`
@@ -266,7 +383,6 @@ function render() {
       </div>`;
     }
 
-    // Actions
     let acts = '';
     if(perfil==='psi') {
       if(p.status==='disponivel' || p.status==='interessados') {
@@ -280,17 +396,13 @@ function render() {
         }
       }
     } else if(perfil==='admin') {
-      const waBtn = interessados.length > 0 ? `<button class="bwa" onclick="enviarWhatsApp('${p.id}')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Enviar para psis
-      </button>` : '';
-      const fimBtn = p.status==='em_atendimento' ? `<button class="bfim" onclick="concluir('${p.id}')">✅ Registrar conclusão</button>` : '';
+      const waBtn = interessados.length > 0 ? `<button class="bwa" onclick="enviarWhatsApp('${p.id}')">📲 Enviar para psis</button>` : '';
+      const fimBtn = p.status==='em_atendimento' ? `<button class="bfim" onclick="concluir('${p.id}')">✅ Concluir</button>` : '';
       acts = `<div class="brow">${waBtn}${fimBtn}</div>`;
     }
 
-    // Valor final
-    const valorFinal = p.valor_final ? `<div style="color:#3D7A5E;font-size:0.78rem;font-weight:500;">💰 Valor final: ${p.valor_final}</div>` : '';
-    const psiAtendeu = p.psi_atendeu ? `<div style="color:#5B3FA0;font-size:0.78rem;">👤 Atendido por: ${p.psi_atendeu}</div>` : '';
+    const valorFinal = p.valor_final ? `<div style="color:#27ae60;font-size:12px;font-weight:600;">💰 Valor final: ${p.valor_final}</div>` : '';
+    const psiAtendeu = p.psi_atendeu ? `<div style="color:#8e44ad;font-size:12px;">👤 Atendido por: ${p.psi_atendeu}</div>` : '';
 
     return `<div class="card s-${p.status}" style="animation-delay:${Math.min(i,10)*0.04}s">
       <div class="chead">${statusEl}${del}</div>
@@ -311,26 +423,22 @@ function render() {
   }).join('');
 }
 
-// REGISTRAR INTERESSE
 async function registrarInteresse(id) {
   const crp = prompt('Digite seu CRP (ex: 06/93008):');
   if(!crp) return;
   try {
     const p = todos.find(x=>x.id===id);
     const interessados = p.interessados ? JSON.parse(p.interessados) : [];
-    if(interessados.length >= MAX_INTERESSE) { toast('❌ Já há 3 psis interessados.'); return; }
+    if(interessados.length >= MAX_INTERESSE) { toast('Já há 3 psis interessados.'); return; }
     if(interessados.some(x=>x.nome===psiNome)) { toast('Você já registrou interesse!'); return; }
     interessados.push({ nome: psiNome, crp: crp.trim() });
-    const novoStatus = 'interessados';
-    await api('PATCH',`pacientes?id=eq.${id}`,{ interessados: JSON.stringify(interessados), status: novoStatus });
-    p.interessados = JSON.stringify(interessados);
-    p.status = novoStatus;
+    await api('PATCH',`pacientes?id=eq.${id}`,{ interessados: JSON.stringify(interessados), status: 'interessados' });
+    p.interessados = JSON.stringify(interessados); p.status = 'interessados';
     badges(); render();
-    toast('✅ Interesse registrado! Aguarde contato do admin.');
+    toast('✅ Interesse registrado! Aguarde contato.');
   } catch(e) { alert('Erro: '+e.message); }
 }
 
-// CANCELAR INTERESSE
 async function cancelarInteresse(id) {
   try {
     const p = todos.find(x=>x.id===id);
@@ -338,53 +446,39 @@ async function cancelarInteresse(id) {
     interessados = interessados.filter(x=>x.nome!==psiNome);
     const novoStatus = interessados.length > 0 ? 'interessados' : 'disponivel';
     await api('PATCH',`pacientes?id=eq.${id}`,{ interessados: JSON.stringify(interessados), status: novoStatus });
-    p.interessados = JSON.stringify(interessados);
-    p.status = novoStatus;
+    p.interessados = JSON.stringify(interessados); p.status = novoStatus;
     badges(); render();
     toast('Interesse cancelado.');
   } catch(e) { alert('Erro: '+e.message); }
 }
 
-// ENVIAR WHATSAPP
 function enviarWhatsApp(id) {
   const p = todos.find(x=>x.id===id);
   if(!p) return;
   const interessados = p.interessados ? JSON.parse(p.interessados) : [];
   const nomes = interessados.map((x,i)=>`${i+1}. ${x.nome} (CRP: ${x.crp||'—'})`).join('\n');
   const msg = `*📋 Conexão Psi — Indicação de Paciente*\n\n` +
-    `*Dados do paciente:*\n` +
-    `👥 Público: ${p.publico||'—'}\n` +
-    `🧠 Demanda: ${p.demanda||'—'}\n` +
-    `📋 Formato: ${p.formato||'—'}\n` +
-    `📍 Cidade: ${p.cidade||'—'}\n` +
-    `💰 Valor: ${p.valor||'—'}\n` +
-    `🕐 Disponibilidade: ${p.horario||'—'}\n\n` +
+    `👥 Público: ${p.publico||'—'}\n🧠 Demanda: ${p.demanda||'—'}\n` +
+    `📋 Formato: ${p.formato||'—'}\n📍 Cidade: ${p.cidade||'—'}\n` +
+    `💰 Valor: ${p.valor||'—'}\n🕐 Disponibilidade: ${p.horario||'—'}\n\n` +
     `*Psis interessados:*\n${nomes}\n\n` +
-    `_Entre em contato com o paciente e confirme o atendimento. Após fechar, registre no sistema._`;
-  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  window.open(url, '_blank');
+    `_Confirme o atendimento e registre no sistema._`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
-// MUDAR STATUS
 async function mudarStatus(id, novoStatus) {
   try {
     await api('PATCH',`pacientes?id=eq.${id}`,{status:novoStatus});
-    const p=todos.find(x=>x.id===id);
-    if(p) p.status=novoStatus;
+    const p=todos.find(x=>x.id===id); if(p) p.status=novoStatus;
     badges(); render();
   } catch(e) { alert('Erro: '+e.message); }
 }
 
-// CONCLUIR
 async function concluir(id) {
   const valor = prompt('Valor da sessão fechado (ex: R$ 100):');
   const psiAtendeu = prompt('Nome do psi que atendeu:');
   try {
-    await api('PATCH',`pacientes?id=eq.${id}`,{
-      status:'concluido',
-      valor_final: valor||'',
-      psi_atendeu: psiAtendeu||''
-    });
+    await api('PATCH',`pacientes?id=eq.${id}`,{status:'concluido',valor_final:valor||'',psi_atendeu:psiAtendeu||''});
     const p=todos.find(x=>x.id===id);
     if(p){p.status='concluido';p.valor_final=valor||'';p.psi_atendeu=psiAtendeu||'';}
     badges(); render();
@@ -392,13 +486,11 @@ async function concluir(id) {
   } catch(e) { alert('Erro: '+e.message); }
 }
 
-// EXCLUIR
 async function excluir(id) {
   if(!confirm('Excluir este paciente?')) return;
   try {
     await api('DELETE',`pacientes?id=eq.${id}`);
-    todos=todos.filter(x=>x.id!==id);
-    badges(); render();
+    todos=todos.filter(x=>x.id!==id); badges(); render();
   } catch(e) { alert('Erro: '+e.message); }
 }
 
