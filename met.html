@@ -828,10 +828,10 @@ header {
     </div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
       <button class="fb active" data-status="todos" onclick="filtrarPacExt(this)">Todos</button>
-      <button class="fb" data-status="aguardando" onclick="filtrarPacExt(this)">⏳ Aguardando</button>
-      <button class="fb" data-status="em_contato" onclick="filtrarPacExt(this)">💬 Em contato</button>
-      <button class="fb" data-status="encaminhado" onclick="filtrarPacExt(this)">✅ Encaminhado</button>
-      <button class="fb" data-status="desistiu" onclick="filtrarPacExt(this)">❌ Desistiu</button>
+      <button class="fb" data-status="disponivel" onclick="filtrarPacExt(this)">⏳ Aguardando</button>
+      <button class="fb" data-status="interessados" onclick="filtrarPacExt(this)">💬 Em contato</button>
+      <button class="fb" data-status="em_atendimento" onclick="filtrarPacExt(this)">✅ Encaminhado</button>
+      <button class="fb" data-status="declinou" onclick="filtrarPacExt(this)">❌ Desistiu</button>
     </div>
     <div id="pacientes-ext-grid">
       <div class="empty"><div class="empty-icon">🧑‍⚕️</div>Carregando...</div>
@@ -1952,11 +1952,14 @@ async function carregarMeets() {
         <div class="meet-req-tipo">${tipoLabel}</div>
         <div class="meet-req-msg">${m.mensagem||'—'}</div>
         ${m.disponibilidade ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">🕐 ${m.disponibilidade}</div>` : ''}
-        <div class="meet-req-actions">
-          ${m.status==='pendente' ? `
-            ${wa ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar">✅ Aceitar pelo WhatsApp</a>` : `<button class="btn-aceitar" onclick="aceitarMeet('${m.id}')">✅ Aceitar</button>`}
-            <button class="btn-recusar" onclick="recusarMeet('${m.id}')">❌ Recusar</button>
-          ` : `<span class="meet-status-${m.status==='aceito'?'aceitou':'recusou'}">${m.status==='aceito'?'✅ Aceito':'❌ Recusado'}</span>`}
+        <div class="meet-req-actions" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${m.status==='pendente' ? `
+              ${wa ? `<a href="https://wa.me/55${wa}?text=${waMsg}" target="_blank" class="btn-aceitar">✅ Aceitar pelo WhatsApp</a>` : `<button class="btn-aceitar" onclick="aceitarMeet('${m.id}')">✅ Aceitar</button>`}
+              <button class="btn-recusar" onclick="recusarMeet('${m.id}')">❌ Recusar</button>
+            ` : `<span class="meet-status-${m.status==='aceito'?'aceitou':'recusou'}">${m.status==='aceito'?'✅ Aceito':'❌ Recusado'}</span>`}
+          </div>
+          ${isAdmin ? `<button onclick="excluirMeet('${m.id}')" title="Excluir" style="padding:5px 9px;background:#fdecea;color:#c0392b;border:1px solid #f5c6c0;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;">🗑 Excluir</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -1991,6 +1994,15 @@ async function recusarMeet(id) {
   } catch(e) { toast('Erro: '+e.message, 'err'); }
 }
 
+async function excluirMeet(id) {
+  if (!confirm('Excluir este meet permanentemente?')) return;
+  try {
+    await api('DELETE', `meet_requests?id=eq.${id}`);
+    carregarMeets();
+    toast('Meet excluído.', 'ok');
+  } catch(e) { toast('Erro: '+e.message, 'err'); }
+}
+
 document.getElementById('modal-meet').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-meet')) fecharModalMeet();
 });
@@ -2003,8 +2015,14 @@ let filtroStatusPac = 'todos';
 
 async function carregarProfissionaisElegiveis() {
   try {
-    const r = await api('GET', 'psis?aprovada=eq.true&select=nome,registro,whatsapp,tipo&order=nome', null);
-    profissionaisElegiveis = r || [];
+    const [psis, meds] = await Promise.all([
+      api('GET', 'psis?status=ilike.aprovado&select=nome,crp,whatsapp&order=nome.asc&limit=200'),
+      api('GET', 'profissionais_saude?status=ilike.aprovado&premium=eq.true&select=nome,registro,tipo,whatsapp&order=nome.asc&limit=200')
+    ]);
+    profissionaisElegiveis = [
+      ...(psis||[]).map(p => ({nome:p.nome, registro:p.crp, whatsapp:p.whatsapp, tipo:'Psicóloga'})),
+      ...(meds||[]).map(p => ({nome:p.nome, registro:p.registro, whatsapp:p.whatsapp, tipo:p.tipo||'Prof. Saúde'}))
+    ].sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   } catch(e) {
     profissionaisElegiveis = [];
   }
@@ -2014,10 +2032,10 @@ async function carregarPacientesExt() {
   const grid = document.getElementById('pacientes-ext-grid');
   grid.innerHTML = '<div class="empty"><div class="empty-icon">🔄</div>Carregando...</div>';
   try {
-    const r = await api('GET', 'pacientes_externos?order=created_at.desc&select=*', null);
+    const r = await api('GET', 'pacientes?select=*&order=created_at.desc&limit=200', null);
     pacientesExtData = r || [];
     // Atualiza badge
-    const aguardando = pacientesExtData.filter(p => p.status === 'aguardando').length;
+    const aguardando = pacientesExtData.filter(p => p.status === 'disponivel').length;
     const badge = document.getElementById('badge-pacientes');
     if (badge) badge.textContent = aguardando || pacientesExtData.length;
     renderPacExt();
@@ -2045,7 +2063,7 @@ function renderPacExt() {
   }
 
   const urgLabel = { baixa:'🌱 Sem pressa', media:'🕐 Breve', alta:'🔴 Urgente' };
-  const statusLabel = { aguardando:'⏳ Aguardando', em_contato:'💬 Em contato', encaminhado:'✅ Encaminhado', desistiu:'❌ Desistiu' };
+  const statusLabel = { disponivel:'🟢 Disponível', interessados:'🟡 Com interesse', em_atendimento:'🔵 Em atendimento', concluido:'✅ Concluído', declinou:'⚫ Declinou' };
 
   const psiOptions = profissionaisElegiveis.length
     ? profissionaisElegiveis.map(p => `<option value="${p.registro}">${p.nome} (${p.registro})</option>`).join('')
@@ -2054,8 +2072,8 @@ function renderPacExt() {
   grid.innerHTML = lista.map(p => {
     const st = p.status || 'aguardando';
     const dt = new Date(p.created_at).toLocaleDateString('pt-BR');
-    const encInfo = p.psi_encaminhado
-      ? `<div class="pac-enc-info">✅ Encaminhado: ${p.psi_encaminhado} ${p.psi_encaminhado_crp ? '· CRP '+p.psi_encaminhado_crp : ''}</div>`
+    const encInfo = p.psi_atendeu
+      ? `<div class="pac-enc-info">✅ Atendido por: ${p.psi_atendeu}</div>`
       : '';
     const waNum = (p.whatsapp||'').replace(/\D/g,'');
     const msgWA = encodeURIComponent(
@@ -2100,7 +2118,7 @@ async function encaminharPaciente(id) {
   if (!psi) { toast('Profissional não encontrado.', 'err'); return; }
 
   try {
-    await api('PATCH', `pacientes_externos?id=eq.${id}`, {
+    await api('PATCH', `pacientes?id=eq.${id}`, {
       status: 'encaminhado',
       psi_encaminhado: psi.nome,
       psi_encaminhado_crp: psi.registro
@@ -2121,7 +2139,7 @@ async function encaminharPaciente(id) {
 
 async function atualizarStatusPac(id, novoStatus) {
   try {
-    await api('PATCH', `pacientes_externos?id=eq.${id}`, { status: novoStatus });
+    await api('PATCH', `pacientes?id=eq.${id}`, { status: novoStatus });
     const idx = pacientesExtData.findIndex(p => p.id === id);
     if (idx >= 0) pacientesExtData[idx].status = novoStatus;
     const labels = { em_contato:'💬 Em contato', desistiu:'❌ Desistiu' };
