@@ -563,7 +563,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
       <div class="sec-title">💰 Financeiro</div>
       <div style="font-size:12px;color:var(--muted);margin-top:2px;">Controle de faturamento e assinaturas premium</div>
     </div>
-    <div style="display:flex;gap:8px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-action" style="border-color:var(--violet);color:var(--violet);" onclick="abrirConfigPlanos()">⚙️ Planos</button>
       <button class="btn-action btn-export" onclick="exportarFinanceiro()">⬇ CSV</button>
       <button class="btn-action btn-refresh" onclick="carregarFinanceiro()">🔄 Atualizar</button>
     </div>
@@ -578,16 +579,36 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
   <!-- Lista premium -->
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
     <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);">Assinantes ativos</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <select id="fin-filter" onchange="renderFinanceiro()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="fin-filter-mes" onchange="renderFinanceiro()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;" title="Filtrar por status de pagamento deste mês"></select>
+      <select id="fin-filter" onchange="renderFinanceiro()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;">
         <option value="todos">Todos</option>
         <option value="psi">Só psis</option>
         <option value="med">Só prof. saúde</option>
         <option value="sem-data">Sem data registrada</option>
+        <option value="pendente-mes">⏳ Pagto pendente</option>
+        <option value="pago-mes">✅ Pagto confirmado</option>
       </select>
     </div>
   </div>
   <div id="fin-lista"></div>
+</div>
+
+<!-- MODAL PLANOS -->
+<div id="modal-planos" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(20,10,40,.55);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--plum);">⚙️ Configurar Planos</div>
+      <button onclick="fecharConfigPlanos()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;">Configure os planos disponíveis. Você pode editar os nomes e valores a qualquer momento — as mudanças refletem imediatamente no cálculo do MRR e no combo de cada pessoa.</div>
+    <div id="planos-editor"></div>
+    <button onclick="adicionarPlano()" style="width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:10px;background:none;font-size:12px;color:var(--muted);cursor:pointer;margin-top:8px;">+ Adicionar plano</button>
+    <div style="display:flex;gap:8px;margin-top:20px;">
+      <button onclick="salvarPlanos()" style="flex:1;padding:12px;background:var(--plum);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">💾 Salvar planos</button>
+      <button onclick="fecharConfigPlanos()" style="padding:12px 20px;background:none;border:1.5px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── SISTEMA ── -->
@@ -2366,9 +2387,41 @@ function toast(msg, tipo='ok') {
 }
 
 // ─────────────────────────────────────────────
+// PLANOS — configuráveis via localStorage
+// ─────────────────────────────────────────────
+const PLANOS_DEFAULT = [
+  { id:'gratis',    label:'PsiMed Grátis',    valor:0,     cor:'#1B5E6B', desc:'Prof. saúde e parcerias' },
+  { id:'fundadora', label:'PsiMed Fundadora', valor:19.90, cor:'#C8934A', desc:'Desconto fundadora' },
+  { id:'premium',   label:'PsiMed Premium',   valor:27.90, cor:'#5B3FA0', desc:'Plano padrão mensal' }
+];
+function getPlanos() {
+  try { return JSON.parse(localStorage.getItem('conexaopsi_planos')) || PLANOS_DEFAULT; }
+  catch(e) { return PLANOS_DEFAULT; }
+}
+function savePlanos(p) { localStorage.setItem('conexaopsi_planos', JSON.stringify(p)); }
+function getPlanoById(id) { return getPlanos().find(p=>p.id===id) || getPlanos().find(p=>p.id==='premium') || PLANOS_DEFAULT[2]; }
+
+function chaveMes() { const d=new Date(); return `pag_${d.getFullYear()}_${d.getMonth()+1}`; }
+function getPagamentos() { try { return JSON.parse(localStorage.getItem('conexaopsi_pagamentos'))||{}; } catch(e){return{};} }
+function setPagamentos(o) { localStorage.setItem('conexaopsi_pagamentos', JSON.stringify(o)); }
+function isPago(id) { const k=chaveMes(); return (getPagamentos()[k]||{})[id]===true; }
+function togglePago(id) {
+  const k=chaveMes(); const p=getPagamentos();
+  if(!p[k])p[k]={};
+  p[k][id]=!p[k][id];
+  setPagamentos(p); renderKPIs(); renderFinanceiro();
+}
+function getPlanosLocais() { try{return JSON.parse(localStorage.getItem('conexaopsi_planos_pessoa'))||{};}catch(e){return{};} }
+function setPlanosLocais(o) { localStorage.setItem('conexaopsi_planos_pessoa', JSON.stringify(o)); }
+function getPlanoLocal(id) { return getPlanosLocais()[id]||'premium'; }
+function setPlanoLocal(id, planoId) {
+  const o=getPlanosLocais(); o[id]=planoId; setPlanosLocais(o);
+  renderKPIs(); renderFinanceiro();
+}
+
+// ─────────────────────────────────────────────
 // FINANCEIRO
 // ─────────────────────────────────────────────
-const VALOR_MENSAL = 27.90;
 let finData = [];
 
 async function carregarFinanceiro() {
@@ -2391,95 +2444,101 @@ async function carregarFinanceiro() {
 }
 
 function renderKPIs() {
-  const total = finData.length;
-  const mrr = (total * VALOR_MENSAL).toFixed(2).replace('.',',');
-  const arr = (total * VALOR_MENSAL * 12).toFixed(2).replace('.',',');
-  const semData = finData.filter(p => !p.premium_desde).length;
   const hoje = new Date();
   const mesPassado = new Date(hoje.getFullYear(), hoje.getMonth()-1, 1);
-  const novosMes = finData.filter(p => p.premium_desde && new Date(p.premium_desde) >= mesPassado).length;
-
+  const total = finData.length;
+  let mrr = 0;
+  finData.forEach(p => { const pl=getPlanoById(getPlanoLocal(p.id)); mrr+=pl.valor; });
+  const arr = (mrr*12).toFixed(2).replace('.',',');
+  const mrrStr = mrr.toFixed(2).replace('.',',');
+  const semData = finData.filter(p=>!p.premium_desde).length;
+  const novosMes = finData.filter(p=>p.premium_desde&&new Date(p.premium_desde)>=mesPassado).length;
+  const pagosMes = finData.filter(p=>isPago(p.id)).length;
+  const pendMes = finData.filter(p=>{const pl=getPlanoById(getPlanoLocal(p.id));return pl.valor>0&&!isPago(p.id);}).length;
   document.getElementById('fin-kpis').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--gold)">${total}</div>
-      <div class="stat-lbl">Premium ativos</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--green)">R$ ${mrr}</div>
-      <div class="stat-lbl">MRR estimado</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--azul)">R$ ${arr}</div>
-      <div class="stat-lbl">ARR estimado</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--roxo)">${novosMes}</div>
-      <div class="stat-lbl">Novos este mês</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:${semData>0?'var(--red)':'var(--green)'}">${semData}</div>
-      <div class="stat-lbl">Sem data registrada</div>
-    </div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--gold)">${total}</div><div class="stat-lbl">Premium ativos</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">R$ ${mrrStr}</div><div class="stat-lbl">MRR real</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--teal)">R$ ${arr}</div><div class="stat-lbl">ARR estimado</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${pagosMes}</div><div class="stat-lbl">✅ Pagos este mês</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:${pendMes>0?'var(--red)':'var(--green)'}">${pendMes}</div><div class="stat-lbl">⏳ Pendentes mês</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:${semData>0?'var(--red)':'var(--green)'}">${semData}</div><div class="stat-lbl">Sem data registrada</div></div>
   `;
 }
 
 function renderAlertas() {
-  const semData = finData.filter(p => !p.premium_desde);
-  if (!semData.length) { document.getElementById('fin-alertas').innerHTML = ''; return; }
-  document.getElementById('fin-alertas').innerHTML = `
-    <div style="background:#fdecea;border:1px solid #f5c6c0;border-radius:10px;padding:12px 16px;font-size:13px;color:#c0392b;margin-bottom:8px;">
-      ⚠️ <strong>${semData.length} premium sem data de ativação registrada.</strong>
-      Clique em "Registrar data" para corrigir.
-    </div>`;
+  const semData = finData.filter(p=>!p.premium_desde);
+  const pendentes = finData.filter(p=>{const pl=getPlanoById(getPlanoLocal(p.id));return pl.valor>0&&!isPago(p.id);});
+  let html='';
+  if(semData.length) html+=`<div style="background:#fdecea;border:1px solid #f5c6c0;border-radius:10px;padding:12px 16px;font-size:13px;color:#c0392b;margin-bottom:8px;">⚠️ <strong>${semData.length} premium sem data de ativação registrada.</strong> Clique em "Registrar data" para corrigir.</div>`;
+  if(pendentes.length) html+=`<div style="background:#fef9ee;border:1px solid #f0d89a;border-radius:10px;padding:12px 16px;font-size:13px;color:#7a4a10;margin-bottom:8px;">💛 <strong>${pendentes.length} pagamento(s) pendente(s) este mês.</strong> Confirme após receber.</div>`;
+  document.getElementById('fin-alertas').innerHTML=html;
 }
 
 function renderFinanceiro() {
   const filtro = document.getElementById('fin-filter').value;
   let lista = finData;
-  if (filtro === 'psi') lista = lista.filter(p=>p.rede==='psi');
-  if (filtro === 'med') lista = lista.filter(p=>p.rede==='med');
-  if (filtro === 'sem-data') lista = lista.filter(p=>!p.premium_desde);
+  if(filtro==='psi') lista=lista.filter(p=>p.rede==='psi');
+  if(filtro==='med') lista=lista.filter(p=>p.rede==='med');
+  if(filtro==='sem-data') lista=lista.filter(p=>!p.premium_desde);
+  if(filtro==='pago-mes') lista=lista.filter(p=>isPago(p.id));
+  if(filtro==='pendente-mes') lista=lista.filter(p=>{const pl=getPlanoById(getPlanoLocal(p.id));return pl.valor>0&&!isPago(p.id);});
 
-  if (!lista.length) {
-    document.getElementById('fin-lista').innerHTML = '<div class="empty-state"><div style="font-size:2rem">💰</div>Nenhum registro neste filtro.</div>';
+  if(!lista.length){
+    document.getElementById('fin-lista').innerHTML='<div class="empty-state"><div style="font-size:2rem">💰</div>Nenhum registro neste filtro.</div>';
     return;
   }
+  const hoje=new Date();
+  const planos=getPlanos();
+  const mes=hoje.toLocaleString('pt-BR',{month:'long'});
 
-  const hoje = new Date();
-  document.getElementById('fin-lista').innerHTML = lista.map(p => {
-    const ini = (p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const cor = p.rede==='psi' ? '#3B2E8A' : '#1B5E6B';
-    const desde = p.premium_desde ? new Date(p.premium_desde) : null;
-    const mesesAtivo = desde ? Math.floor((hoje - desde) / (1000*60*60*24*30.5)) : null;
-    const totalPago = mesesAtivo !== null ? `R$ ${(mesesAtivo * VALOR_MENSAL).toFixed(2).replace('.',',')}` : '—';
-    const dtStr = desde ? desde.toLocaleDateString('pt-BR') : '—';
-    const wa = (p.whatsapp||'').replace(/\D/g,'');
+  document.getElementById('fin-lista').innerHTML=lista.map(p=>{
+    const ini=(p.nome||'??').trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const avatarCor=p.rede==='psi'?'#3B2E8A':'#1B5E6B';
+    const desde=p.premium_desde?new Date(p.premium_desde):null;
+    const mesesAtivo=desde?Math.floor((hoje-desde)/(1000*60*60*24*30.5)):null;
+    const dtStr=desde?desde.toLocaleDateString('pt-BR'):'—';
+    const wa=(p.whatsapp||'').replace(/\D/g,'');
+    const planoId=getPlanoLocal(p.id);
+    const planoObj=getPlanoById(planoId);
+    const totalPago=mesesAtivo!==null&&planoObj.valor>0?`R$ ${(mesesAtivo*planoObj.valor).toFixed(2).replace('.',',')}`:(planoObj.valor===0?'Grátis':'—');
+    const pago=isPago(p.id);
+    const nome1=(p.nome||'').split(' ')[0];
+    const msgWA=planoObj.valor>0
+      ? `Olá, ${nome1}! 💜 Aqui é a Michelle da Conexão Psi. Tudo bem com você? Passando para avisar que a mensalidade do plano *${planoObj.label}* referente a *${mes}* no valor de *R$ ${planoObj.valor.toFixed(2).replace('.',',')}* está disponível para pagamento. Se tiver qualquer dúvida, é só me chamar. Obrigada por fazer parte da nossa comunidade! 🌿`
+      : `Olá, ${nome1}! 💜 Aqui é a Michelle da Conexão Psi. Passando só para dizer que sua participação na rede está ativa e nos deixa muito felizes! Qualquer dúvida, é só chamar. 🌿`;
+    const planoOptions=planos.map(pl=>`<option value="${pl.id}"${pl.id===planoId?' selected':''}>${pl.label}${pl.valor>0?' — R$ '+pl.valor.toFixed(2).replace('.',','):' — Grátis'}</option>`).join('');
 
-    return `<div style="background:white;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="width:38px;height:38px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;">${ini}</div>
-      <div style="flex:1;min-width:150px;">
+    return `<div style="background:white;border:1.5px solid ${pago?'#b7e5c8':'var(--border)'};border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="width:38px;height:38px;border-radius:50%;background:${avatarCor};display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;">${ini}</div>
+      <div style="flex:1;min-width:140px;">
         <div style="font-size:13px;font-weight:600;color:var(--ink);">${p.label} ${p.nome||'—'}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.reg||'—'} · ${p.email||'—'}</div>
       </div>
-      <div style="text-align:center;min-width:80px;">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Desde</div>
+      <div style="min-width:185px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Plano</div>
+        <select onchange="setPlanoLocal('${p.id}',this.value)" style="padding:5px 8px;border:1.5px solid ${planoObj.cor};border-radius:8px;font-size:11px;font-weight:600;color:${planoObj.cor};background:white;outline:none;cursor:pointer;max-width:190px;">${planoOptions}</select>
+      </div>
+      <div style="text-align:center;min-width:72px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Desde</div>
         <div style="font-size:12px;font-weight:600;color:${desde?'var(--ink)':'var(--red)'};">${dtStr}</div>
       </div>
-      <div style="text-align:center;min-width:70px;">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Meses</div>
-        <div style="font-size:13px;font-weight:700;color:var(--azul);">${mesesAtivo !== null ? mesesAtivo : '—'}</div>
+      <div style="text-align:center;min-width:55px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Meses</div>
+        <div style="font-size:13px;font-weight:700;color:var(--teal);">${mesesAtivo!==null?mesesAtivo:'—'}</div>
       </div>
-      <div style="text-align:center;min-width:90px;">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Total pago</div>
-        <div style="font-size:13px;font-weight:700;color:var(--green);">${totalPago}</div>
+      <div style="text-align:center;min-width:80px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Total pago</div>
+        <div style="font-size:12px;font-weight:700;color:var(--green);">${totalPago}</div>
       </div>
-      <div style="display:flex;gap:6px;">
-        ${!desde ? `<button class="btn-action" style="font-size:11px;padding:5px 10px;border-color:var(--gold);color:var(--gold);" onclick="registrarDataPremium('${p.id}','${p.rede}')">📅 Registrar data</button>` : ''}
-        ${wa ? `<button class="btn-action" style="font-size:11px;padding:5px 10px;border-color:#128C7E;color:#128C7E;" onclick="window.open('https://wa.me/55${wa}','_blank')">📲</button>` : ''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        ${!desde?`<button class="btn-action" style="font-size:11px;padding:5px 10px;border-color:var(--gold);color:var(--gold);" onclick="registrarDataPremium('${p.id}','${p.rede}')">📅 Data</button>`:''}
+        ${planoObj.valor>0?`<button onclick="togglePago('${p.id}')" style="padding:5px 12px;border-radius:8px;border:1.5px solid ${pago?'var(--green)':'#d1d5db'};background:${pago?'#eafaf1':'white'};color:${pago?'var(--green)':'var(--muted)'};font-size:11px;font-weight:600;cursor:pointer;">${pago?'✅ Pago':'⏳ Confirmar'}</button>`:'<span style="font-size:11px;color:var(--teal);font-weight:600;padding:5px 8px;">🎁 Grátis</span>'}
+        ${wa?`<button class="btn-action" style="font-size:11px;padding:5px 10px;border-color:#128C7E;color:#128C7E;" onclick="window.open('https://wa.me/55${wa}?text='+encodeURIComponent(\`${msgWA.replace(/`/g,"'")}\`),'_blank')" title="Enviar mensagem">📲 WA</button>`:''}
       </div>
     </div>`;
   }).join('');
 }
+
 
 async function registrarDataPremium(id, rede) {
   const dtInput = prompt('Data de ativação premium (DD/MM/AAAA):');
@@ -2490,7 +2549,6 @@ async function registrarDataPremium(id, rede) {
   if (isNaN(dt)) { toast('Data inválida.'); return; }
   try {
     const tabela = rede === 'psi' ? 'psis' : 'profissionais_saude';
-    const campo = rede === 'psi' ? 'crp' : 'registro';
     await api('PATCH', `${tabela}?id=eq.${id}`, { premium_desde: dt.toISOString() });
     const p = finData.find(x=>x.id===id);
     if (p) p.premium_desde = dt.toISOString();
@@ -2499,14 +2557,52 @@ async function registrarDataPremium(id, rede) {
   } catch(e) { toast('Erro: '+e.message); }
 }
 
+// ── CONFIG PLANOS ──
+function abrirConfigPlanos() {
+  const planos = getPlanos();
+  document.getElementById('planos-editor').innerHTML = planos.map((pl,i) => `
+    <div style="background:#fafafa;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input value="${pl.label}" placeholder="Nome do plano" oninput="updatePlanoField(${i},'label',this.value)"
+        style="flex:2;min-width:120px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;">
+      <div style="display:flex;align-items:center;gap:4px;min-width:100px;">
+        <span style="font-size:12px;color:var(--muted);">R$</span>
+        <input type="number" value="${pl.valor}" min="0" step="0.01"
+          oninput="updatePlanoField(${i},'valor',parseFloat(this.value)||0)"
+          style="width:68px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;">
+      </div>
+      <input value="${pl.desc||''}" placeholder="Descrição curta" oninput="updatePlanoField(${i},'desc',this.value)"
+        style="flex:3;min-width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;">
+      <button onclick="removerPlano(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:2px 6px;" title="Remover">×</button>
+    </div>
+  `).join('');
+  document.getElementById('modal-planos').style.display = 'flex';
+}
+function fecharConfigPlanos() { document.getElementById('modal-planos').style.display='none'; }
+function updatePlanoField(i, field, val) {
+  const p = getPlanos(); p[i][field] = field==='valor' ? (parseFloat(val)||0) : val; savePlanos(p);
+}
+function removerPlano(i) {
+  const p = getPlanos(); p.splice(i,1); savePlanos(p); abrirConfigPlanos();
+}
+function adicionarPlano() {
+  const p = getPlanos();
+  p.push({id:'plano_'+Date.now(), label:'Novo Plano', valor:0, cor:'#5B3FA0', desc:''});
+  savePlanos(p); abrirConfigPlanos();
+}
+function salvarPlanos() {
+  fecharConfigPlanos(); renderKPIs(); renderFinanceiro(); toast('✅ Planos salvos!');
+}
+
 function exportarFinanceiro() {
   const hoje = new Date();
-  const rows = [['Nome','Registro','E-mail','Rede','Premium desde','Meses ativo','Total estimado','Plano']];
+  const rows = [['Nome','Registro','E-mail','Rede','Plano','Valor/mês','Premium desde','Meses ativo','Total estimado','Pago este mês']];
   finData.forEach(p => {
     const desde = p.premium_desde ? new Date(p.premium_desde) : null;
     const meses = desde ? Math.floor((hoje-desde)/(1000*60*60*24*30.5)) : '';
-    const total = meses !== '' ? (meses * VALOR_MENSAL).toFixed(2) : '';
-    rows.push([p.nome||'',p.reg||'',p.email||'',p.rede,desde?desde.toLocaleDateString('pt-BR'):'',meses,total,p.plano||'mensal']);
+    const planoObj = getPlanoById(getPlanoLocal(p.id));
+    const total = meses !== '' && planoObj.valor > 0 ? (meses * planoObj.valor).toFixed(2) : '';
+    const pago = isPago(p.id) ? 'Sim' : 'Não';
+    rows.push([p.nome||'',p.reg||'',p.email||'',p.rede,planoObj.label,planoObj.valor.toFixed(2),desde?desde.toLocaleDateString('pt-BR'):'',meses,total,pago]);
   });
   const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
   const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
