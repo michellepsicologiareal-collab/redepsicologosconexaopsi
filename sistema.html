@@ -205,7 +205,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
   <div class="sidebar-section-label">Referência</div>
   <div class="nav-tabs">
     <button class="nav-tab" onclick="showTab('acessos',this)"><span class="tab-icon">🔐</span><span class="tab-label">Acessos</span></button>
-    <button class="nav-tab" onclick="showTab('financeiro',this)"><span class="tab-icon">💰</span><span class="tab-label">Financeiro</span></button>
     <button class="nav-tab" onclick="showTab('fluxos',this)"><span class="tab-icon">🗺️</span><span class="tab-label">Como funciona</span></button>
   </div>
 
@@ -419,7 +418,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
         <div class="info-row"><span class="info-key">✏️ Editar perfil</span><span class="info-val">E-mail do cadastro</span></div>
         <div class="info-row"><span class="info-key">🤝 PsiMed</span><span class="info-val">E-mail do cadastro</span></div>
         <div class="info-row"><span class="info-key">👥 Pacientes (psis)</span><span class="info-val">E-mail do cadastro</span></div>
-        <div class="info-row"><span class="info-key">👥 Pacientes (admin)</span><span class="info-val">conexaopsi2026</span></div>
+        <div class="info-row"><span class="info-key">👥 Pacientes (admin)</span><span class="info-val" style="color:var(--muted);font-style:italic;">Enviada por WhatsApp pela admin</span></div>
       </div>
 
       <div class="hint"><strong>Dica:</strong> Psis entram em todas as áreas com o e-mail do cadastro — sem precisar de senha.</div>
@@ -430,39 +429,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
         <div class="info-row"><span class="info-key">📝 Cadastro Tally (psis)</span><a href="https://tally.so/r/b5OGYZ" target="_blank" class="chip-link">abrir ↗</a></div>
         <div class="info-row"><span class="info-key">💬 Grupo WhatsApp</span><a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="chip-link">abrir ↗</a></div>
         <div class="info-row"><span class="info-key">📋 Termos de uso</span><a href="termos_conexaopsi.html" target="_blank" class="chip-link">abrir ↗</a></div>
-      </div>
-    </div>
-
-    <!-- FINANCEIRO -->
-    <div class="section" id="tab-financeiro">
-      <div class="sec-header">
-        <div>
-          <div class="sec-title">💰 Financeiro</div>
-          <div class="sec-sub">Como usar o controle de faturamento e assinaturas</div>
-        </div>
-        <a href="admin.html" target="_blank" class="topbar-btn topbar-btn-gold" style="text-decoration:none;">👑 Abrir no Admin</a>
-      </div>
-
-      <div class="info-section">
-        <div class="info-title">⚙️ Configurar Planos</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">No topo do Financeiro, clique em <strong>⚙️ Planos</strong> para editar nome, valor e descrição. As mudanças refletem imediatamente no MRR e nos cards.</div>
-        <div class="info-row"><span class="info-key">🎁 PsiMed Grátis</span><span class="info-val" style="color:var(--teal)">R$ 0 — parceiros e médicos</span></div>
-        <div class="info-row"><span class="info-key">⭐ PsiMed Fundadora</span><span class="info-val" style="color:var(--gold)">R$ 19,90 — desconto fundadora</span></div>
-        <div class="info-row"><span class="info-key">💜 PsiMed Premium</span><span class="info-val" style="color:var(--violet)">R$ 27,90 — plano padrão</span></div>
-      </div>
-
-      <div class="info-section">
-        <div class="info-title">✅ Confirmar Pagamento</div>
-        <div class="step-row"><div class="step-num step-gold">1</div><div><div class="step-title">Cada pessoa tem um botão ⏳ Confirmar</div><div class="step-desc">Aparece para quem tem plano com valor &gt; 0.</div></div></div>
-        <div class="step-row"><div class="step-num step-gold">2</div><div><div class="step-title">Após receber, clique no botão</div><div class="step-desc">Vira ✅ Pago com borda verde.</div></div></div>
-        <div class="step-row"><div class="step-num step-gold">3</div><div><div class="step-title">O status reseta automaticamente</div><div class="step-desc">A cada novo mês, todos voltam para pendente.</div></div></div>
-      </div>
-
-      <div class="info-section">
-        <div class="info-title">📲 Mensagem WA Personalizada</div>
-        <div class="info-row"><span class="info-key" style="flex:1">O botão 📲 WA abre mensagem com nome, plano, mês e valor</span></div>
-        <div class="info-row"><span class="info-key" style="flex:1">Planos grátis recebem mensagem de agradecimento sem cobrança</span></div>
-        <div class="info-row"><span class="info-key" style="flex:1">Aparece apenas para quem tem WhatsApp cadastrado</span></div>
       </div>
     </div>
 
@@ -491,7 +457,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
 const LABELS = {
   diretorio:'🔍 Diretório Psi', psimed:'🤝 PsiMed', pacientes:'👥 Pacientes',
   premium:'✨ Premium', comunidade:'💬 Comunidade', acessos:'🔐 Acessos',
-  financeiro:'💰 Financeiro', fluxos:'🗺️ Como funciona'
+  fluxos:'🗺️ Como funciona'
 };
 
 function showTab(id, btn) {
