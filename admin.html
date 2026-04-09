@@ -413,6 +413,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
     <div class="nav-tabs">
       <button class="nav-tab" onclick="showTab('financeiro',this)"><span class="tab-icon">💰</span><span class="tab-label">Financeiro</span></button>
       <button class="nav-tab" onclick="showTab('sistema',this)"><span class="tab-icon">⚙️</span><span class="tab-label">Sistema</span></button>
+      <button class="nav-tab" onclick="showTab('guia',this)"><span class="tab-icon">📖</span><span class="tab-label">Guia do Sistema</span></button>
       <button class="nav-tab" onclick="abrirDocumentacao()"><span class="tab-icon">📖</span><span class="tab-label">Documentação</span></button>
       <button class="nav-tab master-tab" id="tab-btn-diagnostico" onclick="showTab('diagnostico',this)" style="display:none;"><span class="tab-icon">🩺</span><span class="tab-label">Diagnóstico</span></button>
     </div>
@@ -752,6 +753,178 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
       <button class="btn-fechar" onclick="fecharModal('modal-med')">Cancelar</button>
     </div>
   </div>
+</div>
+
+<!-- ── GUIA DO SISTEMA ── -->
+<div class="section" id="tab-guia">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">📖 Guia do Sistema</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Central de referência — links, acessos, fluxos e financeiro</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="sistema.html" target="_blank" class="btn-action" style="text-decoration:none;border-color:var(--violet);color:var(--violet);">↗ Abrir público</a>
+    </div>
+  </div>
+
+  <!-- SUB-TABS -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:12px;" id="guia-subtabs">
+    <button class="guia-tab active" onclick="showGuia('diretorio',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--violet);background:var(--violet);color:white;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">🔍 Diretório</button>
+    <button class="guia-tab" onclick="showGuia('psimed',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">🤝 PsiMed</button>
+    <button class="guia-tab" onclick="showGuia('pacientes',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">👥 Pacientes</button>
+    <button class="guia-tab" onclick="showGuia('premium',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">✨ Premium</button>
+    <button class="guia-tab" onclick="showGuia('acessos',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">🔐 Acessos</button>
+    <button class="guia-tab" onclick="showGuia('financeiro-guia',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">💰 Financeiro</button>
+    <button class="guia-tab" onclick="showGuia('fluxos',this)" style="padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">🗺️ Fluxos</button>
+  </div>
+
+  <!-- DIRETÓRIO -->
+  <div class="guia-panel active" id="gp-diretorio">
+    <div class="info-section">
+      <div class="info-title">🔍 Diretório Psi — O que é</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">Vitrine profissional da rede. Psis aprovados aparecem internamente. Psis premium aparecem também no diretório público para pacientes.</div>
+      <div class="info-row"><span class="info-key">📸 Foto + WhatsApp + Bio</span><span class="info-val">Visível para pacientes</span></div>
+      <div class="info-row"><span class="info-key">💰 Valor da sessão</span><span class="info-val">No card público</span></div>
+      <div class="info-row"><span class="info-key">🎯 Especialidades</span><span class="info-val">Tags no card</span></div>
+      <div class="info-row"><span class="info-key">✅ Badge verificado</span><span class="info-val" style="color:var(--green)">Credibilidade na rede</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Links do Diretório</div>
+      <div class="info-row"><span class="info-key">Diretório Premium (público)</span><a href="divulgacao.html" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Área interna da rede</span><a href="index.html" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Editar perfil</span><a href="perfil.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    </div>
+  </div>
+
+  <!-- PSIMED -->
+  <div class="guia-panel" id="gp-psimed" style="display:none">
+    <div class="info-section">
+      <div class="info-title">🤝 PsiMed — Rede Colaborativa</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">Área exclusiva para psis premium e profissionais de saúde. Encaminhamentos cruzados, solicitação de meets e colaboração clínica.</div>
+      <div class="info-row"><span class="info-key">Quem acessa</span><span class="info-val">Psis premium + prof. saúde</span></div>
+      <div class="info-row"><span class="info-key">Como entrar</span><span class="info-val">E-mail do cadastro — sem senha</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Como usar</div>
+      <div class="info-row"><span class="info-key" style="flex:1">1. Acesse met.html com seu e-mail</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">2. Na aba "Indicar paciente" — descreva o caso sem dados pessoais</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">3. Em "Profissionais da rede" — solicite um meet a um colega</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Links PsiMed</div>
+      <div class="info-row"><span class="info-key">PsiMed — Rede Colaborativa</span><a href="met.html" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Cadastro para médicos</span><a href="cadastro_med.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    </div>
+  </div>
+
+  <!-- PACIENTES -->
+  <div class="guia-panel" id="gp-pacientes" style="display:none">
+    <div class="info-section">
+      <div class="info-title">👥 Gestão de Pacientes</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">Painel para acompanhar pacientes indicados pela rede — registrar interesse, acompanhar status e registrar desfechos clínicos.</div>
+      <div class="info-row"><span class="info-key">Acesso</span><span class="info-val">E-mail da rede (psis)</span></div>
+      <div class="info-row"><span class="info-key">Senha admin</span><span class="info-val">conexaopsi2026</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Fluxo do paciente</div>
+      <div class="info-row"><span class="info-key" style="flex:1">1. Psi indica o caso (sem dados pessoais)</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">2. Outros psis demonstram interesse</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">3. Admin conecta as partes via WhatsApp</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">4. Desfecho registrado no sistema</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Links</div>
+      <div class="info-row"><span class="info-key">Área psi — Pacientes</span><a href="pacientes.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    </div>
+  </div>
+
+  <!-- PREMIUM -->
+  <div class="guia-panel" id="gp-premium" style="display:none">
+    <div class="info-section">
+      <div class="info-title">✨ Plano Premium</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">Com o Premium a psi aparece no diretório público para pacientes e acessa a PsiMed. A ativação é feita pela admin após confirmação do pagamento.</div>
+      <div class="info-row"><span class="info-key">🔍 Diretório público</span><span class="info-val" style="color:var(--green)">✓ Visível para pacientes</span></div>
+      <div class="info-row"><span class="info-key">🤝 PsiMed</span><span class="info-val" style="color:var(--green)">✓ Encaminhamentos + meets</span></div>
+      <div class="info-row"><span class="info-key">✅ Badge verificado</span><span class="info-val" style="color:var(--green)">✓ Credibilidade na rede</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Fluxo de ativação</div>
+      <div class="info-row"><span class="info-key" style="flex:1">1. Psi assina pelo link do checkout</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">2. Avisa a admin (print ou mensagem)</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">3. Admin ativa no painel — aba Premium</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">Links</div>
+      <div class="info-row"><span class="info-key">Página de planos</span><a href="planos.html" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Checkout Kiwify</span><a href="https://pay.kiwify.com.br/O5SVu87" target="_blank" class="chip-link">abrir ↗</a></div>
+    </div>
+  </div>
+
+  <!-- ACESSOS -->
+  <div class="guia-panel" id="gp-acessos" style="display:none">
+    <div class="info-section">
+      <div class="info-title">🔐 Acessos por área</div>
+      <div class="info-row"><span class="info-key">✏️ Editar perfil</span><span class="info-val">E-mail do cadastro</span></div>
+      <div class="info-row"><span class="info-key">🤝 PsiMed</span><span class="info-val">E-mail do cadastro</span></div>
+      <div class="info-row"><span class="info-key">👥 Pacientes (psi)</span><span class="info-val">E-mail do cadastro</span></div>
+      <div class="info-row"><span class="info-key">👥 Pacientes (admin)</span><span class="info-val">conexaopsi2026</span></div>
+      <div class="info-row"><span class="info-key">🤝 PsiMed Met</span><span class="info-val">login por e-mail cadastrado</span></div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--muted);padding:12px 14px;background:#fef9ee;border-radius:10px;border-left:3px solid var(--gold);">
+      💡 Psis entram em todas as áreas com o e-mail do cadastro — sem precisar de senha.
+    </div>
+    <div class="info-section" style="margin-top:16px;">
+      <div class="info-title">Links rápidos</div>
+      <div class="info-row"><span class="info-key">Cadastro Tally (psis)</span><a href="https://tally.so/r/b5OGYZ" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Grupo WhatsApp da rede</span><a href="https://chat.whatsapp.com/GOaPW0Zonc5Ez6gg1tuuuK" target="_blank" class="chip-link">abrir ↗</a></div>
+      <div class="info-row"><span class="info-key">Termos de uso</span><a href="termos_conexaopsi.html" target="_blank" class="chip-link">abrir ↗</a></div>
+    </div>
+  </div>
+
+  <!-- FINANCEIRO GUIA -->
+  <div class="guia-panel" id="gp-financeiro-guia" style="display:none">
+    <div class="info-section">
+      <div class="info-title">💰 Como funciona o Financeiro</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">O painel Financeiro controla o faturamento mensal da rede. Cada assinante tem um plano atribuído e você confirma o pagamento mês a mês.</div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">⚙️ Configurar Planos</div>
+      <div class="info-row"><span class="info-key" style="flex:1">Clique em <strong>⚙️ Planos</strong> no topo do Financeiro</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">Edite nome, valor e descrição de cada plano</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">As mudanças refletem imediatamente no MRR e nos cards</span></div>
+      <div class="info-row"><span class="info-key">🎁 PsiMed Grátis</span><span class="info-val" style="color:var(--teal)">R$ 0 — parceiros</span></div>
+      <div class="info-row"><span class="info-key">⭐ PsiMed Fundadora</span><span class="info-val" style="color:var(--gold)">R$ 19,90 — desconto</span></div>
+      <div class="info-row"><span class="info-key">💜 PsiMed Premium</span><span class="info-val" style="color:var(--violet)">R$ 27,90 — padrão</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">✅ Confirmar Pagamento</div>
+      <div class="info-row"><span class="info-key" style="flex:1">Cada pessoa tem um botão <strong>⏳ Confirmar</strong></span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">Após receber o pagamento, clique — vira <strong>✅ Pago</strong> com borda verde</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">Planos grátis aparecem como <strong>🎁 Grátis</strong> sem botão</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">O status reseta automaticamente a cada novo mês</span></div>
+    </div>
+    <div class="info-section">
+      <div class="info-title">📲 Mensagem WA</div>
+      <div class="info-row"><span class="info-key" style="flex:1">O botão <strong>📲 WA</strong> abre uma mensagem personalizada com nome, plano, mês e valor</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">Planos grátis recebem mensagem de agradecimento sem cobrança</span></div>
+      <div class="info-row"><span class="info-key" style="flex:1">Aparece só para quem tem WhatsApp cadastrado</span></div>
+    </div>
+  </div>
+
+  <!-- FLUXOS -->
+  <div class="guia-panel" id="gp-fluxos" style="display:none">
+    <div class="info-section">
+      <div class="info-title">🗺️ Fluxos do sistema</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">Selecione um processo para ver o passo a passo.</div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;" id="guia-ftabs"></div>
+    <div style="background:white;border:1.5px solid var(--border);border-radius:12px;padding:20px;border-left:3px solid var(--violet);" id="guia-fcard">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--plum);margin-bottom:6px;" id="guia-ftitle">—</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px;" id="guia-fdesc">—</div>
+      <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;" id="guia-fsteps"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ── DIAGNÓSTICO (Master only) ── -->
@@ -1142,7 +1315,7 @@ function showTab(id, btn) {
   document.getElementById('tab-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   // Atualiza título da topbar
-  const labels = {pendentes:'Pendentes',aprovados:'Aprovados',premium:'Premium',medicos:'Prof. Saúde',todos:'Todos os psis',encaminhamentos:'Encaminhamentos',meets:'Meets',termos:'Termos',financeiro:'Financeiro',sistema:'Sistema',diagnostico:'Diagnóstico'};
+  const labels = {pendentes:'Pendentes',aprovados:'Aprovados',premium:'Premium',medicos:'Prof. Saúde',todos:'Todos os psis',encaminhamentos:'Encaminhamentos',meets:'Meets',termos:'Termos',financeiro:'Financeiro',sistema:'Sistema',guia:'Guia do Sistema',diagnostico:'Diagnóstico'};
   const titulo = document.getElementById('topbar-title');
   if (titulo) titulo.textContent = labels[id] || id;
   if (id === 'medicos' && !todosMeds.length) carregarMedicos();
@@ -2613,6 +2786,64 @@ function exportarFinanceiro() {
   toast('📥 CSV exportado!');
 }
 
+
+// GUIA DO SISTEMA
+function showGuia(id, btn) {
+  document.querySelectorAll('.guia-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.guia-tab').forEach(b => {
+    b.style.background = 'white'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--border)';
+  });
+  const panel = document.getElementById('gp-' + id);
+  if (panel) panel.style.display = 'block';
+  if (btn) { btn.style.background = 'var(--violet)'; btn.style.color = 'white'; btn.style.borderColor = 'var(--violet)'; }
+  if (id === 'fluxos') setTimeout(initGuiaFluxos, 50);
+}
+
+const GUIA_FLUXOS = [
+  {label:'Entrar na rede', cor:'#5B3FA0',
+   title:'Como uma psi entra na Conexão Psi',
+   desc:'Preenche o cadastro → admin verifica CRP e aprova → perfil ativo na rede.',
+   steps:[{e:'📝',t:'Preenche cadastro',s:'formulário Tally'},{e:'⏳',t:'Aguarda aprovação',s:'admin verifica CRP'},{e:'✅',t:'Aprovada',s:'perfil ativo'},{e:'🔍',t:'Aparece na rede',s:'visível para colegas'}]},
+  {label:'Acessar PsiMed', cor:'#1B5E6B',
+   title:'Como acessar a PsiMed',
+   desc:'A PsiMed é exclusiva para psis premium e profissionais de saúde. Acesso por e-mail — sem senha.',
+   steps:[{e:'🌐',t:'Abre met.html',s:'no navegador'},{e:'📧',t:'Digita e-mail',s:'mesmo do cadastro'},{e:'🔑',t:'Sistema reconhece',s:'verifica aprovação'},{e:'🤝',t:'Acesso liberado',s:'todas as funções'}]},
+  {label:'Indicar paciente', cor:'#1B5E6B',
+   title:'Como encaminhar um paciente',
+   desc:'Indica de forma anônima na PsiMed. A admin coordena o encaminhamento.',
+   steps:[{e:'👤',t:'Descreve o caso',s:'sem dados pessoais'},{e:'👀',t:'Colegas interessados',s:'área de pacientes'},{e:'🔄',t:'Admin coordena',s:'escolhe o melhor psi'},{e:'📲',t:'Contato liberado',s:'via WhatsApp'}]},
+  {label:'Virar Premium', cor:'#C8934A',
+   title:'Como ativar o plano Premium',
+   desc:'Psi assina pelo link → avisa a admin → admin ativa no painel.',
+   steps:[{e:'💳',t:'Assina pelo link',s:'checkout Kiwify'},{e:'📩',t:'Avisa a admin',s:'print ou mensagem'},{e:'⚙️',t:'Admin ativa',s:'aba Premium do painel'},{e:'✨',t:'Perfil em destaque',s:'visível para pacientes'}]},
+];
+
+let guiaFInit = false;
+function initGuiaFluxos() {
+  if (guiaFInit) return; guiaFInit = true;
+  const tabs = document.getElementById('guia-ftabs');
+  tabs.innerHTML = GUIA_FLUXOS.map((f,i) =>
+    `<button onclick="drawGuiaFluxo(${i})" id="gftab${i}" style="padding:5px 14px;border-radius:999px;border:1.5px solid ${f.cor};color:${f.cor};background:white;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">${f.label}</button>`
+  ).join('');
+  drawGuiaFluxo(0);
+}
+function drawGuiaFluxo(i) {
+  const f = GUIA_FLUXOS[i];
+  document.querySelectorAll('[id^="gftab"]').forEach((b,j) => {
+    b.style.background = j===i ? GUIA_FLUXOS[j].cor : 'white';
+    b.style.color = j===i ? '#fff' : GUIA_FLUXOS[j].cor;
+  });
+  document.getElementById('guia-ftitle').textContent = f.title;
+  document.getElementById('guia-fdesc').textContent = f.desc;
+  document.getElementById('guia-fcard').style.borderLeftColor = f.cor;
+  document.getElementById('guia-fsteps').innerHTML = f.steps.map((s,j) =>
+    `<div style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;min-width:110px;flex:1;text-align:center;">
+      <div style="font-size:1.2rem;margin-bottom:4px;">${s.e}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--ink);line-height:1.3;">${s.t}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">${s.s}</div>
+    </div>${j < f.steps.length-1 ? `<div style="display:flex;align-items:center;padding:0 4px;color:${f.cor};font-size:1rem;">›</div>` : ''}`
+  ).join('');
+}
 </script>
 </body>
 </html>
