@@ -282,6 +282,11 @@ function render() {
     const waBtn = p.whatsapp ? `<a href="https://wa.me/${p.whatsapp}?text=${waMsg}" target="_blank" class="btn-wa">${WA_SVG} Agendar pelo WhatsApp</a>` : '';
     const instaBtn = h ? `<a href="https://instagram.com/${h}" target="_blank" class="btn-insta">@${h}</a>` : '';
 
+    // Público atendido
+    const pubMap = {adulto:'👤 Adultos',adolescente:'🧒 Adolescentes',infantil:'👶 Infantil',idoso:'🧓 Idosos',casal:'💑 Casais',familia:'👨‍👩‍👧 Família'};
+    const pubLabel = p.publico ? (pubMap[(p.publico||'').toLowerCase()] || p.publico) : '';
+    const pubTag = pubLabel ? `<span class="tag" style="background:#F0EDF8;color:#5B3FA0;border:1px solid #D4C9ED;">${pubLabel}</span>` : '';
+
     return `<div class="card">
       <span class="badge">📋 CRP informado</span>
       <div class="top">${av}<div>
@@ -289,7 +294,7 @@ function render() {
         <div class="crp">${p.crp||''}</div>
         ${h?`<div class="handle">@${h}</div>`:''}
       </div></div>
-      <div class="tags">${abTag}${fmtTag}${espTags}</div>
+      <div class="tags">${abTag}${fmtTag}${pubTag}${espTags}</div>
       ${p.bio?`<div class="bio">"${p.bio}"</div>`:''}
       <div class="meta">
         ${p.cidade?'📍 '+p.cidade:''}
