@@ -468,7 +468,7 @@ function showTab(id, btn) {
   if (btn) btn.classList.add('active');
   document.getElementById('topbar-title').textContent = LABELS[id] || id;
   window.scrollTo({top:0, behavior:'smooth'});
-  if (id === 'fluxos') setTimeout(initFluxos, 50);
+  if (id === 'fluxos') initFluxos();
   closeSidebar();
 }
 
@@ -483,54 +483,107 @@ function closeSidebar() {
 
 // FLUXOS
 const FLUXOS = [
-  {label:'Entrar na rede', cor:'#5B3FA0',
-   title:'Como uma psi entra na Conexão Psi',
-   desc:'Preenche o formulário de cadastro. A admin analisa, verifica o CRP e aprova. Só então você aparece no diretório.',
-   steps:[{e:'📝',t:'Preenche o cadastro',s:'formulário Tally'},{e:'⏳',t:'Aguarda aprovação',s:'admin verifica CRP'},{e:'✅',t:'Cadastro aprovado',s:'perfil ativo'},{e:'🔍',t:'Aparece na rede',s:'visível para colegas'}]},
-  {label:'Acessar PsiMed', cor:'#1B5E6B',
-   title:'Como acessar a PsiMed',
-   desc:'Exclusivo para psis premium e profissionais de saúde. O acesso é feito pelo e-mail — sem senha.',
-   steps:[{e:'🌐',t:'Abre met.html',s:'no navegador'},{e:'📧',t:'Digita e-mail',s:'mesmo do cadastro'},{e:'🔑',t:'Sistema reconhece',s:'verifica aprovação'},{e:'🤝',t:'Acesso liberado',s:'todas as funções'}]},
-  {label:'Indicar paciente', cor:'#1B5E6B',
-   title:'Como encaminhar um paciente',
-   desc:'Indica na PsiMed de forma anônima. A admin coordena o encaminhamento.',
-   steps:[{e:'👤',t:'Descreve o caso',s:'sem dados pessoais'},{e:'👀',t:'Colegas interessados',s:'área de pacientes'},{e:'🔄',t:'Admin coordena',s:'escolhe o melhor psi'},{e:'📲',t:'Contato liberado',s:'via WhatsApp'}]},
-  {label:'Solicitar meet', cor:'#1B5E6B',
-   title:'Como conversar com um colega da rede',
-   desc:'Na lista de profissionais da PsiMed, você encontra colegas e pode pedir uma conversa clínica.',
-   steps:[{e:'👥',t:'Abre lista de colegas',s:'aba Profissionais'},{e:'✉️',t:'Solicita um meet',s:'descreve o contexto'},{e:'🔔',t:'Colega recebe',s:'notificação no sistema'},{e:'💬',t:'Conversa por WA',s:'se aceitar'}]},
-  {label:'Virar Premium', cor:'#C8934A',
-   title:'Como ativar o plano Premium',
-   desc:'A ativação é feita pela admin após confirmação do pagamento.',
-   steps:[{e:'💳',t:'Assina pelo link',s:'checkout Kiwify'},{e:'📩',t:'Avisa a admin',s:'confirma pagamento'},{e:'⚙️',t:'Admin ativa',s:'aba Premium'},{e:'✨',t:'Perfil em destaque',s:'visível para pacientes'}]},
+  {
+    label: 'Entrar na rede', cor: '#5B3FA0',
+    title: 'Como entrar para a Conexão Psi',
+    desc: 'Você preenche um formulário simples, a Michelle analisa o seu perfil e, se tudo estiver certo, você recebe uma mensagem de aprovação. Só depois disso seu nome aparece para os outros membros da rede.',
+    steps: [
+      {e:'📝', t:'Você preenche o cadastro', s:'Um formulário curto com seus dados profissionais e número do CRP.'},
+      {e:'🔍', t:'A Michelle revisa', s:'Ela confere os dados, verifica o CRP e vê se o perfil faz sentido para a rede.'},
+      {e:'📲', t:'Você recebe a aprovação', s:'Uma mensagem no WhatsApp avisando que seu cadastro foi aprovado.'},
+      {e:'🎉', t:'Você está na rede!', s:'Seu perfil fica visível para os outros membros e você pode explorar tudo.'},
+    ]
+  },
+  {
+    label: 'Aparecer para pacientes', cor: '#C8934A',
+    title: 'Como aparecer no diretório público',
+    desc: 'O diretório público é onde os pacientes encontram psicólogas para contratar. Para aparecer lá, você precisa ter o plano premium ativo — e manter seu perfil atualizado com foto, WhatsApp e especialidades.',
+    steps: [
+      {e:'✨', t:'Ative o premium', s:'Assine o plano e avise a Michelle. Ela ativa para você em poucos minutos.'},
+      {e:'✏️', t:'Atualize seu perfil', s:'Coloque uma foto, seu WhatsApp, o valor da sessão e suas especialidades.'},
+      {e:'👀', t:'Pacientes te encontram', s:'Seu card aparece no diretório e qualquer pessoa pode te contatar diretamente.'},
+      {e:'💬', t:'O paciente te chama', s:'Pelo botão do WhatsApp diretamente no seu card — sem intermediários.'},
+    ]
+  },
+  {
+    label: 'Indicar um paciente', cor: '#1B5E6B',
+    title: 'Como encaminhar um paciente para outro profissional',
+    desc: 'Às vezes você tem um paciente que precisa de um tipo de atendimento diferente do seu. Na rede, você pode indicar esse paciente de forma sigilosa — sem revelar o nome dele — e outros colegas demonstram interesse em atendê-lo.',
+    steps: [
+      {e:'👤', t:'Você descreve o caso', s:'Conta o perfil do paciente: faixa etária, demanda, tipo de abordagem que precisa. Sem nome ou dados pessoais.'},
+      {e:'👋', t:'Colegas levantam a mão', s:'Outros profissionais da rede veem o caso e clicam "tenho interesse" se puderem ajudar.'},
+      {e:'🤝', t:'A Michelle conecta', s:'Ela escolhe o profissional mais adequado e faz a apresentação entre vocês pelo WhatsApp.'},
+      {e:'✅', t:'Encaminhamento feito', s:'O paciente é atendido por quem realmente se encaixa no perfil dele.'},
+    ]
+  },
+  {
+    label: 'Conversar com um colega', cor: '#1B5E6B',
+    title: 'Como pedir uma conversa clínica com um colega',
+    desc: 'Quer trocar ideia sobre um caso, pedir uma supervisão rápida ou explorar uma parceria? Você pode enviar uma solicitação diretamente para qualquer membro da rede — sem precisar ter o contato dele.',
+    steps: [
+      {e:'👥', t:'Encontre um colega', s:'Veja a lista de profissionais da rede e escolha com quem quer conversar.'},
+      {e:'✉️', t:'Mande uma mensagem', s:'Explique brevemente o motivo — um caso, uma dúvida, uma proposta de parceria.'},
+      {e:'🔔', t:'O colega recebe', s:'Ele vê sua solicitação e decide se aceita ou não. Tudo dentro da plataforma.'},
+      {e:'💬', t:'Vocês conversam', s:'Se ele aceitar, você recebe o contato dele e combinam a conversa pelo WhatsApp.'},
+    ]
+  },
+  {
+    label: 'Assinar o premium', cor: '#C8934A',
+    title: 'Como assinar o plano e ativar os benefícios',
+    desc: 'O premium é o que permite você aparecer para pacientes e acessar a área colaborativa da rede. A assinatura é feita pelo link de pagamento e a ativação é manual — a Michelle faz isso assim que confirma o pagamento.',
+    steps: [
+      {e:'💳', t:'Assine pelo link', s:'Acesse a página de planos e escolha o seu. O pagamento é mensal e você pode cancelar quando quiser.'},
+      {e:'📩', t:'Avise a Michelle', s:'Mande uma mensagem com o comprovante ou print confirmando que pagou.'},
+      {e:'⚙️', t:'Ela ativa para você', s:'A Michelle entra no painel admin, marca seu perfil como premium e pronto — geralmente em minutos.'},
+      {e:'✨', t:'Benefícios liberados', s:'Você aparece no diretório público, pacientes podem te contatar e você acessa a área colaborativa.'},
+    ]
+  },
+  {
+    label: 'Editar meu perfil', cor: '#5B3FA0',
+    title: 'Como atualizar seus dados na rede',
+    desc: 'Seu perfil é sua vitrine — quanto mais completo e atualizado, melhor. Você pode editar tudo a qualquer momento: foto, WhatsApp, valor da sessão, bio e especialidades.',
+    steps: [
+      {e:'🔗', t:'Acesse a página de perfil', s:'Use o link "Editar meu perfil" aqui neste guia ou vá direto para perfil.html.'},
+      {e:'📧', t:'Entre com seu e-mail', s:'O mesmo e-mail que você usou quando se cadastrou na rede. Sem senha.'},
+      {e:'✏️', t:'Edite o que quiser', s:'Foto, WhatsApp, valor da sessão, sua bio, especialidades, disponibilidade — tudo editável.'},
+      {e:'💾', t:'Salve as mudanças', s:'Clique em salvar e as alterações aparecem no diretório na hora, sem precisar esperar aprovação.'},
+    ]
+  },
 ];
 
-let fInit = false;
 function initFluxos() {
-  if (fInit) return; fInit = true;
   const tabs = document.getElementById('ftabs');
+  if (!tabs) return;
   tabs.innerHTML = FLUXOS.map((f,i) =>
-    `<button class="topbar-btn" id="ftab${i}" onclick="drawFluxo(${i})" style="border-color:${f.cor};color:${f.cor};">${f.label}</button>`
+    `<button id="ftab${i}" onclick="drawFluxo(${i})" style="padding:7px 16px;border-radius:999px;border:1.5px solid ${f.cor};color:${f.cor};background:white;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;">${f.label}</button>`
   ).join('');
   drawFluxo(0);
 }
+
 function drawFluxo(i) {
   const f = FLUXOS[i];
-  document.querySelectorAll('[id^="ftab"]').forEach((b,j) => {
-    b.style.background = j===i ? FLUXOS[j].cor : 'white';
-    b.style.color = j===i ? '#fff' : FLUXOS[j].cor;
-    b.style.borderColor = FLUXOS[j].cor;
+  // Atualizar botões
+  FLUXOS.forEach((fl, j) => {
+    const b = document.getElementById('ftab' + j);
+    if (!b) return;
+    b.style.background = j === i ? fl.cor : 'white';
+    b.style.color = j === i ? '#fff' : fl.cor;
+    b.style.borderColor = fl.cor;
   });
+  // Header do card
   document.getElementById('ftitle').textContent = f.title;
   document.getElementById('fdesc').textContent = f.desc;
   document.getElementById('fcard').style.borderLeftColor = f.cor;
-  document.getElementById('fsteps').innerHTML = f.steps.map((s,j) =>
-    `<div class="flow-step${j===f.steps.length-1?' last':''}">
-      <div class="fse">${s.e}</div>
-      <div class="fst">${s.t}</div>
-      <div class="fss">${s.s}</div>
-    </div>${j < f.steps.length-1 ? `<div class="flow-arrow" style="color:${f.cor}">›</div>` : ''}`
-  ).join('');
+  // Passos em cards verticais com descrição
+  document.getElementById('fsteps').innerHTML = f.steps.map((s, j) => `
+    <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:50%;background:${f.cor};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">${s.e}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;">Passo ${j+1} — ${s.t}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.65;">${s.s}</div>
+      </div>
+    </div>
+  `).join('');
 }
 </script>
 </body>
