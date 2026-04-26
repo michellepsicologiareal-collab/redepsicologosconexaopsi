@@ -515,12 +515,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="step-arrow">INSERT em <span class="step-code">meet_requests</span> · status = pendente · WA para destinatário</div>
         <div class="step-item" style="border-color:rgba(200,147,74,.3);background:var(--gold-pale);">
           <div class="step-num" style="background:var(--gold);color:#fff">3</div>
-          <div><div class="step-main" style="color:var(--gold)">Destinatário vê na aba Meets</div><div class="step-sub">Aceitar → abre WA do solicitante · Recusar → status atualizado</div></div>
+          <div><div class="step-main" style="color:var(--gold)">⚠️ Admin aprova ou recusa</div><div class="step-sub">Todos os meets ficam pendentes até aprovação da admin master · Admin vê na aba Meets</div></div>
         </div>
-        <div class="step-arrow">se tipo = encaminhamento_paciente</div>
+        <div class="step-arrow">✅ Aceitar → encaminhamento criado automaticamente + WA para solicitante</div>
         <div class="step-item" style="border-color:rgba(39,174,96,.3);background:var(--green-pale);">
           <div class="step-num" style="background:var(--green)">4</div>
-          <div><div class="step-main">Admin converte em encaminhamento formal</div><div class="step-sub">Botão "Registrar encaminhamento" no admin</div></div>
+          <div><div class="step-main">Encaminhamento formal criado automaticamente</div><div class="step-sub">INSERT em encaminhamentos_cruzados · status = disponivel · WA automático para o solicitante</div></div>
         </div>
       </div>
     </div>
@@ -601,6 +601,61 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 <div class="divider"></div>
 
 <!-- ══════════════════════════════ -->
+<!--  FLUXO C — PACIENTES EXTERNOS -->
+<!-- ══════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#f8f0ff;">🧑‍⚕️</div>
+    <div>
+      <div class="sec-title" style="color:#8e44ad;">4 — Fluxo C · Pacientes Externos</div>
+      <div class="sec-desc">indicacao_paciente.html → admin.html (Encaminhamentos) — paciente pede indicação, admin encaminha para psi premium</div>
+    </div>
+    <span class="sec-badge" style="background:#f8f0ff;color:#8e44ad;border:1px solid rgba(142,68,173,.2);">Admin intermediado · Premium</span>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:#8e44ad;">📋 Jornada do paciente externo</div>
+    <div class="pipeline">
+      <div class="pipe-node" style="border-left:3px solid #8e44ad;">
+        <div class="pipe-emoji">🌐</div>
+        <div class="pipe-title">Paciente preenche formulário</div>
+        <div class="pipe-sub">indicacao_paciente.html · Nome, WA, demanda, formato, cidade, urgência, obs</div>
+        <span class="pipe-tag" style="background:#f8f0ff;color:#8e44ad;">INSERT pacientes_externos · status = aguardando</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-left:3px solid var(--gold);background:var(--gold-pale);">
+        <div class="pipe-emoji">👑</div>
+        <div class="pipe-title">Admin vê e entra em contato</div>
+        <div class="pipe-sub">Admin.html → aba Encaminhamentos → seção Pacientes Externos · Filtra por status · Botão WA direto</div>
+        <span class="pipe-tag" style="background:var(--gold-pale);color:var(--gold);">status = em_contato</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-left:3px solid #8e44ad;">
+        <div class="pipe-emoji">🧠✨</div>
+        <div class="pipe-title">Admin vincula psi premium</div>
+        <div class="pipe-sub">Dropdown com todas as psis aprovadas · Salva nome e CRP no registro</div>
+        <span class="pipe-tag" style="background:#f8f0ff;color:#8e44ad;">psi_encaminhado + psi_encaminhado_crp</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-left:3px solid var(--green);background:var(--green-pale);">
+        <div class="pipe-emoji">📲</div>
+        <div class="pipe-title">WA automático para a psi</div>
+        <div class="pipe-sub">Sistema abre WA da psi com todos os dados do paciente: nome, WA, demanda, formato, cidade, urgência, obs</div>
+        <span class="pipe-tag" style="background:var(--green-pale);color:var(--green);">WA automático · status = em_contato</span>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-left:3px solid var(--green);background:var(--green-pale);">
+        <div class="pipe-emoji">✅</div>
+        <div class="pipe-title">Admin conclui</div>
+        <div class="pipe-sub">Botão "Concluir" no card · Registro arquivado</div>
+        <span class="pipe-tag" style="background:var(--green-pale);color:var(--green);">status = concluido</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════ -->
 <!--  6 — BANCO DE DADOS           -->
 <!-- ══════════════════════════════ -->
 <div class="section">
@@ -642,6 +697,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="db-desc">Analytics do diretório público. Registra visitas por psi premium.</div>
       <div class="db-who">divulgacao.html</div>
     </div>
+    <div class="db-card" style="border-left-color:#8e44ad;">
+      <div class="db-name" style="color:#8e44ad;">pacientes_externos</div>
+      <div class="db-desc">Pacientes que chegam pelo formulário público pedindo indicação de psi. Admin gerencia e encaminha para psi premium. WA automático ao vincular psi.</div>
+      <div class="db-who">indicacao_paciente.html → Admin (Encaminhamentos)</div>
+    </div>
   </div>
 </div>
 
@@ -680,9 +740,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       </tr>
       <tr>
         <td>🔄 <strong>Encaminhamentos</strong></td>
-        <td>Casos PsiMed + meets pendentes</td>
-        <td>Liberar para profissionais · Registrar desfecho · Converter meet em encaminhamento</td>
-        <td>Profissional indica caso / solicita meet</td>
+        <td>Casos PsiMed + meets pendentes + pacientes externos aguardando psi</td>
+        <td>Liberar para profissionais · Registrar desfecho · Aprovar/recusar meet (cria enc. automático) · Vincular psi premium a paciente externo (WA automático)</td>
+        <td>Profissional solicita meet · Paciente preenche formulário público</td>
       </tr>
       <tr>
         <td>✨ <strong>Premium</strong></td>
@@ -703,7 +763,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 </div><!-- /page -->
 
 <div class="footer">
-  Conexão Psi · Mapa de sistema · Versão Abril 2026 · Admin view only
+  Conexão Psi · Mapa de sistema · Versão Abril 2026 v2 · Admin view only · Atualizado: Fluxo C (Pacientes Externos) + Meets com aprovação admin
 </div>
 
 <script>
