@@ -1646,21 +1646,29 @@ async function carregarPacExtAdmin() {
         ? `<div style="margin-top:8px;padding:8px 10px;background:#f8f0ff;border:1px solid #e8d5ff;border-radius:8px;font-size:12px;color:#6c3483;">
             🧠 <strong>Psi encaminhada:</strong> ${p.psi_encaminhado}${p.psi_encaminhado_crp ? ` · CRP: ${p.psi_encaminhado_crp}` : ''}
            </div>` : '';
-      const psiOptions = (todosPsis||[])
-        .filter(x=>(x.status||'').toLowerCase()==='aprovado')
-        .sort((a,b)=>(a.nome||'').localeCompare(b.nome||''))
+      // Apenas psis premium aprovadas
+      const psisPremium = (todosPsis||[])
+        .filter(x=>(x.status||'').toLowerCase()==='aprovado' && x.premium)
+        .sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+      const psiOptions = psisPremium
         .map(x=>`<option value="${x.nome}|${x.crp||''}">${x.nome}${x.crp?' ('+x.crp+')':''}</option>`)
         .join('');
       const encForm = p.status !== 'concluido' ? `
-        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
-          <div style="flex:1;min-width:160px;">
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;">Encaminhar para psi</label>
-            <select id="psi-sel-${p.id}" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;">
-              <option value="">Selecionar psicóloga...</option>
-              ${psiOptions}
-            </select>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+          <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px;">✨ Encaminhar para psi premium</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;">
+            <div style="flex:1;min-width:200px;position:relative;">
+              <input type="text" id="psi-busca-${p.id}" placeholder="Digite o nome da psi..." autocomplete="off"
+                oninput="filtrarPsiDropdown('${p.id}')"
+                onfocus="document.getElementById('psi-lista-${p.id}').style.display='block'"
+                style="width:100%;padding:7px 10px;border:1.5px solid #c39bd3;border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;outline:none;">
+              <div id="psi-lista-${p.id}" style="display:none;position:absolute;z-index:99;width:100%;max-height:180px;overflow-y:auto;background:white;border:1.5px solid #c39bd3;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.1);">
+                ${psisPremium.map(x=>`<div onclick="selecionarPsi('${p.id}','${x.nome.replace(/'/g,"\\'")}','${(x.crp||'').replace(/'/g,"\\'")}','${(x.whatsapp||'').replace(/'/g,"\\'")}')" style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f0e8ff;" onmouseover="this.style.background='#f8f0ff'" onmouseout="this.style.background='white'">${x.nome}${x.crp?' <span style=\"color:#9b59b6;font-size:11px;\">('+x.crp+')</span>':''}</div>`).join('')}
+              </div>
+              <input type="hidden" id="psi-sel-${p.id}" value="">
+            </div>
+            <button onclick="salvarPsiExterno('${p.id}')" style="padding:7px 14px;background:#8e44ad;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">💾 Salvar</button>
           </div>
-          <button onclick="salvarPsiExterno('${p.id}')" style="padding:7px 14px;background:#8e44ad;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">💾 Salvar</button>
         </div>` : '';
       return `<div style="background:white;border:1px solid var(--border);border-left:3px solid #8e44ad;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
         <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
@@ -1706,14 +1714,39 @@ async function marcarPacExtConcluido(id) {
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
 
+function filtrarPsiDropdown(id) {
+  const busca = (document.getElementById(`psi-busca-${id}`)?.value || '').toLowerCase();
+  const lista = document.getElementById(`psi-lista-${id}`);
+  if (!lista) return;
+  lista.style.display = 'block';
+  lista.querySelectorAll('div').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(busca) ? 'block' : 'none';
+  });
+}
+
+function selecionarPsi(id, nome, crp, wa) {
+  const input = document.getElementById(`psi-busca-${id}`);
+  const hidden = document.getElementById(`psi-sel-${id}`);
+  const lista = document.getElementById(`psi-lista-${id}`);
+  if (input) input.value = nome + (crp ? ` (${crp})` : '');
+  if (hidden) hidden.value = `${nome}|${crp}|${wa}`;
+  if (lista) lista.style.display = 'none';
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('[id^="psi-busca-"]') && !e.target.closest('[id^="psi-lista-"]')) {
+    document.querySelectorAll('[id^="psi-lista-"]').forEach(el => el.style.display = 'none');
+  }
+});
+
 async function salvarPsiExterno(id) {
   const sel = document.getElementById(`psi-sel-${id}`);
-  if (!sel || !sel.value) { toast('Selecione uma psicóloga primeiro.','err'); return; }
-  const [nomePsi, crp] = sel.value.split('|');
-
-  // Buscar WhatsApp da psi selecionada
-  const psiObj = (todosPsis||[]).find(x => x.nome === nomePsi);
-  const waPsi = (psiObj?.whatsapp||'').replace(/\D/g,'');
+  if (!sel || !sel.value) { toast('Digite e selecione uma psicóloga primeiro.','err'); return; }
+  const parts = sel.value.split('|');
+  const nomePsi = parts[0];
+  const crp = parts[1] || '';
+  const waPsi = (parts[2] || '').replace(/\D/g,'');
 
   // Buscar dados do paciente
   const pacs = await api('GET', `pacientes_externos?id=eq.${id}&select=*&limit=1`) || [];
