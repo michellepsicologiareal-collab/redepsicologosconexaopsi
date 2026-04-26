@@ -1642,23 +1642,47 @@ async function carregarPacExtAdmin() {
       const msgWA = encodeURIComponent(`Olá ${p.nome?.split(' ')[0]}! 💜 Sou da Conexão Psi. Recebi sua solicitação de indicação de psicólogo. Podemos conversar agora?`);
       const badge = statusBadge[p.status] || 'background:#f4f4f4;color:#666;border:1px solid #ddd;';
       const label = statusLabel[p.status] || p.status || '—';
-      return `<div style="background:white;border:1px solid var(--border);border-left:3px solid #8e44ad;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
-        <div style="flex:1;min-width:180px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <div style="font-weight:700;font-size:13px;color:var(--plum);">👤 ${p.nome||'—'}</div>
-            <span style="font-size:11px;padding:2px 8px;border-radius:20px;${badge}">${label}</span>
+      const psiInfo = p.psi_encaminhado
+        ? `<div style="margin-top:8px;padding:8px 10px;background:#f8f0ff;border:1px solid #e8d5ff;border-radius:8px;font-size:12px;color:#6c3483;">
+            🧠 <strong>Psi encaminhada:</strong> ${p.psi_encaminhado}${p.psi_encaminhado_crp ? ` · CRP: ${p.psi_encaminhado_crp}` : ''}
+           </div>` : '';
+      const psiOptions = (todosPsis||[])
+        .filter(x=>(x.status||'').toLowerCase()==='aprovado')
+        .sort((a,b)=>(a.nome||'').localeCompare(b.nome||''))
+        .map(x=>`<option value="${x.nome}|${x.crp||''}">${x.nome}${x.crp?' ('+x.crp+')':''}</option>`)
+        .join('');
+      const encForm = p.status !== 'concluido' ? `
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="flex:1;min-width:160px;">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;">Encaminhar para psi</label>
+            <select id="psi-sel-${p.id}" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;">
+              <option value="">Selecionar psicóloga...</option>
+              ${psiOptions}
+            </select>
           </div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-            🎯 ${p.foco||'—'} &nbsp;·&nbsp; 🖥️ ${p.formato||'—'} &nbsp;·&nbsp; 📍 ${p.cidade||'—'}<br>
-            ${urgEmoji[p.urgencia]||'❓'} ${p.urgencia||'—'} &nbsp;·&nbsp; 📅 ${dt}
-            ${p.obs ? `<br>📝 ${p.obs}` : ''}
+          <button onclick="salvarPsiExterno('${p.id}')" style="padding:7px 14px;background:#8e44ad;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">💾 Salvar</button>
+        </div>` : '';
+      return `<div style="background:white;border:1px solid var(--border);border-left:3px solid #8e44ad;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <div style="font-weight:700;font-size:13px;color:var(--plum);">👤 ${p.nome||'—'}</div>
+              <span style="font-size:11px;padding:2px 8px;border-radius:20px;${badge}">${label}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+              🎯 ${p.foco||'—'} &nbsp;·&nbsp; 🖥️ ${p.formato||'—'} &nbsp;·&nbsp; 📍 ${p.cidade||'—'}<br>
+              ${urgEmoji[p.urgencia]||'❓'} ${p.urgencia||'—'} &nbsp;·&nbsp; 📅 ${dt}
+              ${p.obs ? `<br>📝 ${p.obs}` : ''}
+            </div>
+            ${psiInfo}
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            ${wa ? `<a href="https://wa.me/55${wa}?text=${msgWA}" target="_blank" style="padding:7px 14px;background:#25D366;color:white;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WA</a>` : ''}
+            ${p.status !== 'em_contato' && p.status !== 'concluido' ? `<button onclick="marcarPacExtContatado('${p.id}')" style="padding:7px 12px;background:#eaf4fc;color:#2980b9;border:1px solid #aed6f1;border-radius:8px;font-size:12px;cursor:pointer;">Em contato</button>` : ''}
+            ${p.status === 'em_contato' ? `<button onclick="marcarPacExtConcluido('${p.id}')" style="padding:7px 12px;background:#eafaf1;color:#27ae60;border:1px solid #a9dfbf;border-radius:8px;font-size:12px;cursor:pointer;">✅ Concluir</button>` : ''}
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          ${wa ? `<a href="https://wa.me/55${wa}?text=${msgWA}" target="_blank" style="padding:7px 14px;background:#25D366;color:white;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WA</a>` : ''}
-          ${p.status !== 'em_contato' && p.status !== 'concluido' ? `<button onclick="marcarPacExtContatado('${p.id}')" style="padding:7px 12px;background:#eaf4fc;color:#2980b9;border:1px solid #aed6f1;border-radius:8px;font-size:12px;cursor:pointer;">Em contato</button>` : ''}
-          ${p.status === 'em_contato' ? `<button onclick="marcarPacExtConcluido('${p.id}')" style="padding:7px 12px;background:#eafaf1;color:#27ae60;border:1px solid #a9dfbf;border-radius:8px;font-size:12px;cursor:pointer;">✅ Concluir</button>` : ''}
-        </div>
+        ${encForm}
       </div>`;
     }).join('');
   } catch(e) {
@@ -1678,6 +1702,51 @@ async function marcarPacExtConcluido(id) {
   try {
     await api('PATCH', `pacientes_externos?id=eq.${id}`, {status:'concluido'});
     toast('✅ Marcado como concluído!','ok');
+    carregarPacExtAdmin();
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+
+async function salvarPsiExterno(id) {
+  const sel = document.getElementById(`psi-sel-${id}`);
+  if (!sel || !sel.value) { toast('Selecione uma psicóloga primeiro.','err'); return; }
+  const [nomePsi, crp] = sel.value.split('|');
+
+  // Buscar WhatsApp da psi selecionada
+  const psiObj = (todosPsis||[]).find(x => x.nome === nomePsi);
+  const waPsi = (psiObj?.whatsapp||'').replace(/\D/g,'');
+
+  // Buscar dados do paciente
+  const pacs = await api('GET', `pacientes_externos?id=eq.${id}&select=*&limit=1`) || [];
+  const pac = pacs[0];
+
+  try {
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, {
+      psi_encaminhado: nomePsi,
+      psi_encaminhado_crp: crp || null,
+      status: 'em_contato'
+    });
+    toast('💜 Psi encaminhada salva!','ok');
+
+    // Abrir WA para a psi automaticamente
+    if (waPsi && pac) {
+      const primeiroNome = (pac.nome||'').split(' ')[0];
+      const msg = encodeURIComponent(
+        `💜 *Conexão Psi — Novo Paciente Encaminhado*\n\n` +
+        `Olá! Tenho um paciente para você:\n\n` +
+        `👤 *Nome:* ${pac.nome||'—'}\n` +
+        `📱 *WhatsApp:* ${pac.whatsapp ? '55'+pac.whatsapp : 'não informado'}\n` +
+        `🎯 *Demanda:* ${pac.foco||'—'}\n` +
+        `🖥️ *Formato:* ${pac.formato||'—'}\n` +
+        `📍 *Cidade:* ${pac.cidade||'—'}\n` +
+        `🕐 *Urgência:* ${pac.urgencia||'—'}\n` +
+        `${pac.obs ? `📝 *Obs:* ${pac.obs}\n` : ''}\n` +
+        `Por favor entre em contato com o paciente assim que possível. 🙏`
+      );
+      window.open(`https://wa.me/55${waPsi}?text=${msg}`, '_blank');
+    } else if (!waPsi) {
+      toast('⚠️ Psi salva, mas WhatsApp não encontrado — notifique manualmente.','err');
+    }
+
     carregarPacExtAdmin();
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
@@ -2020,9 +2089,38 @@ function renderMeetsAdmin() {
 async function aceitarMeetAdmin(id) {
   try {
     await api('PATCH',`meet_requests?id=eq.${id}`,{status:'aceito'});
-    const m = todosMeets.find(x=>x.id===id); if(m) m.status='aceito';
+    const m = todosMeets.find(x=>x.id===id);
+    if(m) m.status='aceito';
+
+    // Criar encaminhamento formal automaticamente
+    const encData = {
+      indicado_por: m.solicitante_nome || '—',
+      crp_ou_registro: m.solicitante_registro || '',
+      contato_indicador: m.solicitante_wa || '',
+      tipo_buscado: m.tipo || 'outro',
+      demanda: m.mensagem || '',
+      dados_caso: m.dados_caso || m.disponibilidade || '',
+      status: 'disponivel'
+    };
+    await api('POST','encaminhamentos_cruzados', encData);
+
+    // Notificar solicitante via WA
+    const waSol = (m.solicitante_wa||'').replace(/\D/g,'');
+    if (waSol) {
+      const tipoLabel = MEET_TIPO_LABEL[m.tipo] || m.tipo || 'meet';
+      const msg = encodeURIComponent(
+        `✅ *Conexão Psi — Meet Aprovado!*\n\n` +
+        `Olá ${m.solicitante_nome?.split(' ')[0]||''}! Seu meet foi aprovado pela admin.\n\n` +
+        `📋 *Tipo:* ${tipoLabel}\n` +
+        `👤 *Para:* ${m.destinatario_nome||'—'}\n` +
+        `${m.mensagem ? `💬 *Mensagem:* ${m.mensagem}\n` : ''}\n` +
+        `Um encaminhamento formal foi criado no sistema. 💜`
+      );
+      window.open(`https://wa.me/55${waSol}?text=${msg}`,'_blank');
+    }
+
     renderMeetsAdmin(); carregarMeetsAdmin();
-    toast('✅ Meet aceito!');
+    toast('✅ Meet aceito e encaminhamento criado!','ok');
   } catch(e){ toast('Erro: '+e.message,'err'); }
 }
 
