@@ -495,9 +495,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink);
   </div>
   <div id="enc-lista"></div>
 
-  <!-- Pacientes externos aguardando -->
+  <!-- Pacientes externos -->
   <div style="margin-top:24px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8e44ad;margin-bottom:12px;padding-top:16px;border-top:1px solid var(--border);">🧑‍⚕️ PACIENTES EXTERNOS AGUARDANDO</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8e44ad;">🧑‍⚕️ PACIENTES EXTERNOS</div>
+      <select id="filtro-pac-ext" onchange="carregarPacExtAdmin()" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;cursor:pointer;">
+        <option value="todos">Todos</option>
+        <option value="aguardando" selected>Aguardando</option>
+        <option value="em_contato">Em contato</option>
+        <option value="concluido">Concluído</option>
+      </select>
+    </div>
     <div id="enc-pacientes-ext-lista"><div class="empty-state" style="font-size:13px;">Carregando...</div></div>
   </div>
 </div>
@@ -1612,19 +1620,34 @@ async function carregarPacExtAdmin() {
   const el = document.getElementById('enc-pacientes-ext-lista');
   if (!el) return;
   try {
-    const pacs = await api('GET','pacientes_externos?status=eq.aguardando&order=created_at.desc&limit=50') || [];
+    const filtro = document.getElementById('filtro-pac-ext')?.value || 'todos';
+    const query = filtro === 'todos'
+      ? 'pacientes_externos?order=created_at.desc&limit=100'
+      : `pacientes_externos?status=eq.${filtro}&order=created_at.desc&limit=100`;
+    const pacs = await api('GET', query) || [];
     if (!pacs.length) {
-      el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0;">Nenhum paciente externo aguardando. ✨</div>';
+      el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0;">Nenhum paciente externo encontrado. ✨</div>';
       return;
     }
     const urgEmoji = {baixa:'🌱',media:'🕐',alta:'🔴'};
+    const statusBadge = {
+      aguardando: 'background:#fff8e1;color:#f39c12;border:1px solid #f9e4a0;',
+      em_contato: 'background:#eaf4fc;color:#2980b9;border:1px solid #aed6f1;',
+      concluido:  'background:#eafaf1;color:#27ae60;border:1px solid #a9dfbf;',
+    };
+    const statusLabel = {aguardando:'⏳ Aguardando', em_contato:'💬 Em contato', concluido:'✅ Concluído'};
     el.innerHTML = pacs.map(p => {
       const dt = new Date(p.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
       const wa = (p.whatsapp||'').replace(/\D/g,'');
       const msgWA = encodeURIComponent(`Olá ${p.nome?.split(' ')[0]}! 💜 Sou da Conexão Psi. Recebi sua solicitação de indicação de psicólogo. Podemos conversar agora?`);
+      const badge = statusBadge[p.status] || 'background:#f4f4f4;color:#666;border:1px solid #ddd;';
+      const label = statusLabel[p.status] || p.status || '—';
       return `<div style="background:white;border:1px solid var(--border);border-left:3px solid #8e44ad;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
         <div style="flex:1;min-width:180px;">
-          <div style="font-weight:700;font-size:13px;color:var(--plum);margin-bottom:4px;">👤 ${p.nome||'—'}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="font-weight:700;font-size:13px;color:var(--plum);">👤 ${p.nome||'—'}</div>
+            <span style="font-size:11px;padding:2px 8px;border-radius:20px;${badge}">${label}</span>
+          </div>
           <div style="font-size:12px;color:var(--muted);line-height:1.7;">
             🎯 ${p.foco||'—'} &nbsp;·&nbsp; 🖥️ ${p.formato||'—'} &nbsp;·&nbsp; 📍 ${p.cidade||'—'}<br>
             ${urgEmoji[p.urgencia]||'❓'} ${p.urgencia||'—'} &nbsp;·&nbsp; 📅 ${dt}
@@ -1633,7 +1656,8 @@ async function carregarPacExtAdmin() {
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
           ${wa ? `<a href="https://wa.me/55${wa}?text=${msgWA}" target="_blank" style="padding:7px 14px;background:#25D366;color:white;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WA</a>` : ''}
-          <button onclick="marcarPacExtContatado('${p.id}')" style="padding:7px 12px;background:#eaf4fc;color:#2980b9;border:1px solid #aed6f1;border-radius:8px;font-size:12px;cursor:pointer;">Em contato</button>
+          ${p.status !== 'em_contato' && p.status !== 'concluido' ? `<button onclick="marcarPacExtContatado('${p.id}')" style="padding:7px 12px;background:#eaf4fc;color:#2980b9;border:1px solid #aed6f1;border-radius:8px;font-size:12px;cursor:pointer;">Em contato</button>` : ''}
+          ${p.status === 'em_contato' ? `<button onclick="marcarPacExtConcluido('${p.id}')" style="padding:7px 12px;background:#eafaf1;color:#27ae60;border:1px solid #a9dfbf;border-radius:8px;font-size:12px;cursor:pointer;">✅ Concluir</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -1646,6 +1670,14 @@ async function marcarPacExtContatado(id) {
   try {
     await api('PATCH', `pacientes_externos?id=eq.${id}`, {status:'em_contato'});
     toast('💬 Marcado como em contato!','ok');
+    carregarPacExtAdmin();
+  } catch(e) { toast('Erro: '+e.message,'err'); }
+}
+
+async function marcarPacExtConcluido(id) {
+  try {
+    await api('PATCH', `pacientes_externos?id=eq.${id}`, {status:'concluido'});
+    toast('✅ Marcado como concluído!','ok');
     carregarPacExtAdmin();
   } catch(e) { toast('Erro: '+e.message,'err'); }
 }
